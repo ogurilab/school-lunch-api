@@ -1,10 +1,11 @@
 DB_URL=mysql://user:password@localhost:3306/school_lunch
+
 DOCKER_COMPOSE=docker compose
 
 dev:
 	$(DOCKER_COMPOSE) -f docker-compose.dev.yaml up -d
 
-stop-dev:
+dev_stop:
 	$(DOCKER_COMPOSE) -f docker-compose.dev.yaml down
 
 start:
@@ -13,7 +14,7 @@ start:
 prod:
 	$(DOCKER_COMPOSE) -f docker-compose.yaml up -d
 
-stop-prod:
+prod_stop:
 	$(DOCKER_COMPOSE) -f docker-compose.yaml down
 
 migrateup:
@@ -32,4 +33,4 @@ test:
 	go test -v -short -cover ./...
 
 
-.PHONY: dev stop-dev start prod migrateup migratedown new_migration sqlc test
+.PHONY: dev dev_stop start prod prod_stop migrateup migratedown new_migration sqlc test
