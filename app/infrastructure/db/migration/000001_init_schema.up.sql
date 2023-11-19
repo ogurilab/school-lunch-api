@@ -30,8 +30,8 @@ CREATE TABLE `allergens` (
 
 CREATE TABLE `dishes_allergens` (
   `allergen_id` SMALLINT NOT NULL,
-  `dishe_id` varchar(255) NOT NULL,
-  PRIMARY KEY (`dishe_id`, `allergen_id`)
+  `dish_id` varchar(255) NOT NULL,
+  PRIMARY KEY (`dish_id`, `allergen_id`)
 );
 
 CREATE INDEX `menus_index_0` ON `menus` (`region_id`);
@@ -41,3 +41,6 @@ CREATE UNIQUE INDEX `menus_index_1` ON `menus` (`region_id`, `offered_at`);
 CREATE INDEX `dishes_index_2` ON `dishes` (`menu_id`);
 
 CREATE INDEX `dishes_index_3` ON `dishes` (`name`);
+
+INSERT INTO `regions` (`id`, `name`)
+VALUES (1, '半田市');
