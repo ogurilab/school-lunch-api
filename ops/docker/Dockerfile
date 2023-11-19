@@ -4,15 +4,13 @@ WORKDIR /app
 COPY . .
 RUN go build -o main app/cmd/main.go
 
-
 FROM alpine:3.18
 WORKDIR /app
+
 COPY --from=builder /app/main .
-COPY .env .
-COPY run.sh .
-COPY wait-for.sh .
-RUN chmod +x run.sh
-RUN chmod +x wait-for.sh
+COPY app/.env .
+COPY ops/scripts/*.sh .
+RUN chmod +x *.sh
 
 EXPOSE 8080
 CMD [ "/app/main" ]
