@@ -1,7 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"github.com/ogurilab/school-lunch-api/bootstrap"
+	"github.com/ogurilab/school-lunch-api/server"
+)
 
 func main() {
-	fmt.Println("Run main.go")
+	app := bootstrap.NewApp("../")
+	env := app.Env
+
+	server.Run(env)
+
 }
