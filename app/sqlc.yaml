@@ -1,15 +1,12 @@
 version: '2'
 sql:
-  - schema: './db/migration/'
-    queries: './db/query/'
+  - schema: './infrastructure/db/migration'
+    queries: './infrastructure/db/query'
     engine: 'mysql'
     gen:
       go:
         package: 'db'
-        out: './db/sqlc/'
+        out: './infrastructure/db/sqlc'
         emit_json_tags: true
         emit_empty_slices: true
         emit_interface: true
-        overrides:
-          - go_type: 'time.Time'
-            db_type: 'timestamptz'
