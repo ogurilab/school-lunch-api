@@ -21,7 +21,7 @@ services:
     ports:
       - 8080:8080
     environment:
-      DB_SOURCE: mysql://user:password@localhost:3306/school_lunch
+      DB_SOURCE: 'user:password@tcp(mysql:3306)/school_lunch?charset=parseTime=True'
     entrypoint: ['/app/wait-for.sh', 'mysql:3306', '--', '/app/run.sh']
     command: ['/app/main']
     depends_on:
