@@ -1,6 +1,8 @@
 package bootstrap
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+)
 
 type Env struct {
 	ENVIRONMENT    string `mapstructure:"ENVIRONMENT"`
@@ -12,7 +14,9 @@ type Env struct {
 
 func NewEnv(path string) (env Env, err error) {
 	viper.AddConfigPath(path)
-	viper.SetConfigFile(".env")
+
+	viper.SetConfigType("env")
+	viper.SetConfigName(".env")
 
 	viper.AutomaticEnv()
 
