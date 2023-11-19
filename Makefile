@@ -1,5 +1,5 @@
 DB_URL=mysql://user:password@localhost:3306/school_lunch
-
+APP_PATH=app
 DOCKER_COMPOSE=docker compose
 
 dev:
@@ -9,7 +9,7 @@ dev_stop:
 	$(DOCKER_COMPOSE) -f docker-compose.dev.yaml down
 
 start:
-	go run cmd/main.go
+	cd $(APP_PATH) && go run cmd/main.go
 
 prod:
 	$(DOCKER_COMPOSE) -f docker-compose.yaml up -d
@@ -30,7 +30,7 @@ sqlc:
 	sqlc generate
 
 test:
-	go test -v -short -cover ./...
+	cd ${APP_PATH} &&	go test -v -short -cover ./...
 
 
 .PHONY: dev dev_stop start prod prod_stop migrateup migratedown new_migration sqlc test
