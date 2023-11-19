@@ -37,6 +37,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
+          cache: true
+          cache-dependency-path: app/go.sum
           go-version: '1.21'
 
       - name: Install golang-migrate
@@ -47,7 +49,7 @@ jobs:
 
       - name: Set up environment variables
         run: |
-          cp .env.example .env
+          cp app/.env.example app/.env
 
       - name: Run migrations
         run: make migrateup
