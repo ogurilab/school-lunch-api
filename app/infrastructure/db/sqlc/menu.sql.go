@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"time"
 )
 
@@ -17,12 +16,10 @@ INSERT INTO menus (
     offered_at,
     region_id,
     photo_url,
-    wikimedia_commons_url,
     elementary_school_calories,
     junior_high_school_calories
   )
 VALUES (
-    ?,
     ?,
     ?,
     ?,
@@ -33,13 +30,12 @@ VALUES (
 `
 
 type CreateMenuParams struct {
-	ID                       string         `json:"id"`
-	OfferedAt                time.Time      `json:"offered_at"`
-	RegionID                 int32          `json:"region_id"`
-	PhotoUrl                 sql.NullString `json:"photo_url"`
-	WikimediaCommonsUrl      sql.NullString `json:"wikimedia_commons_url"`
-	ElementarySchoolCalories sql.NullInt32  `json:"elementary_school_calories"`
-	JuniorHighSchoolCalories sql.NullInt32  `json:"junior_high_school_calories"`
+	ID                       string    `json:"id"`
+	OfferedAt                time.Time `json:"offered_at"`
+	RegionID                 int32     `json:"region_id"`
+	PhotoUrl                 string    `json:"photo_url"`
+	ElementarySchoolCalories int32     `json:"elementary_school_calories"`
+	JuniorHighSchoolCalories int32     `json:"junior_high_school_calories"`
 }
 
 func (q *Queries) CreateMenu(ctx context.Context, arg CreateMenuParams) error {
@@ -48,7 +44,6 @@ func (q *Queries) CreateMenu(ctx context.Context, arg CreateMenuParams) error {
 		arg.OfferedAt,
 		arg.RegionID,
 		arg.PhotoUrl,
-		arg.WikimediaCommonsUrl,
 		arg.ElementarySchoolCalories,
 		arg.JuniorHighSchoolCalories,
 	)
@@ -56,7 +51,7 @@ func (q *Queries) CreateMenu(ctx context.Context, arg CreateMenuParams) error {
 }
 
 const getMenu = `-- name: GetMenu :one
-SELECT id, offered_at, region_id, photo_url, wikimedia_commons_url, created_at, elementary_school_calories, junior_high_school_calories
+SELECT id, offered_at, region_id, photo_url, created_at, elementary_school_calories, junior_high_school_calories
 FROM menus
 WHERE id = ?
 LIMIT 1
@@ -70,7 +65,6 @@ func (q *Queries) GetMenu(ctx context.Context, id string) (Menu, error) {
 		&i.OfferedAt,
 		&i.RegionID,
 		&i.PhotoUrl,
-		&i.WikimediaCommonsUrl,
 		&i.CreatedAt,
 		&i.ElementarySchoolCalories,
 		&i.JuniorHighSchoolCalories,
@@ -79,7 +73,7 @@ func (q *Queries) GetMenu(ctx context.Context, id string) (Menu, error) {
 }
 
 const listMenus = `-- name: ListMenus :many
-SELECT id, offered_at, region_id, photo_url, wikimedia_commons_url, created_at, elementary_school_calories, junior_high_school_calories
+SELECT id, offered_at, region_id, photo_url, created_at, elementary_school_calories, junior_high_school_calories
 FROM menus
 ORDER BY offered_at
 LIMIT ? OFFSET ?
@@ -104,7 +98,6 @@ func (q *Queries) ListMenus(ctx context.Context, arg ListMenusParams) ([]Menu, e
 			&i.OfferedAt,
 			&i.RegionID,
 			&i.PhotoUrl,
-			&i.WikimediaCommonsUrl,
 			&i.CreatedAt,
 			&i.ElementarySchoolCalories,
 			&i.JuniorHighSchoolCalories,

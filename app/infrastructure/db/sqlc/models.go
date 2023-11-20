@@ -5,7 +5,6 @@
 package db
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -16,10 +15,10 @@ type Allergen struct {
 }
 
 type Dish struct {
-	ID        string         `json:"id"`
-	MenuID    string         `json:"menu_id"`
-	Name      sql.NullString `json:"name"`
-	CreatedAt time.Time      `json:"created_at"`
+	ID        string    `json:"id"`
+	MenuID    string    `json:"menu_id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type DishesAllergen struct {
@@ -30,13 +29,14 @@ type DishesAllergen struct {
 type Menu struct {
 	ID string `json:"id"`
 	// 給食の提供日
-	OfferedAt                time.Time      `json:"offered_at"`
-	RegionID                 int32          `json:"region_id"`
-	PhotoUrl                 sql.NullString `json:"photo_url"`
-	WikimediaCommonsUrl      sql.NullString `json:"wikimedia_commons_url"`
-	CreatedAt                time.Time      `json:"created_at"`
-	ElementarySchoolCalories sql.NullInt32  `json:"elementary_school_calories"`
-	JuniorHighSchoolCalories sql.NullInt32  `json:"junior_high_school_calories"`
+	OfferedAt time.Time `json:"offered_at"`
+	RegionID  int32     `json:"region_id"`
+	PhotoUrl  string    `json:"photo_url"`
+	CreatedAt time.Time `json:"created_at"`
+	// 小学校のカロリー
+	ElementarySchoolCalories int32 `json:"elementary_school_calories"`
+	// 中学校のカロリー
+	JuniorHighSchoolCalories int32 `json:"junior_high_school_calories"`
 }
 
 type Region struct {

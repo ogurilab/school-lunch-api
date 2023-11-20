@@ -4,7 +4,6 @@ INSERT INTO menus (
     offered_at,
     region_id,
     photo_url,
-    wikimedia_commons_url,
     elementary_school_calories,
     junior_high_school_calories
   )
@@ -13,7 +12,6 @@ VALUES (
     sqlc.arg(offered_at),
     sqlc.arg(region_id),
     sqlc.arg(photo_url),
-    sqlc.arg(wikimedia_commons_url),
     sqlc.arg(elementary_school_calories),
     sqlc.arg(junior_high_school_calories)
   );

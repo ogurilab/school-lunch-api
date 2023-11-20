@@ -23,10 +23,9 @@ func TestGetMenu(t *testing.T) {
 	require.Equal(t, menu1.ID, menu2.ID)
 	require.Equal(t, menu1.OfferedAt, menu2.OfferedAt)
 	require.Equal(t, menu1.RegionID, menu2.RegionID)
-	require.Equal(t, menu1.PhotoUrl, menu2.PhotoUrl.String)
-	require.Equal(t, menu1.WikimediaCommonsUrl, menu2.WikimediaCommonsUrl.String)
-	require.Equal(t, menu1.ElementarySchoolCalories, menu2.ElementarySchoolCalories.Int32)
-	require.Equal(t, menu1.JuniorHighSchoolCalories, menu2.JuniorHighSchoolCalories.Int32)
+	require.Equal(t, menu1.PhotoUrl, menu2.PhotoUrl)
+	require.Equal(t, menu1.ElementarySchoolCalories, menu2.ElementarySchoolCalories)
+	require.Equal(t, menu1.JuniorHighSchoolCalories, menu2.JuniorHighSchoolCalories)
 	require.NotEmpty(t, menu2.CreatedAt)
 }
 
@@ -50,10 +49,10 @@ func TestListMenus(t *testing.T) {
 		require.NotEmpty(t, menu.ID)
 		require.NotEmpty(t, menu.OfferedAt)
 		require.NotEmpty(t, menu.RegionID)
-		require.NotEmpty(t, menu.PhotoUrl.String)
-		require.NotEmpty(t, menu.WikimediaCommonsUrl.String)
-		require.NotEmpty(t, menu.ElementarySchoolCalories.Int32)
-		require.NotEmpty(t, menu.JuniorHighSchoolCalories.Int32)
+		require.NotEmpty(t, menu.PhotoUrl)
+
+		require.NotEmpty(t, menu.ElementarySchoolCalories)
+		require.NotEmpty(t, menu.JuniorHighSchoolCalories)
 		require.NotEmpty(t, menu.CreatedAt)
 	}
 
@@ -66,11 +65,9 @@ func createRandomMenu(t *testing.T) *domain.Menu {
 		ID:                       ID,
 		OfferedAt:                util.RandomDate(),
 		RegionID:                 util.RandomInt32(),
-		PhotoUrl:                 util.RandomSqlNullURL(),
-		WikimediaCommonsUrl:      util.RandomSqlNullURL(),
-		ElementarySchoolCalories: util.RandomSqlNullInt32(),
-
-		JuniorHighSchoolCalories: util.RandomSqlNullInt32(),
+		PhotoUrl:                 util.RandomURL(),
+		ElementarySchoolCalories: util.RandomInt32(),
+		JuniorHighSchoolCalories: util.RandomInt32(),
 	}
 
 	err := testQuery.CreateMenu(context.Background(), args)
@@ -86,18 +83,22 @@ func createRandomMenu(t *testing.T) *domain.Menu {
 	require.Equal(t, args.OfferedAt, menu.OfferedAt)
 	require.Equal(t, args.RegionID, menu.RegionID)
 	require.Equal(t, args.PhotoUrl, menu.PhotoUrl)
-	require.Equal(t, args.WikimediaCommonsUrl, menu.WikimediaCommonsUrl)
+
 	require.Equal(t, args.ElementarySchoolCalories, menu.ElementarySchoolCalories)
 	require.Equal(t, args.JuniorHighSchoolCalories, menu.JuniorHighSchoolCalories)
 	require.NotEmpty(t, menu.CreatedAt)
 
-	return domain.NewMenu(
+	result, err := domain.ReNewMenu(
 		menu.ID,
 		menu.OfferedAt,
 		menu.RegionID,
-		menu.PhotoUrl.String,
-		menu.WikimediaCommonsUrl.String,
-		menu.ElementarySchoolCalories.Int32,
-		menu.JuniorHighSchoolCalories.Int32,
+
+		menu.PhotoUrl,
+		menu.ElementarySchoolCalories,
+		menu.JuniorHighSchoolCalories,
 	)
+
+	require.NoError(t, err)
+
+	return result
 }

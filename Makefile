@@ -3,10 +3,10 @@ APP_PATH=app
 DOCKER_COMPOSE=docker compose
 MIGRATION_PATH=infrastructure/db/migration
 
-up_dev:
+up:
 	$(DOCKER_COMPOSE) -f docker-compose.dev.yaml up -d
 
-down_dev:
+down:
 	$(DOCKER_COMPOSE) -f docker-compose.dev.yaml down
 
 start:
@@ -34,4 +34,4 @@ test:
 	cd ${APP_PATH} &&	go test -v -short -cover ./...
 
 
-.PHONY: up_dev down_dev start prod prod_stop migrateup migratedown new_migration sqlc test
+.PHONY: up down start prod prod_stop migrateup migratedown new_migration sqlc test
