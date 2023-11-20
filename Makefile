@@ -1,4 +1,4 @@
-DB_URL=mysql://user:password@tcp(localhost:3306)/school_lunch?parseTime=true
+DB_URL=mysql://user:password@tcp(localhost:3306)/school_lunch?charset=utf8mb4&parseTime=True&loc=Local
 APP_PATH=app
 DOCKER_COMPOSE=docker compose
 MIGRATION_PATH=infrastructure/db/migration
