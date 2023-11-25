@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS `regions`;
-
 DROP TABLE IF EXISTS `menus`;
 
 DROP TABLE IF EXISTS `dishes`;
