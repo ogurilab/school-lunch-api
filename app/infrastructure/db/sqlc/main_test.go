@@ -9,8 +9,12 @@ import (
 
 var testQuery Query
 
-func TestMain(m *testing.M) {
+const (
+	TEST_DB_URL = "root:root@tcp(localhost:3306)/school_lunch_test?charset=utf8mb4&parseTime=True"
+)
 
+func TestMain(m *testing.M) {
+	os.Setenv("DB_SOURCE", TEST_DB_URL)
 	app := bootstrap.NewApp("../../../")
 
 	testQuery = NewQuery(app.DB)
