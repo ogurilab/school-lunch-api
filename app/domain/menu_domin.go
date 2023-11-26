@@ -8,28 +8,47 @@ import (
 )
 
 type Menu struct {
-	ID                       string
-	OfferedAt                time.Time // YYYY-MM-DD
-	RegionID                 int32
-	PhotoUrl                 string
-	ElementarySchoolCalories int32
-	JuniorHighSchoolCalories int32
+	ID                       string    `json:"id"`
+	OfferedAt                time.Time `json:"offered_at"`
+	PhotoUrl                 string    `json:"photo_url"`
+	ElementarySchoolCalories int32     `json:"elementary_school_calories"`
+	JuniorHighSchoolCalories int32     `json:"junior_high_school_calories"`
+}
+
+type MenuWithDishes struct {
+	Menu
+	Dishes []*Dish `json:"dishes"`
 }
 
 type MenuRepository interface {
 	Create(ctx context.Context, menu *Menu) error
-	FindByID(ctx context.Context, id string) (*Menu, error)
+	GetByID(ctx context.Context, id string) (*Menu, error)
+	Fetch(ctx context.Context, limit int32, offset int32) ([]*Menu, error)
+	GetByOfferedAt(ctx context.Context, offeredAt time.Time) (*Menu, error)
+	FetchByOfferedAt(ctx context.Context, offeredAt time.Time, limit int32, offset int32) ([]*Menu, error)
+
+	GetMenuWithDishesByID(ctx context.Context, id string) (*MenuWithDishes, error)
+	GetMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time) (*MenuWithDishes, error)
+	FetchMenuWithDishes(ctx context.Context, limit int32, offset int32) ([]*MenuWithDishes, error)
+	FetchMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time, limit int32, offset int32) ([]*MenuWithDishes, error)
 }
 
 type MenuUsecase interface {
 	Create(ctx context.Context, menu *Menu) error
-	FindByID(ctx context.Context, id string) (*Menu, error)
+	GetByID(ctx context.Context, id string) (*Menu, error)
+	Fetch(ctx context.Context, limit int32, offset int32) ([]*Menu, error)
+	GetByOfferedAt(ctx context.Context, offeredAt time.Time) (*Menu, error)
+	FetchByOfferedAt(ctx context.Context, offeredAt time.Time, limit int32, offset int32) ([]*Menu, error)
+
+	GetMenuWithDishesByID(ctx context.Context, id string) (*MenuWithDishes, error)
+	GetMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time) (*MenuWithDishes, error)
+	FetchMenuWithDishes(ctx context.Context, limit int32, offset int32) ([]*MenuWithDishes, error)
+	FetchMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time, limit int32, offset int32) ([]*MenuWithDishes, error)
 }
 
 func newMenu(
 	id string,
 	offeredAt time.Time,
-	regionID int32,
 	photoUrl string,
 	elementarySchoolCalories int32,
 	juniorHighSchoolCalories int32,
@@ -42,7 +61,6 @@ func newMenu(
 	return &Menu{
 		ID:                       id,
 		OfferedAt:                offeredAt,
-		RegionID:                 regionID,
 		PhotoUrl:                 photoUrl,
 		ElementarySchoolCalories: elementarySchoolCalories,
 		JuniorHighSchoolCalories: juniorHighSchoolCalories,
@@ -52,7 +70,6 @@ func newMenu(
 func ReNewMenu(
 	id string,
 	offeredAt time.Time,
-	regionID int32,
 	photoUrl string,
 	elementarySchoolCalories int32,
 	juniorHighSchoolCalories int32,
@@ -60,7 +77,6 @@ func ReNewMenu(
 	return newMenu(
 		id,
 		offeredAt,
-		regionID,
 		photoUrl,
 		elementarySchoolCalories,
 		juniorHighSchoolCalories,
@@ -69,7 +85,6 @@ func ReNewMenu(
 
 func NewMenu(
 	offeredAt time.Time,
-	regionID int32,
 	photoUrl string,
 	elementarySchoolCalories int32,
 	juniorHighSchoolCalories int32,
@@ -78,7 +93,6 @@ func NewMenu(
 	return newMenu(
 		id,
 		offeredAt,
-		regionID,
 		photoUrl,
 		elementarySchoolCalories,
 		juniorHighSchoolCalories,

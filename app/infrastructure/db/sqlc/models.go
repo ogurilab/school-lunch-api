@@ -30,17 +30,10 @@ type Menu struct {
 	ID string `json:"id"`
 	// 給食の提供日
 	OfferedAt time.Time `json:"offered_at"`
-	RegionID  int32     `json:"region_id"`
 	PhotoUrl  string    `json:"photo_url"`
 	CreatedAt time.Time `json:"created_at"`
 	// 小学校のカロリー
 	ElementarySchoolCalories int32 `json:"elementary_school_calories"`
 	// 中学校のカロリー
 	JuniorHighSchoolCalories int32 `json:"junior_high_school_calories"`
-}
-
-type Region struct {
-	ID        int32     `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
 }
