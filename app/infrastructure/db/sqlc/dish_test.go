@@ -37,7 +37,7 @@ func TestFetchMenuByID(t *testing.T) {
 	dishes, err := testQuery.ListDishes(context.Background(), menu.ID)
 
 	require.NoError(t, err)
-	require.Len(t, dishes, 5)
+	require.Len(t, dishes, 10)
 
 	for _, dish := range dishes {
 		require.NotEmpty(t, dish)

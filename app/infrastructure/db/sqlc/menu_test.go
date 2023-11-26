@@ -32,7 +32,7 @@ func TestGetMenu(t *testing.T) {
 	require.NotEmpty(t, menu2.CreatedAt)
 }
 
-func TestListMenus(t *testing.T) {
+func TestFetchMenus(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		createRandomMenu(t)
 	}
@@ -74,7 +74,7 @@ func TestGetMenuByOfferedAt(t *testing.T) {
 	require.NotEmpty(t, result.CreatedAt)
 }
 
-func TestListMenusByOfferedAt(t *testing.T) {
+func TestFetchMenusByOfferedAt(t *testing.T) {
 
 	var offeredAts []time.Time
 
@@ -145,7 +145,7 @@ func TestGetWithDishes(t *testing.T) {
 
 }
 
-func TestListMenuWithDishes(t *testing.T) {
+func TestFetchMenuWithDishes(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		menu := createRandomMenu(t)
 
@@ -204,7 +204,7 @@ func TestGetMenuWithDishesByOfferedAt(t *testing.T) {
 
 }
 
-func TestListMenuWithDishesByOfferedAt(t *testing.T) {
+func TestFetchMenuWithDishesByOfferedAt(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		menu := createRandomMenu(t)
 
