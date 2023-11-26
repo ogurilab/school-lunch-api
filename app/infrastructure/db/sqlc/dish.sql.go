@@ -108,17 +108,10 @@ SELECT id, menu_id, name, created_at
 FROM dishes
 WHERE menu_id = ?
 ORDER BY id
-LIMIT ? OFFSET ?
 `
 
-type ListDishesParams struct {
-	MenuID string `json:"menu_id"`
-	Limit  int32  `json:"limit"`
-	Offset int32  `json:"offset"`
-}
-
-func (q *Queries) ListDishes(ctx context.Context, arg ListDishesParams) ([]Dish, error) {
-	rows, err := q.db.QueryContext(ctx, listDishes, arg.MenuID, arg.Limit, arg.Offset)
+func (q *Queries) ListDishes(ctx context.Context, menuID string) ([]Dish, error) {
+	rows, err := q.db.QueryContext(ctx, listDishes, menuID)
 	if err != nil {
 		return nil, err
 	}

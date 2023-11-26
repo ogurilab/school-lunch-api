@@ -18,7 +18,7 @@ type Querier interface {
 	GetMenuByOfferedAt(ctx context.Context, offeredAt time.Time) (Menu, error)
 	GetMenuWithDishes(ctx context.Context, id string) (GetMenuWithDishesRow, error)
 	GetMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time) (GetMenuWithDishesByOfferedAtRow, error)
-	ListDishes(ctx context.Context, arg ListDishesParams) ([]Dish, error)
+	ListDishes(ctx context.Context, menuID string) ([]Dish, error)
 	ListMenuWithDishes(ctx context.Context, arg ListMenuWithDishesParams) ([]ListMenuWithDishesRow, error)
 	ListMenuWithDishesByOfferedAt(ctx context.Context, arg ListMenuWithDishesByOfferedAtParams) ([]ListMenuWithDishesByOfferedAtRow, error)
 	ListMenus(ctx context.Context, arg ListMenusParams) ([]Menu, error)

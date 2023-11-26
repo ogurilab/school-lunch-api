@@ -8,12 +8,10 @@ type Query interface {
 
 type SQLQuery struct {
 	*Queries
-	db *sql.DB
 }
 
 func NewQuery(db *sql.DB) Query {
 	return &SQLQuery{
 		Queries: New(db),
-		db:      db,
 	}
 }

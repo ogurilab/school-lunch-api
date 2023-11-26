@@ -28,19 +28,13 @@ func TestGetDish(t *testing.T) {
 
 }
 
-func TestListDishes(t *testing.T) {
+func TestFetchMenuByID(t *testing.T) {
 	menu := createRandomMenu(t)
 	for i := 0; i < 10; i++ {
 		createRandomDish(t, menu.ID)
 	}
 
-	arg := ListDishesParams{
-		MenuID: menu.ID,
-		Limit:  5,
-		Offset: 5,
-	}
-
-	dishes, err := testQuery.ListDishes(context.Background(), arg)
+	dishes, err := testQuery.ListDishes(context.Background(), menu.ID)
 
 	require.NoError(t, err)
 	require.Len(t, dishes, 5)
@@ -54,7 +48,7 @@ func TestListDishes(t *testing.T) {
 	}
 }
 
-func TestGetByNames(t *testing.T) {
+func TestFetchByNames(t *testing.T) {
 	menu := createRandomMenu(t)
 
 	var names []string

@@ -16,8 +16,7 @@ LIMIT 1;
 SELECT *
 FROM dishes
 WHERE menu_id = sqlc.arg(menu_id)
-ORDER BY id
-LIMIT ? OFFSET ?;
+ORDER BY id;
 
 -- name: GetDishByNames :many
 SELECT *
