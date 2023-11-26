@@ -25,12 +25,12 @@ type MenuRepository interface {
 	GetByID(ctx context.Context, id string) (*Menu, error)
 	Fetch(ctx context.Context, limit int32, offset int32) ([]*Menu, error)
 	GetByOfferedAt(ctx context.Context, offeredAt time.Time) (*Menu, error)
-	FetchByOfferedAt(ctx context.Context, offeredAt time.Time, limit int32, offset int32) ([]*Menu, error)
+	FetchByOfferedAt(ctx context.Context, start, end time.Time) ([]*Menu, error)
 
 	GetMenuWithDishesByID(ctx context.Context, id string) (*MenuWithDishes, error)
 	GetMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time) (*MenuWithDishes, error)
 	FetchMenuWithDishes(ctx context.Context, limit int32, offset int32) ([]*MenuWithDishes, error)
-	FetchMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time, limit int32, offset int32) ([]*MenuWithDishes, error)
+	FetchMenuWithDishesByOfferedAt(ctx context.Context, start, end time.Time) ([]*MenuWithDishes, error)
 }
 
 type MenuUsecase interface {
@@ -38,12 +38,12 @@ type MenuUsecase interface {
 	GetByID(ctx context.Context, id string) (*Menu, error)
 	Fetch(ctx context.Context, limit int32, offset int32) ([]*Menu, error)
 	GetByOfferedAt(ctx context.Context, offeredAt time.Time) (*Menu, error)
-	FetchByOfferedAt(ctx context.Context, offeredAt time.Time, limit int32, offset int32) ([]*Menu, error)
+	FetchByOfferedAt(ctx context.Context, start, end time.Time) ([]*Menu, error)
 
 	GetMenuWithDishesByID(ctx context.Context, id string) (*MenuWithDishes, error)
 	GetMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time) (*MenuWithDishes, error)
 	FetchMenuWithDishes(ctx context.Context, limit int32, offset int32) ([]*MenuWithDishes, error)
-	FetchMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time, limit int32, offset int32) ([]*MenuWithDishes, error)
+	FetchMenuWithDishesByOfferedAt(ctx context.Context, start, end time.Time) ([]*MenuWithDishes, error)
 }
 
 func newMenu(

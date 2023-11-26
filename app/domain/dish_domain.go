@@ -1,6 +1,10 @@
 package domain
 
-import "github.com/ogurilab/school-lunch-api/util"
+import (
+	"context"
+
+	"github.com/ogurilab/school-lunch-api/util"
+)
 
 type Dish struct {
 	ID     string `json:"id"`
@@ -9,17 +13,17 @@ type Dish struct {
 }
 
 type DishRepository interface {
-	Create(dish *Dish) error
-	GetByID(id string) (*Dish, error)
-	GetByMenuID(menuID string) ([]*Dish, error)
-	GetByNames(names []string) ([]*Dish, error)
+	Create(ctx context.Context, dish *Dish) error
+	GetByID(ctx context.Context, id string) (*Dish, error)
+	FetchByMenuID(ctx context.Context, menuID string) ([]*Dish, error)
+	FetchByNames(ctx context.Context, names []string, limit, offset int32) ([]*Dish, error)
 }
 
 type DishUsecase interface {
-	Create(dish *Dish) error
-	GetByID(id string) (*Dish, error)
-	GetByMenuID(menuID string) ([]*Dish, error)
-	GetByNames(names []string) ([]*Dish, error)
+	Create(ctx context.Context, dish *Dish) error
+	GetByID(ctx context.Context, id string) (*Dish, error)
+	FetchByMenuID(ctx context.Context, menuID string) ([]*Dish, error)
+	FetchByNames(ctx context.Context, names []string, limit, offset int32) ([]*Dish, error)
 }
 
 func newDish(id string, menuID string, name string) (*Dish, error) {
