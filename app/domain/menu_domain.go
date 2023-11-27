@@ -24,26 +24,28 @@ type MenuRepository interface {
 	Create(ctx context.Context, menu *Menu) error
 	GetByID(ctx context.Context, id string) (*Menu, error)
 	Fetch(ctx context.Context, limit int32, offset int32) ([]*Menu, error)
-	GetByOfferedAt(ctx context.Context, offeredAt time.Time) (*Menu, error)
-	FetchByOfferedAt(ctx context.Context, start, end time.Time) ([]*Menu, error)
+	GetByDate(ctx context.Context, offeredAt time.Time) (*Menu, error)
+	FetchByRangeDate(ctx context.Context, start, end time.Time) ([]*Menu, error)
 
-	GetMenuWithDishesByID(ctx context.Context, id string) (*MenuWithDishes, error)
-	GetMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time) (*MenuWithDishes, error)
-	FetchMenuWithDishes(ctx context.Context, limit int32, offset int32) ([]*MenuWithDishes, error)
-	FetchMenuWithDishesByOfferedAt(ctx context.Context, start, end time.Time) ([]*MenuWithDishes, error)
+	// MenuWithDishes
+	GetByIDWithDishes(ctx context.Context, id string) (*MenuWithDishes, error)
+	FetchWithDishes(ctx context.Context, limit int32, offset int32) ([]*MenuWithDishes, error)
+	GetByDateWithDishes(ctx context.Context, offeredAt time.Time) (*MenuWithDishes, error)
+	FetchByRangeDateWithDishes(ctx context.Context, start, end time.Time) ([]*MenuWithDishes, error)
 }
 
 type MenuUsecase interface {
 	Create(ctx context.Context, menu *Menu) error
 	GetByID(ctx context.Context, id string) (*Menu, error)
 	Fetch(ctx context.Context, limit int32, offset int32) ([]*Menu, error)
-	GetByOfferedAt(ctx context.Context, offeredAt time.Time) (*Menu, error)
-	FetchByOfferedAt(ctx context.Context, start, end time.Time) ([]*Menu, error)
+	GetByDate(ctx context.Context, offeredAt time.Time) (*Menu, error)
+	FetchByRangeDate(ctx context.Context, start, end time.Time) ([]*Menu, error)
 
-	GetMenuWithDishesByID(ctx context.Context, id string) (*MenuWithDishes, error)
-	GetMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time) (*MenuWithDishes, error)
-	FetchMenuWithDishes(ctx context.Context, limit int32, offset int32) ([]*MenuWithDishes, error)
-	FetchMenuWithDishesByOfferedAt(ctx context.Context, start, end time.Time) ([]*MenuWithDishes, error)
+	// MenuWithDishes
+	GetByIDWithDishes(ctx context.Context, id string) (*MenuWithDishes, error)
+	FetchWithDishes(ctx context.Context, limit int32, offset int32) ([]*MenuWithDishes, error)
+	GetByDateWithDishes(ctx context.Context, offeredAt time.Time) (*MenuWithDishes, error)
+	FetchByRangeDateWithDishes(ctx context.Context, start, end time.Time) ([]*MenuWithDishes, error)
 }
 
 func newMenu(

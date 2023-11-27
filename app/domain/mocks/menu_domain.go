@@ -69,49 +69,79 @@ func (mr *MockMenuRepositoryMockRecorder) Fetch(ctx, limit, offset any) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockMenuRepository)(nil).Fetch), ctx, limit, offset)
 }
 
-// FetchByOfferedAt mocks base method.
-func (m *MockMenuRepository) FetchByOfferedAt(ctx context.Context, start, end time.Time) ([]*domain.Menu, error) {
+// FetchByRangeDate mocks base method.
+func (m *MockMenuRepository) FetchByRangeDate(ctx context.Context, start, end time.Time) ([]*domain.Menu, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchByOfferedAt", ctx, start, end)
+	ret := m.ctrl.Call(m, "FetchByRangeDate", ctx, start, end)
 	ret0, _ := ret[0].([]*domain.Menu)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FetchByOfferedAt indicates an expected call of FetchByOfferedAt.
-func (mr *MockMenuRepositoryMockRecorder) FetchByOfferedAt(ctx, start, end any) *gomock.Call {
+// FetchByRangeDate indicates an expected call of FetchByRangeDate.
+func (mr *MockMenuRepositoryMockRecorder) FetchByRangeDate(ctx, start, end any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByOfferedAt", reflect.TypeOf((*MockMenuRepository)(nil).FetchByOfferedAt), ctx, start, end)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByRangeDate", reflect.TypeOf((*MockMenuRepository)(nil).FetchByRangeDate), ctx, start, end)
 }
 
-// FetchMenuWithDishes mocks base method.
-func (m *MockMenuRepository) FetchMenuWithDishes(ctx context.Context, limit, offset int32) ([]*domain.MenuWithDishes, error) {
+// FetchByRangeDateWithDishes mocks base method.
+func (m *MockMenuRepository) FetchByRangeDateWithDishes(ctx context.Context, start, end time.Time) ([]*domain.MenuWithDishes, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchMenuWithDishes", ctx, limit, offset)
+	ret := m.ctrl.Call(m, "FetchByRangeDateWithDishes", ctx, start, end)
 	ret0, _ := ret[0].([]*domain.MenuWithDishes)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FetchMenuWithDishes indicates an expected call of FetchMenuWithDishes.
-func (mr *MockMenuRepositoryMockRecorder) FetchMenuWithDishes(ctx, limit, offset any) *gomock.Call {
+// FetchByRangeDateWithDishes indicates an expected call of FetchByRangeDateWithDishes.
+func (mr *MockMenuRepositoryMockRecorder) FetchByRangeDateWithDishes(ctx, start, end any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchMenuWithDishes", reflect.TypeOf((*MockMenuRepository)(nil).FetchMenuWithDishes), ctx, limit, offset)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByRangeDateWithDishes", reflect.TypeOf((*MockMenuRepository)(nil).FetchByRangeDateWithDishes), ctx, start, end)
 }
 
-// FetchMenuWithDishesByOfferedAt mocks base method.
-func (m *MockMenuRepository) FetchMenuWithDishesByOfferedAt(ctx context.Context, start, end time.Time) ([]*domain.MenuWithDishes, error) {
+// FetchWithDishes mocks base method.
+func (m *MockMenuRepository) FetchWithDishes(ctx context.Context, limit, offset int32) ([]*domain.MenuWithDishes, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchMenuWithDishesByOfferedAt", ctx, start, end)
+	ret := m.ctrl.Call(m, "FetchWithDishes", ctx, limit, offset)
 	ret0, _ := ret[0].([]*domain.MenuWithDishes)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FetchMenuWithDishesByOfferedAt indicates an expected call of FetchMenuWithDishesByOfferedAt.
-func (mr *MockMenuRepositoryMockRecorder) FetchMenuWithDishesByOfferedAt(ctx, start, end any) *gomock.Call {
+// FetchWithDishes indicates an expected call of FetchWithDishes.
+func (mr *MockMenuRepositoryMockRecorder) FetchWithDishes(ctx, limit, offset any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchMenuWithDishesByOfferedAt", reflect.TypeOf((*MockMenuRepository)(nil).FetchMenuWithDishesByOfferedAt), ctx, start, end)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchWithDishes", reflect.TypeOf((*MockMenuRepository)(nil).FetchWithDishes), ctx, limit, offset)
+}
+
+// GetByDate mocks base method.
+func (m *MockMenuRepository) GetByDate(ctx context.Context, offeredAt time.Time) (*domain.Menu, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByDate", ctx, offeredAt)
+	ret0, _ := ret[0].(*domain.Menu)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByDate indicates an expected call of GetByDate.
+func (mr *MockMenuRepositoryMockRecorder) GetByDate(ctx, offeredAt any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByDate", reflect.TypeOf((*MockMenuRepository)(nil).GetByDate), ctx, offeredAt)
+}
+
+// GetByDateWithDishes mocks base method.
+func (m *MockMenuRepository) GetByDateWithDishes(ctx context.Context, offeredAt time.Time) (*domain.MenuWithDishes, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByDateWithDishes", ctx, offeredAt)
+	ret0, _ := ret[0].(*domain.MenuWithDishes)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByDateWithDishes indicates an expected call of GetByDateWithDishes.
+func (mr *MockMenuRepositoryMockRecorder) GetByDateWithDishes(ctx, offeredAt any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByDateWithDishes", reflect.TypeOf((*MockMenuRepository)(nil).GetByDateWithDishes), ctx, offeredAt)
 }
 
 // GetByID mocks base method.
@@ -129,49 +159,19 @@ func (mr *MockMenuRepositoryMockRecorder) GetByID(ctx, id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockMenuRepository)(nil).GetByID), ctx, id)
 }
 
-// GetByOfferedAt mocks base method.
-func (m *MockMenuRepository) GetByOfferedAt(ctx context.Context, offeredAt time.Time) (*domain.Menu, error) {
+// GetByIDWithDishes mocks base method.
+func (m *MockMenuRepository) GetByIDWithDishes(ctx context.Context, id string) (*domain.MenuWithDishes, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByOfferedAt", ctx, offeredAt)
-	ret0, _ := ret[0].(*domain.Menu)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetByOfferedAt indicates an expected call of GetByOfferedAt.
-func (mr *MockMenuRepositoryMockRecorder) GetByOfferedAt(ctx, offeredAt any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByOfferedAt", reflect.TypeOf((*MockMenuRepository)(nil).GetByOfferedAt), ctx, offeredAt)
-}
-
-// GetMenuWithDishesByID mocks base method.
-func (m *MockMenuRepository) GetMenuWithDishesByID(ctx context.Context, id string) (*domain.MenuWithDishes, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMenuWithDishesByID", ctx, id)
+	ret := m.ctrl.Call(m, "GetByIDWithDishes", ctx, id)
 	ret0, _ := ret[0].(*domain.MenuWithDishes)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetMenuWithDishesByID indicates an expected call of GetMenuWithDishesByID.
-func (mr *MockMenuRepositoryMockRecorder) GetMenuWithDishesByID(ctx, id any) *gomock.Call {
+// GetByIDWithDishes indicates an expected call of GetByIDWithDishes.
+func (mr *MockMenuRepositoryMockRecorder) GetByIDWithDishes(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenuWithDishesByID", reflect.TypeOf((*MockMenuRepository)(nil).GetMenuWithDishesByID), ctx, id)
-}
-
-// GetMenuWithDishesByOfferedAt mocks base method.
-func (m *MockMenuRepository) GetMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time) (*domain.MenuWithDishes, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMenuWithDishesByOfferedAt", ctx, offeredAt)
-	ret0, _ := ret[0].(*domain.MenuWithDishes)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetMenuWithDishesByOfferedAt indicates an expected call of GetMenuWithDishesByOfferedAt.
-func (mr *MockMenuRepositoryMockRecorder) GetMenuWithDishesByOfferedAt(ctx, offeredAt any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenuWithDishesByOfferedAt", reflect.TypeOf((*MockMenuRepository)(nil).GetMenuWithDishesByOfferedAt), ctx, offeredAt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByIDWithDishes", reflect.TypeOf((*MockMenuRepository)(nil).GetByIDWithDishes), ctx, id)
 }
 
 // MockMenuUsecase is a mock of MenuUsecase interface.
@@ -226,49 +226,79 @@ func (mr *MockMenuUsecaseMockRecorder) Fetch(ctx, limit, offset any) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockMenuUsecase)(nil).Fetch), ctx, limit, offset)
 }
 
-// FetchByOfferedAt mocks base method.
-func (m *MockMenuUsecase) FetchByOfferedAt(ctx context.Context, start, end time.Time) ([]*domain.Menu, error) {
+// FetchByRangeDate mocks base method.
+func (m *MockMenuUsecase) FetchByRangeDate(ctx context.Context, start, end time.Time) ([]*domain.Menu, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchByOfferedAt", ctx, start, end)
+	ret := m.ctrl.Call(m, "FetchByRangeDate", ctx, start, end)
 	ret0, _ := ret[0].([]*domain.Menu)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FetchByOfferedAt indicates an expected call of FetchByOfferedAt.
-func (mr *MockMenuUsecaseMockRecorder) FetchByOfferedAt(ctx, start, end any) *gomock.Call {
+// FetchByRangeDate indicates an expected call of FetchByRangeDate.
+func (mr *MockMenuUsecaseMockRecorder) FetchByRangeDate(ctx, start, end any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByOfferedAt", reflect.TypeOf((*MockMenuUsecase)(nil).FetchByOfferedAt), ctx, start, end)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByRangeDate", reflect.TypeOf((*MockMenuUsecase)(nil).FetchByRangeDate), ctx, start, end)
 }
 
-// FetchMenuWithDishes mocks base method.
-func (m *MockMenuUsecase) FetchMenuWithDishes(ctx context.Context, limit, offset int32) ([]*domain.MenuWithDishes, error) {
+// FetchByRangeDateWithDishes mocks base method.
+func (m *MockMenuUsecase) FetchByRangeDateWithDishes(ctx context.Context, start, end time.Time) ([]*domain.MenuWithDishes, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchMenuWithDishes", ctx, limit, offset)
+	ret := m.ctrl.Call(m, "FetchByRangeDateWithDishes", ctx, start, end)
 	ret0, _ := ret[0].([]*domain.MenuWithDishes)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FetchMenuWithDishes indicates an expected call of FetchMenuWithDishes.
-func (mr *MockMenuUsecaseMockRecorder) FetchMenuWithDishes(ctx, limit, offset any) *gomock.Call {
+// FetchByRangeDateWithDishes indicates an expected call of FetchByRangeDateWithDishes.
+func (mr *MockMenuUsecaseMockRecorder) FetchByRangeDateWithDishes(ctx, start, end any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchMenuWithDishes", reflect.TypeOf((*MockMenuUsecase)(nil).FetchMenuWithDishes), ctx, limit, offset)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByRangeDateWithDishes", reflect.TypeOf((*MockMenuUsecase)(nil).FetchByRangeDateWithDishes), ctx, start, end)
 }
 
-// FetchMenuWithDishesByOfferedAt mocks base method.
-func (m *MockMenuUsecase) FetchMenuWithDishesByOfferedAt(ctx context.Context, start, end time.Time) ([]*domain.MenuWithDishes, error) {
+// FetchWithDishes mocks base method.
+func (m *MockMenuUsecase) FetchWithDishes(ctx context.Context, limit, offset int32) ([]*domain.MenuWithDishes, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchMenuWithDishesByOfferedAt", ctx, start, end)
+	ret := m.ctrl.Call(m, "FetchWithDishes", ctx, limit, offset)
 	ret0, _ := ret[0].([]*domain.MenuWithDishes)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FetchMenuWithDishesByOfferedAt indicates an expected call of FetchMenuWithDishesByOfferedAt.
-func (mr *MockMenuUsecaseMockRecorder) FetchMenuWithDishesByOfferedAt(ctx, start, end any) *gomock.Call {
+// FetchWithDishes indicates an expected call of FetchWithDishes.
+func (mr *MockMenuUsecaseMockRecorder) FetchWithDishes(ctx, limit, offset any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchMenuWithDishesByOfferedAt", reflect.TypeOf((*MockMenuUsecase)(nil).FetchMenuWithDishesByOfferedAt), ctx, start, end)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchWithDishes", reflect.TypeOf((*MockMenuUsecase)(nil).FetchWithDishes), ctx, limit, offset)
+}
+
+// GetByDate mocks base method.
+func (m *MockMenuUsecase) GetByDate(ctx context.Context, offeredAt time.Time) (*domain.Menu, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByDate", ctx, offeredAt)
+	ret0, _ := ret[0].(*domain.Menu)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByDate indicates an expected call of GetByDate.
+func (mr *MockMenuUsecaseMockRecorder) GetByDate(ctx, offeredAt any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByDate", reflect.TypeOf((*MockMenuUsecase)(nil).GetByDate), ctx, offeredAt)
+}
+
+// GetByDateWithDishes mocks base method.
+func (m *MockMenuUsecase) GetByDateWithDishes(ctx context.Context, offeredAt time.Time) (*domain.MenuWithDishes, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByDateWithDishes", ctx, offeredAt)
+	ret0, _ := ret[0].(*domain.MenuWithDishes)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByDateWithDishes indicates an expected call of GetByDateWithDishes.
+func (mr *MockMenuUsecaseMockRecorder) GetByDateWithDishes(ctx, offeredAt any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByDateWithDishes", reflect.TypeOf((*MockMenuUsecase)(nil).GetByDateWithDishes), ctx, offeredAt)
 }
 
 // GetByID mocks base method.
@@ -286,47 +316,17 @@ func (mr *MockMenuUsecaseMockRecorder) GetByID(ctx, id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockMenuUsecase)(nil).GetByID), ctx, id)
 }
 
-// GetByOfferedAt mocks base method.
-func (m *MockMenuUsecase) GetByOfferedAt(ctx context.Context, offeredAt time.Time) (*domain.Menu, error) {
+// GetByIDWithDishes mocks base method.
+func (m *MockMenuUsecase) GetByIDWithDishes(ctx context.Context, id string) (*domain.MenuWithDishes, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByOfferedAt", ctx, offeredAt)
-	ret0, _ := ret[0].(*domain.Menu)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetByOfferedAt indicates an expected call of GetByOfferedAt.
-func (mr *MockMenuUsecaseMockRecorder) GetByOfferedAt(ctx, offeredAt any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByOfferedAt", reflect.TypeOf((*MockMenuUsecase)(nil).GetByOfferedAt), ctx, offeredAt)
-}
-
-// GetMenuWithDishesByID mocks base method.
-func (m *MockMenuUsecase) GetMenuWithDishesByID(ctx context.Context, id string) (*domain.MenuWithDishes, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMenuWithDishesByID", ctx, id)
+	ret := m.ctrl.Call(m, "GetByIDWithDishes", ctx, id)
 	ret0, _ := ret[0].(*domain.MenuWithDishes)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetMenuWithDishesByID indicates an expected call of GetMenuWithDishesByID.
-func (mr *MockMenuUsecaseMockRecorder) GetMenuWithDishesByID(ctx, id any) *gomock.Call {
+// GetByIDWithDishes indicates an expected call of GetByIDWithDishes.
+func (mr *MockMenuUsecaseMockRecorder) GetByIDWithDishes(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenuWithDishesByID", reflect.TypeOf((*MockMenuUsecase)(nil).GetMenuWithDishesByID), ctx, id)
-}
-
-// GetMenuWithDishesByOfferedAt mocks base method.
-func (m *MockMenuUsecase) GetMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time) (*domain.MenuWithDishes, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMenuWithDishesByOfferedAt", ctx, offeredAt)
-	ret0, _ := ret[0].(*domain.MenuWithDishes)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetMenuWithDishesByOfferedAt indicates an expected call of GetMenuWithDishesByOfferedAt.
-func (mr *MockMenuUsecaseMockRecorder) GetMenuWithDishesByOfferedAt(ctx, offeredAt any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenuWithDishesByOfferedAt", reflect.TypeOf((*MockMenuUsecase)(nil).GetMenuWithDishesByOfferedAt), ctx, offeredAt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByIDWithDishes", reflect.TypeOf((*MockMenuUsecase)(nil).GetByIDWithDishes), ctx, id)
 }
