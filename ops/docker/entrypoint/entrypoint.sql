@@ -1,3 +1,0 @@
-CREATE DATABASE IF NOT EXISTS `school_lunch_test` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-
-GRANT ALL PRIVILEGES ON *.* TO 'root' @'%';

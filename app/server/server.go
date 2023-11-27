@@ -7,15 +7,14 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/ogurilab/school-lunch-api/bootstrap"
-	db "github.com/ogurilab/school-lunch-api/infrastructure/db/sqlc"
 	"github.com/ogurilab/school-lunch-api/server/routes"
 )
 
-func Run(env bootstrap.Env, query db.Query) {
+func Run(env bootstrap.Env) {
 	gin := gin.Default()
 	timeout := time.Duration(env.ContextTimeout) * time.Second
 
-	routes.InitRoutes(env, timeout, gin, query)
+	routes.InitRoutes(env, timeout, gin)
 
 	err := gin.Run(env.ServerAddress)
 

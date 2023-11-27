@@ -5,10 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ogurilab/school-lunch-api/bootstrap"
-	db "github.com/ogurilab/school-lunch-api/infrastructure/db/sqlc"
 )
 
-func InitRoutes(env bootstrap.Env, timeout time.Duration, gin *gin.Engine, query db.Query) {
+func InitRoutes(env bootstrap.Env, timeout time.Duration, gin *gin.Engine) {
 	v1 := gin.Group("/v1")
 
 	v1.GET("/health", healthHandler())

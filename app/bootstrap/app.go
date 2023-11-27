@@ -1,7 +1,6 @@
 package bootstrap
 
 import (
-	"database/sql"
 	"os"
 
 	"github.com/rs/zerolog"
@@ -10,7 +9,6 @@ import (
 
 type Application struct {
 	Env Env
-	DB  *sql.DB
 }
 
 func NewApp(path string) (app Application) {
@@ -25,14 +23,7 @@ func NewApp(path string) (app Application) {
 		log.Fatal().Err(err).Msg("Failed to load env")
 	}
 
-	db, err := NewDatabase(env)
-
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to connect to database")
-	}
-
 	return Application{
 		Env: env,
-		DB:  db,
 	}
 }
