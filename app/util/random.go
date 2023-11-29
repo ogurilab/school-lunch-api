@@ -1,6 +1,7 @@
 package util
 
 import (
+	"database/sql"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -47,6 +48,17 @@ func RandomURL() string {
 	return fmt.Sprintf("https://%s.com", RandomString(10))
 }
 
+func RandomNullURL() sql.NullString {
+	return sql.NullString{
+		String: RandomURL(),
+		Valid:  true,
+	}
+}
+
 func RandomInt32() int32 {
 	return int32(RandomInt(0, 100))
+}
+
+func RandomCityCode() int32 {
+	return int32(RandomInt(0, 4713))
 }

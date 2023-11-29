@@ -6,7 +6,6 @@ package db
 
 import (
 	"context"
-	"time"
 )
 
 type Querier interface {
@@ -14,10 +13,10 @@ type Querier interface {
 	CreateMenu(ctx context.Context, arg CreateMenuParams) error
 	GetDish(ctx context.Context, id string) (Dish, error)
 	GetDishByNames(ctx context.Context, arg GetDishByNamesParams) ([]Dish, error)
-	GetMenu(ctx context.Context, id string) (Menu, error)
-	GetMenuByOfferedAt(ctx context.Context, offeredAt time.Time) (Menu, error)
-	GetMenuWithDishes(ctx context.Context, id string) (GetMenuWithDishesRow, error)
-	GetMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time) (GetMenuWithDishesByOfferedAtRow, error)
+	GetMenu(ctx context.Context, arg GetMenuParams) (Menu, error)
+	GetMenuByOfferedAt(ctx context.Context, arg GetMenuByOfferedAtParams) (Menu, error)
+	GetMenuWithDishes(ctx context.Context, arg GetMenuWithDishesParams) (GetMenuWithDishesRow, error)
+	GetMenuWithDishesByOfferedAt(ctx context.Context, arg GetMenuWithDishesByOfferedAtParams) (GetMenuWithDishesByOfferedAtRow, error)
 	ListDishes(ctx context.Context, menuID string) ([]Dish, error)
 	ListMenuWithDishes(ctx context.Context, arg ListMenuWithDishesParams) ([]ListMenuWithDishesRow, error)
 	ListMenuWithDishesByOfferedAt(ctx context.Context, arg ListMenuWithDishesByOfferedAtParams) ([]ListMenuWithDishesByOfferedAtRow, error)

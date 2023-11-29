@@ -5,6 +5,7 @@
 package db
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -12,6 +13,15 @@ type Allergen struct {
 	ID        int32     `json:"id"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type City struct {
+	CityCode       int32  `json:"city_code"`
+	CityName       string `json:"city_name"`
+	PrefectureCode int32  `json:"prefecture_code"`
+	PrefectureName string `json:"prefecture_name"`
+	// 給食のデータが登録されているかどうか
+	SchoolLunchInfoAvailable bool `json:"school_lunch_info_available"`
 }
 
 type Dish struct {
@@ -26,14 +36,38 @@ type DishesAllergen struct {
 	DishID     string `json:"dish_id"`
 }
 
+type ExternalDataSource struct {
+	SourceID int32 `json:"source_id"`
+	CityCode int32 `json:"city_code"`
+	// linkedDataのdatasetのURL
+	DatasetID string    `json:"dataset_id"`
+	Year      int32     `json:"year"`
+	UpdatedAt time.Time `json:"updated_at"`
+	// Status of the data source: Active (currently in use), Inactive (not in use), Updating (currently being updated), Error (an error has occurred)
+	Status string `json:"status"`
+	// menu or dish or allergens
+	Category    string         `json:"category"`
+	Description sql.NullString `json:"description"`
+}
+
 type Menu struct {
 	ID string `json:"id"`
 	// 給食の提供日
-	OfferedAt time.Time `json:"offered_at"`
-	PhotoUrl  string    `json:"photo_url"`
+	OfferedAt                time.Time      `json:"offered_at"`
+	PhotoUrl                 sql.NullString `json:"photo_url"`
+	CreatedAt                time.Time      `json:"created_at"`
+	ElementarySchoolCalories int32          `json:"elementary_school_calories"`
+	JuniorHighSchoolCalories int32          `json:"junior_high_school_calories"`
+	CityCode                 int32          `json:"city_code"`
+}
+
+type User struct {
+	ID             int32  `json:"id"`
+	Username       string `json:"username"`
+	HashedPassword string `json:"hashed_password"`
+	Email          string `json:"email"`
+	// User roles: municipality (for municipal staff), admin (for system administrators), guest (for general users)
+	Role      string    `json:"role"`
 	CreatedAt time.Time `json:"created_at"`
-	// 小学校のカロリー
-	ElementarySchoolCalories int32 `json:"elementary_school_calories"`
-	// 中学校のカロリー
-	JuniorHighSchoolCalories int32 `json:"junior_high_school_calories"`
+	CityCode  int32     `json:"city_code"`
 }
