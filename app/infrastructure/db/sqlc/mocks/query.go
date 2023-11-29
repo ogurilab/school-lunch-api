@@ -11,7 +11,6 @@ package mocks
 import (
 	context "context"
 	reflect "reflect"
-	time "time"
 
 	db "github.com/ogurilab/school-lunch-api/infrastructure/db/sqlc"
 	gomock "go.uber.org/mock/gomock"
@@ -99,63 +98,63 @@ func (mr *MockQueryMockRecorder) GetDishByNames(ctx, arg any) *gomock.Call {
 }
 
 // GetMenu mocks base method.
-func (m *MockQuery) GetMenu(ctx context.Context, id string) (db.Menu, error) {
+func (m *MockQuery) GetMenu(ctx context.Context, arg db.GetMenuParams) (db.Menu, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMenu", ctx, id)
+	ret := m.ctrl.Call(m, "GetMenu", ctx, arg)
 	ret0, _ := ret[0].(db.Menu)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetMenu indicates an expected call of GetMenu.
-func (mr *MockQueryMockRecorder) GetMenu(ctx, id any) *gomock.Call {
+func (mr *MockQueryMockRecorder) GetMenu(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenu", reflect.TypeOf((*MockQuery)(nil).GetMenu), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenu", reflect.TypeOf((*MockQuery)(nil).GetMenu), ctx, arg)
 }
 
 // GetMenuByOfferedAt mocks base method.
-func (m *MockQuery) GetMenuByOfferedAt(ctx context.Context, offeredAt time.Time) (db.Menu, error) {
+func (m *MockQuery) GetMenuByOfferedAt(ctx context.Context, arg db.GetMenuByOfferedAtParams) (db.Menu, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMenuByOfferedAt", ctx, offeredAt)
+	ret := m.ctrl.Call(m, "GetMenuByOfferedAt", ctx, arg)
 	ret0, _ := ret[0].(db.Menu)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetMenuByOfferedAt indicates an expected call of GetMenuByOfferedAt.
-func (mr *MockQueryMockRecorder) GetMenuByOfferedAt(ctx, offeredAt any) *gomock.Call {
+func (mr *MockQueryMockRecorder) GetMenuByOfferedAt(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenuByOfferedAt", reflect.TypeOf((*MockQuery)(nil).GetMenuByOfferedAt), ctx, offeredAt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenuByOfferedAt", reflect.TypeOf((*MockQuery)(nil).GetMenuByOfferedAt), ctx, arg)
 }
 
 // GetMenuWithDishes mocks base method.
-func (m *MockQuery) GetMenuWithDishes(ctx context.Context, id string) (db.GetMenuWithDishesRow, error) {
+func (m *MockQuery) GetMenuWithDishes(ctx context.Context, arg db.GetMenuWithDishesParams) (db.GetMenuWithDishesRow, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMenuWithDishes", ctx, id)
+	ret := m.ctrl.Call(m, "GetMenuWithDishes", ctx, arg)
 	ret0, _ := ret[0].(db.GetMenuWithDishesRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetMenuWithDishes indicates an expected call of GetMenuWithDishes.
-func (mr *MockQueryMockRecorder) GetMenuWithDishes(ctx, id any) *gomock.Call {
+func (mr *MockQueryMockRecorder) GetMenuWithDishes(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenuWithDishes", reflect.TypeOf((*MockQuery)(nil).GetMenuWithDishes), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenuWithDishes", reflect.TypeOf((*MockQuery)(nil).GetMenuWithDishes), ctx, arg)
 }
 
 // GetMenuWithDishesByOfferedAt mocks base method.
-func (m *MockQuery) GetMenuWithDishesByOfferedAt(ctx context.Context, offeredAt time.Time) (db.GetMenuWithDishesByOfferedAtRow, error) {
+func (m *MockQuery) GetMenuWithDishesByOfferedAt(ctx context.Context, arg db.GetMenuWithDishesByOfferedAtParams) (db.GetMenuWithDishesByOfferedAtRow, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMenuWithDishesByOfferedAt", ctx, offeredAt)
+	ret := m.ctrl.Call(m, "GetMenuWithDishesByOfferedAt", ctx, arg)
 	ret0, _ := ret[0].(db.GetMenuWithDishesByOfferedAtRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetMenuWithDishesByOfferedAt indicates an expected call of GetMenuWithDishesByOfferedAt.
-func (mr *MockQueryMockRecorder) GetMenuWithDishesByOfferedAt(ctx, offeredAt any) *gomock.Call {
+func (mr *MockQueryMockRecorder) GetMenuWithDishesByOfferedAt(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenuWithDishesByOfferedAt", reflect.TypeOf((*MockQuery)(nil).GetMenuWithDishesByOfferedAt), ctx, offeredAt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenuWithDishesByOfferedAt", reflect.TypeOf((*MockQuery)(nil).GetMenuWithDishesByOfferedAt), ctx, arg)
 }
 
 // ListDishes mocks base method.

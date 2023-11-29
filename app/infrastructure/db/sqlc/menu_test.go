@@ -12,13 +12,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var cityCode = util.RandomCityCode()
+
 func TestCreateMenu(t *testing.T) {
 	createRandomMenu(t)
 }
 
 func TestGetMenu(t *testing.T) {
 	menu1 := createRandomMenu(t)
-	menu2, err := testQuery.GetMenu(context.Background(), menu1.ID)
+	arg := GetMenuParams{
+		ID:       menu1.ID,
+		CityCode: menu1.CityCode,
+	}
+
+	menu2, err := testQuery.GetMenu(context.Background(), arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, menu2)
@@ -38,8 +45,9 @@ func TestFetchMenus(t *testing.T) {
 	}
 
 	arg := ListMenusParams{
-		Limit:  5,
-		Offset: 5,
+		Limit:    5,
+		Offset:   5,
+		CityCode: cityCode,
 	}
 
 	menus, err := testQuery.ListMenus(context.Background(), arg)
@@ -61,7 +69,12 @@ func TestFetchMenus(t *testing.T) {
 func TestGetMenuByOfferedAt(t *testing.T) {
 	menu := createRandomMenu(t)
 
-	result, err := testQuery.GetMenuByOfferedAt(context.Background(), menu.OfferedAt)
+	arg := GetMenuByOfferedAtParams{
+		OfferedAt: menu.OfferedAt,
+		CityCode:  menu.CityCode,
+	}
+
+	result, err := testQuery.GetMenuByOfferedAt(context.Background(), arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, result)
@@ -81,6 +94,7 @@ func TestFetchMenusByOfferedAt(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		menu := createRandomMenu(t)
 		offeredAts = append(offeredAts, menu.OfferedAt)
+
 	}
 
 	sort.Slice(offeredAts, func(i, j int) bool {
@@ -91,6 +105,7 @@ func TestFetchMenusByOfferedAt(t *testing.T) {
 		StartOfferedAt: offeredAts[0],
 		EndOfferedAt:   offeredAts[5],
 		Limit:          5,
+		CityCode:       cityCode,
 	}
 
 	menus, err := testQuery.ListMenusByOfferedAt(context.Background(), arg)
@@ -124,7 +139,12 @@ func TestGetWithDishes(t *testing.T) {
 
 	require.Len(t, mockDishes, 10)
 
-	result, err := testQuery.GetMenuWithDishes(context.Background(), menu.ID)
+	arg := GetMenuWithDishesParams{
+		ID:       menu.ID,
+		CityCode: menu.CityCode,
+	}
+
+	result, err := testQuery.GetMenuWithDishes(context.Background(), arg)
 
 	require.NoError(t, err)
 
@@ -155,8 +175,9 @@ func TestFetchMenuWithDishes(t *testing.T) {
 	}
 
 	arg := ListMenuWithDishesParams{
-		Limit:  5,
-		Offset: 5,
+		Limit:    5,
+		Offset:   5,
+		CityCode: cityCode,
 	}
 
 	results, err := testQuery.ListMenuWithDishes(context.Background(), arg)
@@ -183,7 +204,12 @@ func TestGetMenuWithDishesByOfferedAt(t *testing.T) {
 
 	require.Len(t, mockDishes, 10)
 
-	result, err := testQuery.GetMenuWithDishesByOfferedAt(context.Background(), menu.OfferedAt)
+	arg := GetMenuWithDishesByOfferedAtParams{
+		OfferedAt: menu.OfferedAt,
+		CityCode:  menu.CityCode,
+	}
+
+	result, err := testQuery.GetMenuWithDishesByOfferedAt(context.Background(), arg)
 
 	require.NoError(t, err)
 
@@ -228,6 +254,7 @@ func TestFetchMenuWithDishesByOfferedAt(t *testing.T) {
 		StartOfferedAt: offeredAts[0],
 		EndOfferedAt:   offeredAts[5],
 		Limit:          5,
+		CityCode:       cityCode,
 	}
 
 	results, err := testQuery.ListMenuWithDishesByOfferedAt(context.Background(), arg)
@@ -244,21 +271,27 @@ func TestFetchMenuWithDishesByOfferedAt(t *testing.T) {
 }
 
 func createRandomMenu(t *testing.T) *domain.Menu {
-	ID := util.RandomUlid()
+	id := util.RandomUlid()
 
 	args := CreateMenuParams{
-		ID:                       ID,
+		ID:                       id,
 		OfferedAt:                util.RandomDate(),
-		PhotoUrl:                 util.RandomURL(),
+		PhotoUrl:                 util.RandomNullURL(),
 		ElementarySchoolCalories: util.RandomInt32(),
 		JuniorHighSchoolCalories: util.RandomInt32(),
+		CityCode:                 cityCode,
 	}
 
 	err := testQuery.CreateMenu(context.Background(), args)
 
 	require.NoError(t, err)
 
-	menu, err := testQuery.GetMenu(context.Background(), ID)
+	getArg := GetMenuParams{
+		ID:       id,
+		CityCode: cityCode,
+	}
+
+	menu, err := testQuery.GetMenu(context.Background(), getArg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, menu)
@@ -276,6 +309,7 @@ func createRandomMenu(t *testing.T) *domain.Menu {
 		menu.PhotoUrl,
 		menu.ElementarySchoolCalories,
 		menu.JuniorHighSchoolCalories,
+		menu.CityCode,
 	)
 
 	require.NoError(t, err)
