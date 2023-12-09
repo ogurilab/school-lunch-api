@@ -12,6 +12,11 @@ VALUES (
     sqlc.arg(prefecture_name)
   );
 
+-- name: UpdateAvailable :exec
+UPDATE cities
+SET school_lunch_info_available = true
+WHERE city_code = sqlc.arg(city_code);
+
 -- name: GetCity :one
 SELECT *
 FROM cities

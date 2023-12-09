@@ -187,3 +187,14 @@ func (q *Queries) ListCitiesByPrefecture(ctx context.Context, arg ListCitiesByPr
 	}
 	return items, nil
 }
+
+const updateAvailable = `-- name: UpdateAvailable :exec
+UPDATE cities
+SET school_lunch_info_available = true
+WHERE city_code = ?
+`
+
+func (q *Queries) UpdateAvailable(ctx context.Context, cityCode int32) error {
+	_, err := q.db.ExecContext(ctx, updateAvailable, cityCode)
+	return err
+}

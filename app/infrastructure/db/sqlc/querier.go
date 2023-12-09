@@ -27,6 +27,7 @@ type Querier interface {
 	ListMenuWithDishesByOfferedAt(ctx context.Context, arg ListMenuWithDishesByOfferedAtParams) ([]ListMenuWithDishesByOfferedAtRow, error)
 	ListMenus(ctx context.Context, arg ListMenusParams) ([]Menu, error)
 	ListMenusByOfferedAt(ctx context.Context, arg ListMenusByOfferedAtParams) ([]Menu, error)
+	UpdateAvailable(ctx context.Context, cityCode int32) error
 }
 
 var _ Querier = (*Queries)(nil)

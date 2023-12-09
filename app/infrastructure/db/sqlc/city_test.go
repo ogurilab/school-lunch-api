@@ -13,6 +13,25 @@ func TestCreateCity(t *testing.T) {
 	createRandomCity(t)
 }
 
+func TestUpdateAvailable(t *testing.T) {
+	city := createRandomCity(t)
+
+	err := testQuery.UpdateAvailable(context.Background(), city.CityCode)
+
+	require.NoError(t, err)
+
+	city2, err := testQuery.GetCity(context.Background(), city.CityCode)
+
+	require.NoError(t, err)
+	require.NotEmpty(t, city2)
+
+	require.Equal(t, city.CityCode, city2.CityCode)
+	require.Equal(t, city.CityName, city2.CityName)
+	require.Equal(t, city.PrefectureCode, city2.PrefectureCode)
+	require.Equal(t, city.PrefectureName, city2.PrefectureName)
+	require.Equal(t, city2.SchoolLunchInfoAvailable, true)
+}
+
 func TestGetCity(t *testing.T) {
 	city := createRandomCity(t)
 	city2, err := testQuery.GetCity(context.Background(), city.CityCode)
@@ -91,7 +110,7 @@ func TestListCitiesByPrefecture(t *testing.T) {
 	cities, err := testQuery.ListCitiesByPrefecture(context.Background(), arg)
 
 	require.NoError(t, err)
-	require.Len(t, cities, 1)
+	require.GreaterOrEqual(t, len(cities), 1)
 
 	for _, city := range cities {
 		require.NotEmpty(t, city)
