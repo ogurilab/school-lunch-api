@@ -13,17 +13,15 @@ type City struct {
 }
 
 type CityRepository interface {
-	GetByID(ctx context.Context, id int32) (*City, error)
+	GetByCityCode(ctx context.Context, code int32) (*City, error)
 	Fetch(ctx context.Context, limit int32, offset int32, search string) ([]*City, error)
-	FetchByPrefectureCode(ctx context.Context, prefectureCode int32) ([]*City, error)
-	FetchByCityName(ctx context.Context, cityName string) ([]*City, error)
+	FetchByPrefectureCode(ctx context.Context, limit int32, offset int32, prefectureCode int32) ([]*City, error)
 }
 
 type CityUsecase interface {
-	GetByID(ctx context.Context, id int32) (*City, error)
+	GetByCityCode(ctx context.Context, code int32) (*City, error)
 	Fetch(ctx context.Context, limit int32, offset int32, search string) ([]*City, error)
-	FetchByPrefectureCode(ctx context.Context, prefectureCode int32) ([]*City, error)
-	FetchByCityName(ctx context.Context, cityName string) ([]*City, error)
+	FetchByPrefectureCode(ctx context.Context, limit int32, offset int32, prefectureCode int32) ([]*City, error)
 }
 
 func NewCity(
