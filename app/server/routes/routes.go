@@ -11,5 +11,6 @@ import (
 func InitRoutes(env bootstrap.Env, timeout time.Duration, gin *gin.Engine, query db.Query) {
 	v1 := gin.Group("/v1")
 
-	v1.GET("/health", healthHandler())
+	NewSwaggerRouter(v1)
+
 }

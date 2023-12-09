@@ -69,5 +69,10 @@ sqlc:
 test:
 	cd ${APP_PATH} && DB_SOURCE="${TEST_DB_URL}"	go test -count=1 -v -short -cover ./...
 
+build_swagger:
+	rm -rf ${APP_PATH}/doc/swagger/statik
+	cd ${APP_PATH} && statik -src=./doc/swagger -dest=./doc
+	
+
 
 .PHONY: up down start prod prod_stop migrateup migratedown new_migration sqlc test
