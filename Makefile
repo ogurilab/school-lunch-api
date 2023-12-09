@@ -10,7 +10,7 @@ DOCKER_COMPOSE=docker compose
 
 MIGRATION_PATH=infrastructure/db/migration
 
-INTERFACE_SOURCES=domain/dish_domain.go domain/menu_domain.go infrastructure/db/sqlc/query.go
+INTERFACE_SOURCES=domain/dish_domain.go domain/menu_domain.go domain/city_domain.go infrastructure/db/sqlc/query.go 
 
 up:
 	$(DOCKER_COMPOSE) -f docker-compose.dev.yaml up -d
