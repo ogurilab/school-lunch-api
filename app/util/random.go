@@ -60,5 +60,5 @@ func RandomInt32() int32 {
 }
 
 func RandomCityCode() int32 {
-	return int32(RandomInt(0, 4713))
+	return int32(RandomInt(0, 10000))
 }
