@@ -2,6 +2,8 @@ package domain
 
 import (
 	"context"
+
+	"github.com/labstack/echo/v4"
 )
 
 type City struct {
@@ -22,6 +24,12 @@ type CityUsecase interface {
 	GetByCityCode(ctx context.Context, code int32) (*City, error)
 	Fetch(ctx context.Context, limit int32, offset int32, search string) ([]*City, error)
 	FetchByPrefectureCode(ctx context.Context, limit int32, offset int32, prefectureCode int32) ([]*City, error)
+}
+
+type CityController interface {
+	GetByCityCode(c echo.Context) error
+	Fetch(c echo.Context) error
+	FetchByPrefectureCode(c echo.Context) error
 }
 
 func NewCity(
