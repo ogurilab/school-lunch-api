@@ -17,8 +17,12 @@ func Logger() echo.MiddlewareFunc {
 			var event *zerolog.Event
 
 			if err != nil {
-				event = log.Error()
+
 				c.Error(err)
+			}
+
+			if c.Response().Status >= 400 {
+				event = log.Error()
 			} else {
 				event = log.Info()
 			}

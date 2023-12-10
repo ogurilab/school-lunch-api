@@ -10,10 +10,12 @@ import (
 	db "github.com/ogurilab/school-lunch-api/infrastructure/db/sqlc"
 	"github.com/ogurilab/school-lunch-api/server/middleware"
 	"github.com/ogurilab/school-lunch-api/server/routes"
+	"github.com/ogurilab/school-lunch-api/server/validator"
 )
 
 func Run(env bootstrap.Env, query db.Query) {
 	e := echo.New()
+	e.Validator = validator.NewCustomValidator()
 
 	timeout := time.Duration(env.ContextTimeout) * time.Second
 
