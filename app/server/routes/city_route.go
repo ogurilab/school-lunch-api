@@ -18,5 +18,7 @@ func NewCityRouter(group *echo.Group, timeout time.Duration, query db.Query) {
 	)
 
 	group.GET("/cities/:code", cc.GetByCityCode)
+	group.GET("/cities", cc.Fetch)
+	group.GET("/cities/prefectures/:code", cc.FetchByPrefectureCode)
 
 }
