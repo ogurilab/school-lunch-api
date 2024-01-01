@@ -3,21 +3,27 @@ package server
 import (
 	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 
 	"github.com/ogurilab/school-lunch-api/bootstrap"
 	db "github.com/ogurilab/school-lunch-api/infrastructure/db/sqlc"
+	"github.com/ogurilab/school-lunch-api/server/middleware"
 	"github.com/ogurilab/school-lunch-api/server/routes"
+	"github.com/ogurilab/school-lunch-api/server/validator"
 )
 
 func Run(env bootstrap.Env, query db.Query) {
-	gin := gin.Default()
+	e := echo.New()
+	e.Validator = validator.NewCustomValidator()
+
 	timeout := time.Duration(env.ContextTimeout) * time.Second
 
-	routes.InitRoutes(env, timeout, gin, query)
+	e.Use(middleware.Logger())
 
-	err := gin.Run(env.ServerAddress)
+	routes.InitRoutes(env, timeout, e, query)
+
+	err := e.Start(env.ServerAddress)
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to start server")

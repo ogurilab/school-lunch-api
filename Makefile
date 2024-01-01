@@ -10,7 +10,7 @@ DOCKER_COMPOSE=docker compose
 
 MIGRATION_PATH=infrastructure/db/migration
 
-INTERFACE_SOURCES=domain/dish_domain.go domain/menu_domain.go infrastructure/db/sqlc/query.go
+INTERFACE_SOURCES=domain/dish_domain.go domain/menu_domain.go domain/city_domain.go infrastructure/db/sqlc/query.go 
 
 up:
 	$(DOCKER_COMPOSE) -f docker-compose.dev.yaml up -d
@@ -68,6 +68,11 @@ sqlc:
 
 test:
 	cd ${APP_PATH} && DB_SOURCE="${TEST_DB_URL}"	go test -count=1 -v -short -cover ./...
+
+build_swagger:
+	rm -rf ${APP_PATH}/doc/swagger/statik
+	cd ${APP_PATH} && statik -src=./doc/swagger -dest=./doc
+	
 
 
 .PHONY: up down start prod prod_stop migrateup migratedown new_migration sqlc test

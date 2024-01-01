@@ -1,34 +1,41 @@
 package errors
 
+import (
+	"fmt"
+	"net/http"
+)
+
+type ErrorType string
+
 const (
-	ErrInternalServerError = "Internal Server Error"
-	ErrNotFound            = "Your requested Item is not found"
-	ErrConflict            = "Your Item already exist"
-	ErrBadParamInput       = "Given Param is not valid"
+	ErrInternalServerError ErrorType = "Internal Server Error"
+	ErrNotFound            ErrorType = "Your requested Item is not found"
+	ErrConflict            ErrorType = "Your Item already exist"
+	ErrBadRequest          ErrorType = "Bad Request"
 )
 
 type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
-func NewErrorResponse(message string) *ErrorResponse {
+func NewErrorResponse(errType ErrorType, err error) *ErrorResponse {
 	return &ErrorResponse{
-		Message: message,
+		Message: fmt.Sprintf("%s: %s", errType, err.Error()),
 	}
 }
 
-func NewInternalServerErrorResponse() *ErrorResponse {
-	return NewErrorResponse(ErrInternalServerError)
+func NewInternalServerError(err error) (int, *ErrorResponse) {
+	return http.StatusInternalServerError, NewErrorResponse(ErrInternalServerError, err)
 }
 
-func NewNotFoundErrorResponse() *ErrorResponse {
-	return NewErrorResponse(ErrNotFound)
+func NewNotFoundError(err error) (int, *ErrorResponse) {
+	return http.StatusNotFound, NewErrorResponse(ErrNotFound, err)
 }
 
-func NewConflictErrorResponse() *ErrorResponse {
-	return NewErrorResponse(ErrConflict)
+func NewConflictError(err error) (int, *ErrorResponse) {
+	return http.StatusConflict, NewErrorResponse(ErrConflict, err)
 }
 
-func NewBadParamInputErrorResponse() *ErrorResponse {
-	return NewErrorResponse(ErrBadParamInput)
+func NewBadRequestError(err error) (int, *ErrorResponse) {
+	return http.StatusBadRequest, NewErrorResponse(ErrBadRequest, err)
 }
