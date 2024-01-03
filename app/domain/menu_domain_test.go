@@ -188,7 +188,7 @@ func TestReNewMenu(t *testing.T) {
 
 }
 
-func TestNewMenuWithDishes(t *testing.T) {
+func TestReNewMenuWithDishes(t *testing.T) {
 	now := time.Now()
 	var dishes []*Dish
 
@@ -201,6 +201,7 @@ func TestNewMenuWithDishes(t *testing.T) {
 	}
 
 	type input struct {
+		id                       string
 		OfferedAt                time.Time
 		PhotoUrl                 sql.NullString
 		ElementarySchoolCalories int32
@@ -218,6 +219,7 @@ func TestNewMenuWithDishes(t *testing.T) {
 			name: "OK",
 			createStub: func() input {
 				return input{
+					id:                       util.NewUlid(),
 					OfferedAt:                now,
 					PhotoUrl:                 sql.NullString{String: "http://example.com", Valid: true},
 					ElementarySchoolCalories: 100,
@@ -244,6 +246,7 @@ func TestNewMenuWithDishes(t *testing.T) {
 			name: "Empty Dishes",
 			createStub: func() input {
 				return input{
+					id:                       util.NewUlid(),
 					OfferedAt:                now,
 					PhotoUrl:                 sql.NullString{String: "http://example.com", Valid: true},
 					ElementarySchoolCalories: 100,
@@ -273,7 +276,8 @@ func TestNewMenuWithDishes(t *testing.T) {
 
 			stub := tc.createStub()
 
-			m, err := NewMenuWithDishes(
+			m, err := ReNewMenuWithDishes(
+				stub.id,
 				stub.OfferedAt,
 				stub.PhotoUrl,
 				stub.ElementarySchoolCalories,
