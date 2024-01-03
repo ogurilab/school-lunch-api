@@ -109,7 +109,8 @@ func NewMenu(
 	)
 }
 
-func NewMenuWithDishes(
+func ReNewMenuWithDishes(
+	id string,
 	offeredAt time.Time,
 	photoUrl sql.NullString,
 	elementarySchoolCalories int32,
@@ -117,7 +118,8 @@ func NewMenuWithDishes(
 	cityCode int32,
 	dishes []*Dish,
 ) (*MenuWithDishes, error) {
-	menu, err := NewMenu(
+	menu, err := ReNewMenu(
+		id,
 		offeredAt,
 		photoUrl,
 		elementarySchoolCalories,
