@@ -70,33 +70,33 @@ func (mr *MockMenuRepositoryMockRecorder) Fetch(ctx, limit, offset, city any) *g
 }
 
 // FetchByRangeDate mocks base method.
-func (m *MockMenuRepository) FetchByRangeDate(ctx context.Context, start, end time.Time, city int32) ([]*domain.Menu, error) {
+func (m *MockMenuRepository) FetchByRangeDate(ctx context.Context, start, end time.Time, city, limit int32) ([]*domain.Menu, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchByRangeDate", ctx, start, end, city)
+	ret := m.ctrl.Call(m, "FetchByRangeDate", ctx, start, end, city, limit)
 	ret0, _ := ret[0].([]*domain.Menu)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FetchByRangeDate indicates an expected call of FetchByRangeDate.
-func (mr *MockMenuRepositoryMockRecorder) FetchByRangeDate(ctx, start, end, city any) *gomock.Call {
+func (mr *MockMenuRepositoryMockRecorder) FetchByRangeDate(ctx, start, end, city, limit any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByRangeDate", reflect.TypeOf((*MockMenuRepository)(nil).FetchByRangeDate), ctx, start, end, city)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByRangeDate", reflect.TypeOf((*MockMenuRepository)(nil).FetchByRangeDate), ctx, start, end, city, limit)
 }
 
 // FetchByRangeDateWithDishes mocks base method.
-func (m *MockMenuRepository) FetchByRangeDateWithDishes(ctx context.Context, start, end time.Time, city int32) ([]*domain.MenuWithDishes, error) {
+func (m *MockMenuRepository) FetchByRangeDateWithDishes(ctx context.Context, start, end time.Time, city, limit int32) ([]*domain.MenuWithDishes, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchByRangeDateWithDishes", ctx, start, end, city)
+	ret := m.ctrl.Call(m, "FetchByRangeDateWithDishes", ctx, start, end, city, limit)
 	ret0, _ := ret[0].([]*domain.MenuWithDishes)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FetchByRangeDateWithDishes indicates an expected call of FetchByRangeDateWithDishes.
-func (mr *MockMenuRepositoryMockRecorder) FetchByRangeDateWithDishes(ctx, start, end, city any) *gomock.Call {
+func (mr *MockMenuRepositoryMockRecorder) FetchByRangeDateWithDishes(ctx, start, end, city, limit any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByRangeDateWithDishes", reflect.TypeOf((*MockMenuRepository)(nil).FetchByRangeDateWithDishes), ctx, start, end, city)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByRangeDateWithDishes", reflect.TypeOf((*MockMenuRepository)(nil).FetchByRangeDateWithDishes), ctx, start, end, city, limit)
 }
 
 // FetchWithDishes mocks base method.
@@ -242,18 +242,18 @@ func (mr *MockMenuUsecaseMockRecorder) FetchByRangeDate(ctx, start, end, city an
 }
 
 // FetchByRangeDateWithDishes mocks base method.
-func (m *MockMenuUsecase) FetchByRangeDateWithDishes(ctx context.Context, start, end time.Time, city int32) ([]*domain.MenuWithDishes, error) {
+func (m *MockMenuUsecase) FetchByRangeDateWithDishes(ctx context.Context, start, end time.Time, city, limit int32) ([]*domain.MenuWithDishes, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchByRangeDateWithDishes", ctx, start, end, city)
+	ret := m.ctrl.Call(m, "FetchByRangeDateWithDishes", ctx, start, end, city, limit)
 	ret0, _ := ret[0].([]*domain.MenuWithDishes)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FetchByRangeDateWithDishes indicates an expected call of FetchByRangeDateWithDishes.
-func (mr *MockMenuUsecaseMockRecorder) FetchByRangeDateWithDishes(ctx, start, end, city any) *gomock.Call {
+func (mr *MockMenuUsecaseMockRecorder) FetchByRangeDateWithDishes(ctx, start, end, city, limit any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByRangeDateWithDishes", reflect.TypeOf((*MockMenuUsecase)(nil).FetchByRangeDateWithDishes), ctx, start, end, city)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByRangeDateWithDishes", reflect.TypeOf((*MockMenuUsecase)(nil).FetchByRangeDateWithDishes), ctx, start, end, city, limit)
 }
 
 // FetchWithDishes mocks base method.
