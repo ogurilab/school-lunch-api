@@ -156,10 +156,23 @@ func (r *menuRepository) FetchByRangeDate(ctx context.Context, start, end time.T
 	}
 
 	return menus, nil
-
 }
 
-func (r *menuRepository) GetByIDWithDishes(ctx context.Context, id string, city int32) (*domain.MenuWithDishes, error) {
+/********************
+ * MenuWithDishesRepository
+ ********************/
+
+type menuWithDishesRepository struct {
+	query db.Query
+}
+
+func NewMenuWithDishesRepository(query db.Query) domain.MenuWithDishesRepository {
+	return &menuWithDishesRepository{
+		query: query,
+	}
+}
+
+func (r *menuWithDishesRepository) GetByIDWithDishes(ctx context.Context, id string, city int32) (*domain.MenuWithDishes, error) {
 	arg := db.GetMenuWithDishesParams{
 		ID:       id,
 		CityCode: city,
@@ -194,7 +207,7 @@ func (r *menuRepository) GetByIDWithDishes(ctx context.Context, id string, city 
 	return menu, nil
 }
 
-func (r *menuRepository) FetchWithDishes(ctx context.Context, limit int32, offset int32, city int32) ([]*domain.MenuWithDishes, error) {
+func (r *menuWithDishesRepository) FetchWithDishes(ctx context.Context, limit int32, offset int32, city int32) ([]*domain.MenuWithDishes, error) {
 	arg := db.ListMenuWithDishesParams{
 		Limit:    limit,
 		Offset:   offset,
@@ -237,7 +250,7 @@ func (r *menuRepository) FetchWithDishes(ctx context.Context, limit int32, offse
 	return menus, nil
 }
 
-func (r *menuRepository) GetByDateWithDishes(ctx context.Context, offeredAt time.Time, city int32) (*domain.MenuWithDishes, error) {
+func (r *menuWithDishesRepository) GetByDateWithDishes(ctx context.Context, offeredAt time.Time, city int32) (*domain.MenuWithDishes, error) {
 	arg := db.GetMenuWithDishesByOfferedAtParams{
 		OfferedAt: offeredAt,
 		CityCode:  city,
@@ -272,7 +285,7 @@ func (r *menuRepository) GetByDateWithDishes(ctx context.Context, offeredAt time
 	return menu, nil
 }
 
-func (r *menuRepository) FetchByRangeDateWithDishes(ctx context.Context, start, end time.Time, city int32, limit int32) ([]*domain.MenuWithDishes, error) {
+func (r *menuWithDishesRepository) FetchByRangeDateWithDishes(ctx context.Context, start, end time.Time, city int32, limit int32) ([]*domain.MenuWithDishes, error) {
 	arg := db.ListMenuWithDishesByOfferedAtParams{
 		StartOfferedAt: start,
 		EndOfferedAt:   end,

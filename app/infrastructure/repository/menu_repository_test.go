@@ -406,6 +406,10 @@ func TestFetchByRangeDate(t *testing.T) {
 	}
 }
 
+/******************
+ * With Dishes
+ ******************/
+
 func TestGetByIDWithDishes(t *testing.T) {
 	id := util.NewUlid()
 	date := util.RandomDate()
@@ -565,7 +569,7 @@ func TestGetByIDWithDishes(t *testing.T) {
 			query := mocks.NewMockQuery(ctrl)
 			tc.buildStub(query)
 
-			repo := NewMenuRepository(query)
+			repo := NewMenuWithDishesRepository(query)
 
 			menu, err := repo.GetByIDWithDishes(context.Background(), tc.input.ID, tc.input.CityCode)
 
@@ -697,7 +701,7 @@ func TestFetchWithDishes(t *testing.T) {
 			query := mocks.NewMockQuery(ctrl)
 			tc.build(query)
 
-			repo := NewMenuRepository(query)
+			repo := NewMenuWithDishesRepository(query)
 
 			menus, err := repo.FetchWithDishes(context.Background(), tc.input.Limit, tc.input.Offset, tc.input.CityCode)
 
@@ -868,7 +872,7 @@ func TestGetByDateWithDishes(t *testing.T) {
 			query := mocks.NewMockQuery(ctrl)
 			tc.build(query)
 
-			repo := NewMenuRepository(query)
+			repo := NewMenuWithDishesRepository(query)
 
 			menu, err := repo.GetByDateWithDishes(context.Background(), tc.input.OfferedAt, tc.input.CityCode)
 
@@ -1023,7 +1027,7 @@ func TestFetchByRangeDateWithDishes(t *testing.T) {
 			query := mocks.NewMockQuery(ctrl)
 			tc.build(query)
 
-			repo := NewMenuRepository(query)
+			repo := NewMenuWithDishesRepository(query)
 
 			menus, err := repo.FetchByRangeDateWithDishes(ctx, tc.input.StartOfferedAt, tc.input.EndOfferedAt, tc.input.CityCode, tc.input.Limit)
 
