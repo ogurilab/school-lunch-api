@@ -89,20 +89,20 @@ func NewMenuWithDishesUsecase(mr domain.MenuWithDishesRepository, timeout time.D
 	}
 }
 
-func (mu *menuWithDishesUsecase) GetByIDWithDishes(ctx context.Context, id string, city int32) (*domain.MenuWithDishes, error) {
+func (mu *menuWithDishesUsecase) GetByID(ctx context.Context, id string, city int32) (*domain.MenuWithDishes, error) {
 
 	ctx, cancel := context.WithTimeout(ctx, mu.contextTimeout)
 	defer cancel()
 
-	return mu.menuRepo.GetByIDWithDishes(ctx, id, city)
+	return mu.menuRepo.GetByID(ctx, id, city)
 }
 
-func (mu *menuWithDishesUsecase) FetchWithDishes(ctx context.Context, limit int32, offset int32, city int32) ([]*domain.MenuWithDishes, error) {
+func (mu *menuWithDishesUsecase) Fetch(ctx context.Context, limit int32, offset int32, city int32) ([]*domain.MenuWithDishes, error) {
 
 	ctx, cancel := context.WithTimeout(ctx, mu.contextTimeout)
 	defer cancel()
 
-	r, err := mu.menuRepo.FetchWithDishes(ctx, limit, offset, city)
+	r, err := mu.menuRepo.Fetch(ctx, limit, offset, city)
 
 	if err != nil {
 		return nil, err
@@ -115,20 +115,20 @@ func (mu *menuWithDishesUsecase) FetchWithDishes(ctx context.Context, limit int3
 	return r, nil
 }
 
-func (mu *menuWithDishesUsecase) GetByDateWithDishes(ctx context.Context, offeredAt time.Time, city int32) (*domain.MenuWithDishes, error) {
+func (mu *menuWithDishesUsecase) GetByDate(ctx context.Context, offeredAt time.Time, city int32) (*domain.MenuWithDishes, error) {
 
 	ctx, cancel := context.WithTimeout(ctx, mu.contextTimeout)
 	defer cancel()
 
-	return mu.menuRepo.GetByDateWithDishes(ctx, offeredAt, city)
+	return mu.menuRepo.GetByDate(ctx, offeredAt, city)
 }
 
-func (mu *menuWithDishesUsecase) FetchByRangeDateWithDishes(ctx context.Context, start, end time.Time, city int32, limit int32) ([]*domain.MenuWithDishes, error) {
+func (mu *menuWithDishesUsecase) FetchByRangeDate(ctx context.Context, start, end time.Time, city int32, limit int32) ([]*domain.MenuWithDishes, error) {
 
 	ctx, cancel := context.WithTimeout(ctx, mu.contextTimeout)
 	defer cancel()
 
-	r, err := mu.menuRepo.FetchByRangeDateWithDishes(ctx, start, end, city, limit)
+	r, err := mu.menuRepo.FetchByRangeDate(ctx, start, end, city, limit)
 
 	if err != nil {
 		return nil, err

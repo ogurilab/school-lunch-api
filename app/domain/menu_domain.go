@@ -31,10 +31,10 @@ type MenuRepository interface {
 }
 
 type MenuWithDishesRepository interface {
-	GetByIDWithDishes(ctx context.Context, id string, city int32) (*MenuWithDishes, error)
-	FetchWithDishes(ctx context.Context, limit int32, offset int32, city int32) ([]*MenuWithDishes, error)
-	GetByDateWithDishes(ctx context.Context, offeredAt time.Time, city int32) (*MenuWithDishes, error)
-	FetchByRangeDateWithDishes(ctx context.Context, start, end time.Time, city int32, limit int32) ([]*MenuWithDishes, error)
+	GetByID(ctx context.Context, id string, city int32) (*MenuWithDishes, error)
+	Fetch(ctx context.Context, limit int32, offset int32, city int32) ([]*MenuWithDishes, error)
+	GetByDate(ctx context.Context, offeredAt time.Time, city int32) (*MenuWithDishes, error)
+	FetchByRangeDate(ctx context.Context, start, end time.Time, city int32, limit int32) ([]*MenuWithDishes, error)
 }
 
 type MenuUsecase interface {
@@ -46,11 +46,13 @@ type MenuUsecase interface {
 }
 
 type MenuWithDishesUsecase interface {
-	GetByIDWithDishes(ctx context.Context, id string, city int32) (*MenuWithDishes, error)
-	FetchWithDishes(ctx context.Context, limit int32, offset int32, city int32) ([]*MenuWithDishes, error)
-	GetByDateWithDishes(ctx context.Context, offeredAt time.Time, city int32) (*MenuWithDishes, error)
-	FetchByRangeDateWithDishes(ctx context.Context, start, end time.Time, city int32, limit int32) ([]*MenuWithDishes, error)
+	GetByID(ctx context.Context, id string, city int32) (*MenuWithDishes, error)
+	Fetch(ctx context.Context, limit int32, offset int32, city int32) ([]*MenuWithDishes, error)
+	GetByDate(ctx context.Context, offeredAt time.Time, city int32) (*MenuWithDishes, error)
+	FetchByRangeDate(ctx context.Context, start, end time.Time, city int32, limit int32) ([]*MenuWithDishes, error)
 }
+
+type MenuController interface{}
 
 func newMenu(
 	id string,

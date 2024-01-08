@@ -571,7 +571,7 @@ func TestGetByIDWithDishes(t *testing.T) {
 
 			repo := NewMenuWithDishesRepository(query)
 
-			menu, err := repo.GetByIDWithDishes(context.Background(), tc.input.ID, tc.input.CityCode)
+			menu, err := repo.GetByID(context.Background(), tc.input.ID, tc.input.CityCode)
 
 			tc.check(t, menu, err)
 		})
@@ -703,7 +703,7 @@ func TestFetchWithDishes(t *testing.T) {
 
 			repo := NewMenuWithDishesRepository(query)
 
-			menus, err := repo.FetchWithDishes(context.Background(), tc.input.Limit, tc.input.Offset, tc.input.CityCode)
+			menus, err := repo.Fetch(context.Background(), tc.input.Limit, tc.input.Offset, tc.input.CityCode)
 
 			tc.check(t, menus, err)
 		})
@@ -874,7 +874,7 @@ func TestGetByDateWithDishes(t *testing.T) {
 
 			repo := NewMenuWithDishesRepository(query)
 
-			menu, err := repo.GetByDateWithDishes(context.Background(), tc.input.OfferedAt, tc.input.CityCode)
+			menu, err := repo.GetByDate(context.Background(), tc.input.OfferedAt, tc.input.CityCode)
 
 			tc.check(t, menu, err)
 		})
@@ -1029,7 +1029,7 @@ func TestFetchByRangeDateWithDishes(t *testing.T) {
 
 			repo := NewMenuWithDishesRepository(query)
 
-			menus, err := repo.FetchByRangeDateWithDishes(ctx, tc.input.StartOfferedAt, tc.input.EndOfferedAt, tc.input.CityCode, tc.input.Limit)
+			menus, err := repo.FetchByRangeDate(ctx, tc.input.StartOfferedAt, tc.input.EndOfferedAt, tc.input.CityCode, tc.input.Limit)
 
 			tc.check(t, menus, err)
 		})

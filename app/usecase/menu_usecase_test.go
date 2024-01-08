@@ -432,7 +432,7 @@ func TestMenuWithDishesGetByID(t *testing.T) {
 				ctx:  context.Background(),
 			},
 			buildStub: func(repo *mocks.MockMenuWithDishesRepository) {
-				repo.EXPECT().GetByIDWithDishes(gomock.Any(), gomock.Eq(menu.ID), gomock.Eq(menu.CityCode)).Times(1).Return(menu, nil)
+				repo.EXPECT().GetByID(gomock.Any(), gomock.Eq(menu.ID), gomock.Eq(menu.CityCode)).Times(1).Return(menu, nil)
 			},
 			check: func(t *testing.T, menu *domain.MenuWithDishes, err error) {
 				require.NoError(t, err)
@@ -454,7 +454,7 @@ func TestMenuWithDishesGetByID(t *testing.T) {
 				ctx:  context.Background(),
 			},
 			buildStub: func(repo *mocks.MockMenuWithDishesRepository) {
-				repo.EXPECT().GetByIDWithDishes(gomock.Any(), gomock.Eq("bad_id"), gomock.Eq(menu.CityCode)).Times(1).Return(nil, sql.ErrNoRows)
+				repo.EXPECT().GetByID(gomock.Any(), gomock.Eq("bad_id"), gomock.Eq(menu.CityCode)).Times(1).Return(nil, sql.ErrNoRows)
 			},
 			check: func(t *testing.T, menu *domain.MenuWithDishes, err error) {
 				require.Error(t, err)
@@ -475,7 +475,7 @@ func TestMenuWithDishesGetByID(t *testing.T) {
 
 			uc := NewMenuWithDishesUsecase(repo, ctxTime)
 
-			menu, err := uc.GetByIDWithDishes(tc.input.ctx, tc.input.id, tc.input.city)
+			menu, err := uc.GetByID(tc.input.ctx, tc.input.id, tc.input.city)
 
 			tc.check(t, menu, err)
 		})
@@ -514,7 +514,7 @@ func TestMenuWithDishesFetch(t *testing.T) {
 					menus = append(menus, menu)
 				}
 
-				repo.EXPECT().FetchWithDishes(gomock.Any(), gomock.Eq(int32(10)), gomock.Eq(int32(0)), gomock.Eq(menu.CityCode)).Times(1).Return(menus, nil)
+				repo.EXPECT().Fetch(gomock.Any(), gomock.Eq(int32(10)), gomock.Eq(int32(0)), gomock.Eq(menu.CityCode)).Times(1).Return(menus, nil)
 			},
 			check: func(t *testing.T, menus []*domain.MenuWithDishes, err error) {
 				require.NoError(t, err)
@@ -532,7 +532,7 @@ func TestMenuWithDishesFetch(t *testing.T) {
 				ctx:    context.Background(),
 			},
 			buildStub: func(repo *mocks.MockMenuWithDishesRepository) {
-				repo.EXPECT().FetchWithDishes(gomock.Any(), gomock.Eq(int32(10)), gomock.Eq(int32(0)), gomock.Eq(int32(-1))).Times(1).Return(nil, sql.ErrNoRows)
+				repo.EXPECT().Fetch(gomock.Any(), gomock.Eq(int32(10)), gomock.Eq(int32(0)), gomock.Eq(int32(-1))).Times(1).Return(nil, sql.ErrNoRows)
 			},
 			check: func(t *testing.T, menus []*domain.MenuWithDishes, err error) {
 				require.Error(t, err)
@@ -547,7 +547,7 @@ func TestMenuWithDishesFetch(t *testing.T) {
 				ctx:   context.Background(),
 			},
 			buildStub: func(repo *mocks.MockMenuWithDishesRepository) {
-				repo.EXPECT().FetchWithDishes(gomock.Any(), gomock.Eq(int32(10)), gomock.Eq(int32(0)), gomock.Eq(menu.CityCode)).Times(1).Return([]*domain.MenuWithDishes{}, nil)
+				repo.EXPECT().Fetch(gomock.Any(), gomock.Eq(int32(10)), gomock.Eq(int32(0)), gomock.Eq(menu.CityCode)).Times(1).Return([]*domain.MenuWithDishes{}, nil)
 			},
 			check: func(t *testing.T, menus []*domain.MenuWithDishes, err error) {
 				require.NoError(t, err)
@@ -571,7 +571,7 @@ func TestMenuWithDishesFetch(t *testing.T) {
 
 			uc := NewMenuWithDishesUsecase(repo, ctxTime)
 
-			menus, err := uc.FetchWithDishes(tc.input.ctx, tc.input.limit, tc.input.offset, tc.input.city)
+			menus, err := uc.Fetch(tc.input.ctx, tc.input.limit, tc.input.offset, tc.input.city)
 
 			tc.check(t, menus, err)
 		})
@@ -601,7 +601,7 @@ func TestMenuWithDishesGetByDate(t *testing.T) {
 				ctx:       context.Background(),
 			},
 			buildStub: func(repo *mocks.MockMenuWithDishesRepository) {
-				repo.EXPECT().GetByDateWithDishes(gomock.Any(), gomock.Eq(menu.OfferedAt), gomock.Eq(menu.CityCode)).Times(1).Return(menu, nil)
+				repo.EXPECT().GetByDate(gomock.Any(), gomock.Eq(menu.OfferedAt), gomock.Eq(menu.CityCode)).Times(1).Return(menu, nil)
 			},
 			check: func(t *testing.T, menu *domain.MenuWithDishes, err error) {
 				require.NoError(t, err)
@@ -623,7 +623,7 @@ func TestMenuWithDishesGetByDate(t *testing.T) {
 				ctx:       context.Background(),
 			},
 			buildStub: func(repo *mocks.MockMenuWithDishesRepository) {
-				repo.EXPECT().GetByDateWithDishes(gomock.Any(), gomock.Eq(time.Time{}), gomock.Eq(menu.CityCode)).Times(1).Return(nil, sql.ErrNoRows)
+				repo.EXPECT().GetByDate(gomock.Any(), gomock.Eq(time.Time{}), gomock.Eq(menu.CityCode)).Times(1).Return(nil, sql.ErrNoRows)
 			},
 			check: func(t *testing.T, menu *domain.MenuWithDishes, err error) {
 				require.Error(t, err)
@@ -644,7 +644,7 @@ func TestMenuWithDishesGetByDate(t *testing.T) {
 
 			uc := NewMenuWithDishesUsecase(repo, ctxTime)
 
-			menu, err := uc.GetByDateWithDishes(tc.input.ctx, tc.input.offeredAt, tc.input.city)
+			menu, err := uc.GetByDate(tc.input.ctx, tc.input.offeredAt, tc.input.city)
 
 			tc.check(t, menu, err)
 		})
@@ -688,7 +688,7 @@ func TestMenuWithDishesFetchByRangeDate(t *testing.T) {
 					menus = append(menus, menu)
 				}
 
-				repo.EXPECT().FetchByRangeDateWithDishes(gomock.Any(), gomock.Eq(start), gomock.Eq(end), gomock.Eq(menu.CityCode), gomock.Eq(int32(10))).Times(1).Return(menus, nil)
+				repo.EXPECT().FetchByRangeDate(gomock.Any(), gomock.Eq(start), gomock.Eq(end), gomock.Eq(menu.CityCode), gomock.Eq(int32(10))).Times(1).Return(menus, nil)
 			},
 			check: func(t *testing.T, menus []*domain.MenuWithDishes, err error) {
 				require.NoError(t, err)
@@ -707,7 +707,7 @@ func TestMenuWithDishesFetchByRangeDate(t *testing.T) {
 				ctx:   context.Background(),
 			},
 			buildStub: func(repo *mocks.MockMenuWithDishesRepository) {
-				repo.EXPECT().FetchByRangeDateWithDishes(gomock.Any(), gomock.Eq(start), gomock.Eq(end), gomock.Eq(int32(-1)), gomock.Eq(int32(10))).Times(1).Return(nil, sql.ErrNoRows)
+				repo.EXPECT().FetchByRangeDate(gomock.Any(), gomock.Eq(start), gomock.Eq(end), gomock.Eq(int32(-1)), gomock.Eq(int32(10))).Times(1).Return(nil, sql.ErrNoRows)
 			},
 			check: func(t *testing.T, menus []*domain.MenuWithDishes, err error) {
 				require.Error(t, err)
@@ -725,7 +725,7 @@ func TestMenuWithDishesFetchByRangeDate(t *testing.T) {
 			},
 			buildStub: func(repo *mocks.MockMenuWithDishesRepository) {
 
-				repo.EXPECT().FetchByRangeDateWithDishes(gomock.Any(), gomock.Eq(start), gomock.Eq(end), gomock.Eq(menu.CityCode), gomock.Eq(int32(10))).Times(1).Return([]*domain.MenuWithDishes{}, nil)
+				repo.EXPECT().FetchByRangeDate(gomock.Any(), gomock.Eq(start), gomock.Eq(end), gomock.Eq(menu.CityCode), gomock.Eq(int32(10))).Times(1).Return([]*domain.MenuWithDishes{}, nil)
 			},
 			check: func(t *testing.T, menus []*domain.MenuWithDishes, err error) {
 				require.NoError(t, err)
@@ -749,7 +749,7 @@ func TestMenuWithDishesFetchByRangeDate(t *testing.T) {
 
 			uc := NewMenuWithDishesUsecase(repo, ctxTime)
 
-			menus, err := uc.FetchByRangeDateWithDishes(tc.input.ctx, tc.input.start, tc.input.end, tc.input.city, tc.input.limit)
+			menus, err := uc.FetchByRangeDate(tc.input.ctx, tc.input.start, tc.input.end, tc.input.city, tc.input.limit)
 
 			tc.check(t, menus, err)
 		})
