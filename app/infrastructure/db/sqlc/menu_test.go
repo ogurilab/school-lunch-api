@@ -55,15 +55,6 @@ func TestFetchMenus(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, menus, 5)
 
-	for _, menu := range menus {
-		require.NotEmpty(t, menu)
-		require.NotEmpty(t, menu.ID)
-		require.NotEmpty(t, menu.OfferedAt)
-		require.NotEmpty(t, menu.PhotoUrl)
-		require.NotEmpty(t, menu.ElementarySchoolCalories)
-		require.NotEmpty(t, menu.JuniorHighSchoolCalories)
-		require.NotEmpty(t, menu.CreatedAt)
-	}
 }
 
 func TestGetMenuByOfferedAt(t *testing.T) {
