@@ -250,18 +250,18 @@ func (mr *MockMenuUsecaseMockRecorder) Fetch(ctx, limit, offset, city any) *gomo
 }
 
 // FetchByRangeDate mocks base method.
-func (m *MockMenuUsecase) FetchByRangeDate(ctx context.Context, start, end time.Time, city int32) ([]*domain.Menu, error) {
+func (m *MockMenuUsecase) FetchByRangeDate(ctx context.Context, start, end time.Time, city, limit int32) ([]*domain.Menu, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchByRangeDate", ctx, start, end, city)
+	ret := m.ctrl.Call(m, "FetchByRangeDate", ctx, start, end, city, limit)
 	ret0, _ := ret[0].([]*domain.Menu)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FetchByRangeDate indicates an expected call of FetchByRangeDate.
-func (mr *MockMenuUsecaseMockRecorder) FetchByRangeDate(ctx, start, end, city any) *gomock.Call {
+func (mr *MockMenuUsecaseMockRecorder) FetchByRangeDate(ctx, start, end, city, limit any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByRangeDate", reflect.TypeOf((*MockMenuUsecase)(nil).FetchByRangeDate), ctx, start, end, city)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByRangeDate", reflect.TypeOf((*MockMenuUsecase)(nil).FetchByRangeDate), ctx, start, end, city, limit)
 }
 
 // GetByDate mocks base method.

@@ -42,7 +42,7 @@ type MenuUsecase interface {
 	GetByID(ctx context.Context, id string, city int32) (*Menu, error)
 	Fetch(ctx context.Context, limit int32, offset int32, city int32) ([]*Menu, error)
 	GetByDate(ctx context.Context, offeredAt time.Time, city int32) (*Menu, error)
-	FetchByRangeDate(ctx context.Context, start, end time.Time, city int32) ([]*Menu, error)
+	FetchByRangeDate(ctx context.Context, start, end time.Time, city int32, limit int32) ([]*Menu, error)
 }
 
 type MenuWithDishesUsecase interface {
