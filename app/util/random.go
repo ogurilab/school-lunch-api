@@ -63,6 +63,10 @@ func RandomCityCode() int32 {
 	return int32(RandomInt(0, 10000))
 }
 
+func RandomYYYYMMDD() string {
+	return RandomDate().Format("2006-01-02")
+}
+
 func RandomDateFromStart(start time.Time) time.Time {
 	// YYYY-MM-DD
 
