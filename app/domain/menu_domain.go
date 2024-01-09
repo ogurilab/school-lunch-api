@@ -3,8 +3,10 @@ package domain
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"time"
 
+	"github.com/labstack/echo/v4"
 	"github.com/ogurilab/school-lunch-api/util"
 )
 
@@ -34,6 +36,47 @@ type MenuUsecase interface {
 	FetchByCity(ctx context.Context, limit int32, offset int32, offered time.Time, city int32) ([]*Menu, error)
 }
 
+type MenuController interface {
+	Create(c echo.Context) error
+	GetByID(c echo.Context) error
+	FetchByCity(c echo.Context) error
+}
+
+func (m *Menu) MarshalJSON() ([]byte, error) {
+	type Alias Menu
+	return json.Marshal(&struct {
+		OfferedAt string `json:"offered_at"`
+		*Alias
+	}{
+		OfferedAt: m.OfferedAt.Format("2006-01-02"),
+		Alias:     (*Alias)(m),
+	})
+}
+
+func (m *Menu) UnmarshalJSON(data []byte) error {
+	type Alias Menu
+	aux := &struct {
+		OfferedAt string `json:"offered_at"`
+		*Alias
+	}{
+		Alias: (*Alias)(m),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	offeredAt, err := time.Parse("2006-01-02", aux.OfferedAt)
+
+	if err != nil {
+		return err
+	}
+
+	m.OfferedAt = offeredAt
+
+	return nil
+}
+
 /************************
  * MenuWithDishes
  ************************/
@@ -48,6 +91,34 @@ type MenuWithDishesUsecase interface {
 	GetByID(ctx context.Context, id string, city int32) (*MenuWithDishes, error)
 	FetchByCity(ctx context.Context, limit int32, offset int32, offered time.Time, city int32) ([]*MenuWithDishes, error)
 	Fetch(ctx context.Context, limit int32, offset int32, offered time.Time) ([]*MenuWithDishes, error)
+}
+
+type MenuWithDishesController interface {
+	GetByID(c echo.Context) error
+	FetchByCity(c echo.Context) error
+	Fetch(c echo.Context) error
+}
+
+func (m *MenuWithDishes) MarshalJSON() ([]byte, error) {
+
+	return json.Marshal(&struct {
+		Dishes                   []*Dish        `json:"dishes"`
+		OfferedAt                string         `json:"offered_at"`
+		ID                       string         `json:"id"`
+		PhotoUrl                 sql.NullString `json:"photo_url"`
+		ElementarySchoolCalories int32          `json:"elementary_school_calories"`
+		JuniorHighSchoolCalories int32          `json:"junior_high_school_calories"`
+		CityCode                 int32          `json:"city_code"`
+	}{
+
+		Dishes:                   m.Dishes,
+		OfferedAt:                m.OfferedAt.Format("2006-01-02"),
+		ID:                       m.ID,
+		PhotoUrl:                 m.PhotoUrl,
+		ElementarySchoolCalories: m.ElementarySchoolCalories,
+		JuniorHighSchoolCalories: m.JuniorHighSchoolCalories,
+		CityCode:                 m.CityCode,
+	})
 }
 
 func newMenu(
