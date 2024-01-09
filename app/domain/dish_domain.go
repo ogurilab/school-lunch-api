@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/ogurilab/school-lunch-api/util"
 )
@@ -47,4 +48,16 @@ func NewDish(menuID string, name string) (*Dish, error) {
 	id := util.NewUlid()
 
 	return newDish(id, menuID, name)
+}
+
+func NewDishesFromJson(
+	input json.RawMessage,
+) ([]*Dish, error) {
+	var dishes []*Dish
+
+	if err := json.Unmarshal(input, &dishes); err != nil {
+		return nil, err
+	}
+
+	return dishes, nil
 }

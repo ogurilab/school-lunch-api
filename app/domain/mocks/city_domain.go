@@ -12,6 +12,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	echo "github.com/labstack/echo/v4"
 	domain "github.com/ogurilab/school-lunch-api/domain"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -150,4 +151,69 @@ func (m *MockCityUsecase) GetByCityCode(ctx context.Context, code int32) (*domai
 func (mr *MockCityUsecaseMockRecorder) GetByCityCode(ctx, code any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByCityCode", reflect.TypeOf((*MockCityUsecase)(nil).GetByCityCode), ctx, code)
+}
+
+// MockCityController is a mock of CityController interface.
+type MockCityController struct {
+	ctrl     *gomock.Controller
+	recorder *MockCityControllerMockRecorder
+}
+
+// MockCityControllerMockRecorder is the mock recorder for MockCityController.
+type MockCityControllerMockRecorder struct {
+	mock *MockCityController
+}
+
+// NewMockCityController creates a new mock instance.
+func NewMockCityController(ctrl *gomock.Controller) *MockCityController {
+	mock := &MockCityController{ctrl: ctrl}
+	mock.recorder = &MockCityControllerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCityController) EXPECT() *MockCityControllerMockRecorder {
+	return m.recorder
+}
+
+// Fetch mocks base method.
+func (m *MockCityController) Fetch(c echo.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Fetch", c)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Fetch indicates an expected call of Fetch.
+func (mr *MockCityControllerMockRecorder) Fetch(c any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockCityController)(nil).Fetch), c)
+}
+
+// FetchByPrefectureCode mocks base method.
+func (m *MockCityController) FetchByPrefectureCode(c echo.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FetchByPrefectureCode", c)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// FetchByPrefectureCode indicates an expected call of FetchByPrefectureCode.
+func (mr *MockCityControllerMockRecorder) FetchByPrefectureCode(c any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByPrefectureCode", reflect.TypeOf((*MockCityController)(nil).FetchByPrefectureCode), c)
+}
+
+// GetByCityCode mocks base method.
+func (m *MockCityController) GetByCityCode(c echo.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByCityCode", c)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GetByCityCode indicates an expected call of GetByCityCode.
+func (mr *MockCityControllerMockRecorder) GetByCityCode(c any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByCityCode", reflect.TypeOf((*MockCityController)(nil).GetByCityCode), c)
 }

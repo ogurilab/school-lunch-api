@@ -4,10 +4,9 @@
 name: Run unit Tests
 
 on:
-  push:
-    branches: ['main', 'develop']
   pull_request:
-    branches: ['main', 'develop']
+    paths:
+      - 'app/**'
 
 jobs:
   test:

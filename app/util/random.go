@@ -62,3 +62,13 @@ func RandomInt32() int32 {
 func RandomCityCode() int32 {
 	return int32(RandomInt(0, 10000))
 }
+
+func RandomDateFromStart(start time.Time) time.Time {
+	// YYYY-MM-DD
+
+	year := RandomInt(start.Year(), start.Year()+1000)
+	month := RandomInt(1, 12)
+	day := RandomInt(1, 31)
+
+	return time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+}
