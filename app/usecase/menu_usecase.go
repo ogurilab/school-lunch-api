@@ -34,37 +34,11 @@ func (mu *menuUsecase) GetByID(ctx context.Context, id string, city int32) (*dom
 	return mu.menuRepo.GetByID(ctx, id, city)
 }
 
-func (mu *menuUsecase) Fetch(ctx context.Context, limit int32, offset int32, city int32) ([]*domain.Menu, error) {
+func (mu *menuUsecase) FetchByCity(ctx context.Context, limit int32, offset int32, offered time.Time, city int32) ([]*domain.Menu, error) {
 	ctx, cancel := context.WithTimeout(ctx, mu.contextTimeout)
 	defer cancel()
 
-	r, err := mu.menuRepo.Fetch(ctx, limit, offset, city)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if len(r) == 0 {
-		return []*domain.Menu{}, nil
-	}
-
-	return r, nil
-}
-
-func (mu *menuUsecase) GetByDate(ctx context.Context, offeredAt time.Time, city int32) (*domain.Menu, error) {
-
-	ctx, cancel := context.WithTimeout(ctx, mu.contextTimeout)
-	defer cancel()
-
-	return mu.menuRepo.GetByDate(ctx, offeredAt, city)
-}
-
-func (mu *menuUsecase) FetchByRangeDate(ctx context.Context, start, end time.Time, city int32, limit int32) ([]*domain.Menu, error) {
-
-	ctx, cancel := context.WithTimeout(ctx, mu.contextTimeout)
-	defer cancel()
-
-	r, err := mu.menuRepo.FetchByRangeDate(ctx, start, end, city, limit)
+	r, err := mu.menuRepo.FetchByCity(ctx, limit, offset, offered, city)
 
 	if err != nil {
 		return nil, err
@@ -97,12 +71,12 @@ func (mu *menuWithDishesUsecase) GetByID(ctx context.Context, id string, city in
 	return mu.menuRepo.GetByID(ctx, id, city)
 }
 
-func (mu *menuWithDishesUsecase) Fetch(ctx context.Context, limit int32, offset int32, city int32) ([]*domain.MenuWithDishes, error) {
+func (mu *menuWithDishesUsecase) Fetch(ctx context.Context, limit int32, offset int32, offered time.Time) ([]*domain.MenuWithDishes, error) {
 
 	ctx, cancel := context.WithTimeout(ctx, mu.contextTimeout)
 	defer cancel()
 
-	r, err := mu.menuRepo.Fetch(ctx, limit, offset, city)
+	r, err := mu.menuRepo.Fetch(ctx, limit, offset, offered)
 
 	if err != nil {
 		return nil, err
@@ -115,20 +89,12 @@ func (mu *menuWithDishesUsecase) Fetch(ctx context.Context, limit int32, offset 
 	return r, nil
 }
 
-func (mu *menuWithDishesUsecase) GetByDate(ctx context.Context, offeredAt time.Time, city int32) (*domain.MenuWithDishes, error) {
+func (mu *menuWithDishesUsecase) FetchByCity(ctx context.Context, limit int32, offset int32, offered time.Time, city int32) ([]*domain.MenuWithDishes, error) {
 
 	ctx, cancel := context.WithTimeout(ctx, mu.contextTimeout)
 	defer cancel()
 
-	return mu.menuRepo.GetByDate(ctx, offeredAt, city)
-}
-
-func (mu *menuWithDishesUsecase) FetchByRangeDate(ctx context.Context, start, end time.Time, city int32, limit int32) ([]*domain.MenuWithDishes, error) {
-
-	ctx, cancel := context.WithTimeout(ctx, mu.contextTimeout)
-	defer cancel()
-
-	r, err := mu.menuRepo.FetchByRangeDate(ctx, start, end, city, limit)
+	r, err := mu.menuRepo.FetchByCity(ctx, limit, offset, offered, city)
 
 	if err != nil {
 		return nil, err
