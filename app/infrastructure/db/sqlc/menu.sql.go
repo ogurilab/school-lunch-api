@@ -130,7 +130,7 @@ func (q *Queries) GetMenuWithDishes(ctx context.Context, arg GetMenuWithDishesPa
 	return i, err
 }
 
-const listMenuNyCity = `-- name: ListMenuNyCity :many
+const listMenuByCity = `-- name: ListMenuByCity :many
 SELECT id, offered_at, photo_url, created_at, elementary_school_calories, junior_high_school_calories, city_code
 FROM menus AS m
 WHERE city_code = ?
@@ -139,15 +139,15 @@ ORDER BY offered_at
 LIMIT ? OFFSET ?
 `
 
-type ListMenuNyCityParams struct {
+type ListMenuByCityParams struct {
 	CityCode  int32     `json:"city_code"`
 	OfferedAt time.Time `json:"offered_at"`
 	Limit     int32     `json:"limit"`
 	Offset    int32     `json:"offset"`
 }
 
-func (q *Queries) ListMenuNyCity(ctx context.Context, arg ListMenuNyCityParams) ([]Menu, error) {
-	rows, err := q.db.QueryContext(ctx, listMenuNyCity,
+func (q *Queries) ListMenuByCity(ctx context.Context, arg ListMenuByCityParams) ([]Menu, error) {
+	rows, err := q.db.QueryContext(ctx, listMenuByCity,
 		arg.CityCode,
 		arg.OfferedAt,
 		arg.Limit,

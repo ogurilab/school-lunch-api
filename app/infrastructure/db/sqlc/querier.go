@@ -21,7 +21,7 @@ type Querier interface {
 	ListCitiesByName(ctx context.Context, arg ListCitiesByNameParams) ([]City, error)
 	ListCitiesByPrefecture(ctx context.Context, arg ListCitiesByPrefectureParams) ([]City, error)
 	ListDishes(ctx context.Context, menuID string) ([]Dish, error)
-	ListMenuNyCity(ctx context.Context, arg ListMenuNyCityParams) ([]Menu, error)
+	ListMenuByCity(ctx context.Context, arg ListMenuByCityParams) ([]Menu, error)
 	ListMenuWithDishes(ctx context.Context, arg ListMenuWithDishesParams) ([]ListMenuWithDishesRow, error)
 	ListMenuWithDishesByCity(ctx context.Context, arg ListMenuWithDishesByCityParams) ([]ListMenuWithDishesByCityRow, error)
 	UpdateAvailable(ctx context.Context, cityCode int32) error

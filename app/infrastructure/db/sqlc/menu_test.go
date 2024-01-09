@@ -44,14 +44,14 @@ func TestFetchMenusByCity(t *testing.T) {
 		createRandomMenuFromStart(t, start)
 	}
 
-	arg := ListMenuNyCityParams{
+	arg := ListMenuByCityParams{
 		Limit:     5,
 		Offset:    5,
 		CityCode:  cityCode,
 		OfferedAt: start,
 	}
 
-	menus, err := testQuery.ListMenuNyCity(context.Background(), arg)
+	menus, err := testQuery.ListMenuByCity(context.Background(), arg)
 
 	require.NoError(t, err)
 	require.Len(t, menus, 5)

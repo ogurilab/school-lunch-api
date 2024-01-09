@@ -22,7 +22,7 @@ FROM menus
 WHERE id = sqlc.arg(id)
   AND city_code = sqlc.arg(city_code);
 
--- name: ListMenuNyCity :many
+-- name: ListMenuByCity :many
 SELECT *
 FROM menus AS m
 WHERE city_code = sqlc.arg(city_code)
