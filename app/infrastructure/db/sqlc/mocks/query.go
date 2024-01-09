@@ -141,21 +141,6 @@ func (mr *MockQueryMockRecorder) GetMenu(ctx, arg any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenu", reflect.TypeOf((*MockQuery)(nil).GetMenu), ctx, arg)
 }
 
-// GetMenuByOfferedAt mocks base method.
-func (m *MockQuery) GetMenuByOfferedAt(ctx context.Context, arg db.GetMenuByOfferedAtParams) (db.Menu, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMenuByOfferedAt", ctx, arg)
-	ret0, _ := ret[0].(db.Menu)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetMenuByOfferedAt indicates an expected call of GetMenuByOfferedAt.
-func (mr *MockQueryMockRecorder) GetMenuByOfferedAt(ctx, arg any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenuByOfferedAt", reflect.TypeOf((*MockQuery)(nil).GetMenuByOfferedAt), ctx, arg)
-}
-
 // GetMenuWithDishes mocks base method.
 func (m *MockQuery) GetMenuWithDishes(ctx context.Context, arg db.GetMenuWithDishesParams) (db.GetMenuWithDishesRow, error) {
 	m.ctrl.T.Helper()
@@ -169,21 +154,6 @@ func (m *MockQuery) GetMenuWithDishes(ctx context.Context, arg db.GetMenuWithDis
 func (mr *MockQueryMockRecorder) GetMenuWithDishes(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenuWithDishes", reflect.TypeOf((*MockQuery)(nil).GetMenuWithDishes), ctx, arg)
-}
-
-// GetMenuWithDishesByOfferedAt mocks base method.
-func (m *MockQuery) GetMenuWithDishesByOfferedAt(ctx context.Context, arg db.GetMenuWithDishesByOfferedAtParams) (db.GetMenuWithDishesByOfferedAtRow, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMenuWithDishesByOfferedAt", ctx, arg)
-	ret0, _ := ret[0].(db.GetMenuWithDishesByOfferedAtRow)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetMenuWithDishesByOfferedAt indicates an expected call of GetMenuWithDishesByOfferedAt.
-func (mr *MockQueryMockRecorder) GetMenuWithDishesByOfferedAt(ctx, arg any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenuWithDishesByOfferedAt", reflect.TypeOf((*MockQuery)(nil).GetMenuWithDishesByOfferedAt), ctx, arg)
 }
 
 // ListCities mocks base method.
@@ -246,6 +216,21 @@ func (mr *MockQueryMockRecorder) ListDishes(ctx, menuID any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListDishes", reflect.TypeOf((*MockQuery)(nil).ListDishes), ctx, menuID)
 }
 
+// ListMenuNyCity mocks base method.
+func (m *MockQuery) ListMenuNyCity(ctx context.Context, arg db.ListMenuNyCityParams) ([]db.Menu, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListMenuNyCity", ctx, arg)
+	ret0, _ := ret[0].([]db.Menu)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListMenuNyCity indicates an expected call of ListMenuNyCity.
+func (mr *MockQueryMockRecorder) ListMenuNyCity(ctx, arg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMenuNyCity", reflect.TypeOf((*MockQuery)(nil).ListMenuNyCity), ctx, arg)
+}
+
 // ListMenuWithDishes mocks base method.
 func (m *MockQuery) ListMenuWithDishes(ctx context.Context, arg db.ListMenuWithDishesParams) ([]db.ListMenuWithDishesRow, error) {
 	m.ctrl.T.Helper()
@@ -261,49 +246,19 @@ func (mr *MockQueryMockRecorder) ListMenuWithDishes(ctx, arg any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMenuWithDishes", reflect.TypeOf((*MockQuery)(nil).ListMenuWithDishes), ctx, arg)
 }
 
-// ListMenuWithDishesByOfferedAt mocks base method.
-func (m *MockQuery) ListMenuWithDishesByOfferedAt(ctx context.Context, arg db.ListMenuWithDishesByOfferedAtParams) ([]db.ListMenuWithDishesByOfferedAtRow, error) {
+// ListMenuWithDishesByCity mocks base method.
+func (m *MockQuery) ListMenuWithDishesByCity(ctx context.Context, arg db.ListMenuWithDishesByCityParams) ([]db.ListMenuWithDishesByCityRow, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListMenuWithDishesByOfferedAt", ctx, arg)
-	ret0, _ := ret[0].([]db.ListMenuWithDishesByOfferedAtRow)
+	ret := m.ctrl.Call(m, "ListMenuWithDishesByCity", ctx, arg)
+	ret0, _ := ret[0].([]db.ListMenuWithDishesByCityRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListMenuWithDishesByOfferedAt indicates an expected call of ListMenuWithDishesByOfferedAt.
-func (mr *MockQueryMockRecorder) ListMenuWithDishesByOfferedAt(ctx, arg any) *gomock.Call {
+// ListMenuWithDishesByCity indicates an expected call of ListMenuWithDishesByCity.
+func (mr *MockQueryMockRecorder) ListMenuWithDishesByCity(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMenuWithDishesByOfferedAt", reflect.TypeOf((*MockQuery)(nil).ListMenuWithDishesByOfferedAt), ctx, arg)
-}
-
-// ListMenus mocks base method.
-func (m *MockQuery) ListMenus(ctx context.Context, arg db.ListMenusParams) ([]db.Menu, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListMenus", ctx, arg)
-	ret0, _ := ret[0].([]db.Menu)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListMenus indicates an expected call of ListMenus.
-func (mr *MockQueryMockRecorder) ListMenus(ctx, arg any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMenus", reflect.TypeOf((*MockQuery)(nil).ListMenus), ctx, arg)
-}
-
-// ListMenusByOfferedAt mocks base method.
-func (m *MockQuery) ListMenusByOfferedAt(ctx context.Context, arg db.ListMenusByOfferedAtParams) ([]db.Menu, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListMenusByOfferedAt", ctx, arg)
-	ret0, _ := ret[0].([]db.Menu)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListMenusByOfferedAt indicates an expected call of ListMenusByOfferedAt.
-func (mr *MockQueryMockRecorder) ListMenusByOfferedAt(ctx, arg any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMenusByOfferedAt", reflect.TypeOf((*MockQuery)(nil).ListMenusByOfferedAt), ctx, arg)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMenuWithDishesByCity", reflect.TypeOf((*MockQuery)(nil).ListMenuWithDishesByCity), ctx, arg)
 }
 
 // UpdateAvailable mocks base method.
