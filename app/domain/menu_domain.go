@@ -44,19 +44,30 @@ type MenuController interface {
 
 func (m *Menu) MarshalJSON() ([]byte, error) {
 	type Alias Menu
-	return json.Marshal(&struct {
-		OfferedAt string `json:"offered_at"`
+
+	type Date struct {
+		ID        string  `json:"id"`
+		OfferedAt string  `json:"offered_at"`
+		PhotoUrl  *string `json:"photo_url"`
 		*Alias
-	}{
-		OfferedAt: m.OfferedAt.Format("2006-01-02"),
-		Alias:     (*Alias)(m),
-	})
+	}
+
+	return json.Marshal(
+		&Date{
+			ID:        m.ID,
+			OfferedAt: m.OfferedAt.Format("2006-01-02"),
+			PhotoUrl:  util.NullStringToPointer(m.PhotoUrl),
+			Alias:     (*Alias)(m),
+		},
+	)
 }
 
 func (m *Menu) UnmarshalJSON(data []byte) error {
+
 	type Alias Menu
 	aux := &struct {
-		OfferedAt string `json:"offered_at"`
+		OfferedAt string  `json:"offered_at"`
+		PhotoUrl  *string `json:"photo_url"`
 		*Alias
 	}{
 		Alias: (*Alias)(m),
@@ -73,6 +84,7 @@ func (m *Menu) UnmarshalJSON(data []byte) error {
 	}
 
 	m.OfferedAt = offeredAt
+	m.PhotoUrl = util.PointerToNullString(aux.PhotoUrl)
 
 	return nil
 }
@@ -101,24 +113,67 @@ type MenuWithDishesController interface {
 
 func (m *MenuWithDishes) MarshalJSON() ([]byte, error) {
 
-	return json.Marshal(&struct {
-		Dishes                   []*Dish        `json:"dishes"`
-		OfferedAt                string         `json:"offered_at"`
-		ID                       string         `json:"id"`
-		PhotoUrl                 sql.NullString `json:"photo_url"`
-		ElementarySchoolCalories int32          `json:"elementary_school_calories"`
-		JuniorHighSchoolCalories int32          `json:"junior_high_school_calories"`
-		CityCode                 int32          `json:"city_code"`
-	}{
+	type Date struct {
+		ID                       string  `json:"id"`
+		OfferedAt                string  `json:"offered_at"`
+		PhotoUrl                 *string `json:"photo_url"`
+		ElementarySchoolCalories int32   `json:"elementary_school_calories"`
+		JuniorHighSchoolCalories int32   `json:"junior_high_school_calories"`
+		CityCode                 int32   `json:"city_code"`
+		Dishes                   []*Dish `json:"dishes"`
+	}
 
+	if m.Dishes == nil {
+		m.Dishes = []*Dish{}
+	}
+
+	return json.Marshal(&Date{
 		Dishes:                   m.Dishes,
 		OfferedAt:                m.OfferedAt.Format("2006-01-02"),
 		ID:                       m.ID,
-		PhotoUrl:                 m.PhotoUrl,
+		PhotoUrl:                 util.NullStringToPointer(m.PhotoUrl),
 		ElementarySchoolCalories: m.ElementarySchoolCalories,
 		JuniorHighSchoolCalories: m.JuniorHighSchoolCalories,
 		CityCode:                 m.CityCode,
 	})
+}
+
+func (m *MenuWithDishes) UnmarshalJSON(data []byte) error {
+
+	type MenuAlias Menu
+
+	aux := &struct {
+		Dishes    []*Dish `json:"dishes"`
+		OfferedAt string  `json:"offered_at"`
+		PhotoUrl  *string `json:"photo_url"`
+		*MenuAlias
+	}{
+		Dishes:    m.Dishes,
+		OfferedAt: m.OfferedAt.Format("2006-01-02"),
+		PhotoUrl:  util.NullStringToPointer(m.PhotoUrl),
+		MenuAlias: (*MenuAlias)(&m.Menu),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	offeredAt, err := time.Parse("2006-01-02", aux.OfferedAt)
+
+	if err != nil {
+		return err
+	}
+
+	m.OfferedAt = offeredAt
+	m.PhotoUrl = util.PointerToNullString(aux.PhotoUrl)
+
+	if aux.Dishes != nil {
+		m.Dishes = aux.Dishes
+	} else {
+		m.Dishes = []*Dish{}
+	}
+
+	return nil
 }
 
 func newMenu(

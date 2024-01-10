@@ -2,6 +2,7 @@ package domain
 
 import (
 	"database/sql"
+	"fmt"
 	"testing"
 	"time"
 
@@ -185,7 +186,6 @@ func TestReNewMenu(t *testing.T) {
 			tc.check(m, err)
 		})
 	}
-
 }
 
 func TestReNewMenuWithDishes(t *testing.T) {
@@ -289,4 +289,367 @@ func TestReNewMenuWithDishes(t *testing.T) {
 			tc.check(m, err)
 		})
 	}
+}
+
+func TestMenuMarshalJSON(t *testing.T) {
+
+	validPhotoUrlMenu := randomMenu(t, true)
+
+	invalidPhotoUrlMenu := randomMenu(t, false)
+
+	testCases := []struct {
+		name       string
+		createStub func() Menu
+		check      func([]byte, error)
+	}{
+		{
+			name: "OK Valid PhotoUrl",
+			createStub: func() Menu {
+				return validPhotoUrlMenu
+			},
+			check: func(b []byte, err error) {
+				require.NoError(t, err)
+				require.NotNil(t, b)
+				require.NotEmpty(t, b)
+				requireEqualMenuJSON(t, validPhotoUrlMenu, b)
+			},
+		},
+		{
+			name: "OK Invalid PhotoUrl",
+			createStub: func() Menu {
+				return invalidPhotoUrlMenu
+			},
+			check: func(b []byte, err error) {
+				require.NoError(t, err)
+				require.NotNil(t, b)
+				require.NotEmpty(t, b)
+				requireEqualMenuJSON(t, invalidPhotoUrlMenu, b)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			stub := tc.createStub()
+
+			m, err := ReNewMenu(
+				stub.ID,
+				stub.OfferedAt,
+				stub.PhotoUrl,
+				stub.ElementarySchoolCalories,
+				stub.JuniorHighSchoolCalories,
+				stub.CityCode,
+			)
+
+			require.NoError(t, err)
+
+			b, err := m.MarshalJSON()
+
+			tc.check(b, err)
+		})
+	}
+}
+
+func TestMenuUnmarshalJSON(t *testing.T) {
+
+	validPhotoUrlMenu := randomMenu(t, true)
+
+	invalidPhotoUrlMenu := randomMenu(t, false)
+
+	testCases := []struct {
+		name       string
+		createStub func() Menu
+		check      func(*Menu, error)
+	}{
+		{
+			name: "OK Valid PhotoUrl",
+			createStub: func() Menu {
+				return validPhotoUrlMenu
+			},
+			check: func(m *Menu, err error) {
+				require.NoError(t, err)
+				requireEqualMenu(t, validPhotoUrlMenu, *m)
+			},
+		},
+		{
+			name: "OK Invalid PhotoUrl",
+			createStub: func() Menu {
+				return invalidPhotoUrlMenu
+			},
+			check: func(m *Menu, err error) {
+				require.NoError(t, err)
+				requireEqualMenu(t, invalidPhotoUrlMenu, *m)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			stub := tc.createStub()
+
+			b, err := stub.MarshalJSON()
+			require.NoError(t, err)
+
+			m := &Menu{}
+			err = m.UnmarshalJSON(b)
+
+			tc.check(m, err)
+		})
+	}
+}
+
+func TestMenuWithDishesMarshalJSON(t *testing.T) {
+
+	validPhotoUrlMenu := randomMenuWithDishes(t, true, false)
+
+	invalidPhotoUrlMenu := randomMenuWithDishes(t, false, false)
+
+	emptyDishesMenu := randomMenuWithDishes(t, true, true)
+
+	testCases := []struct {
+		name       string
+		createStub func() MenuWithDishes
+		check      func([]byte, error)
+	}{
+		{
+			name: "OK Valid PhotoUrl",
+			createStub: func() MenuWithDishes {
+				return validPhotoUrlMenu
+			},
+			check: func(b []byte, err error) {
+				require.NoError(t, err)
+				require.NotNil(t, b)
+				require.NotEmpty(t, b)
+				requireEqualMenuWithDishesJSON(t, validPhotoUrlMenu, b)
+			},
+		},
+		{
+			name: "OK Invalid PhotoUrl",
+			createStub: func() MenuWithDishes {
+				return invalidPhotoUrlMenu
+			},
+			check: func(b []byte, err error) {
+				require.NoError(t, err)
+				require.NotNil(t, b)
+				require.NotEmpty(t, b)
+				requireEqualMenuWithDishesJSON(t, invalidPhotoUrlMenu, b)
+			},
+		},
+		{
+			name: "OK Empty Dishes",
+			createStub: func() MenuWithDishes {
+				return emptyDishesMenu
+			},
+			check: func(b []byte, err error) {
+				require.NoError(t, err)
+				require.NotNil(t, b)
+				fmt.Println(string(b))
+				requireEqualMenuWithEmptyDishesJSON(t, emptyDishesMenu, b)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			stub := tc.createStub()
+
+			b, err := stub.MarshalJSON()
+
+			tc.check(b, err)
+		})
+	}
+}
+
+func TestMenuWithDishesUnmarshalJSON(t *testing.T) {
+
+	validPhotoUrlMenu := randomMenuWithDishes(t, true, false)
+
+	invalidPhotoUrlMenu := randomMenuWithDishes(t, false, false)
+
+	emptyDishesMenu := randomMenuWithDishes(t, true, true)
+
+	testCases := []struct {
+		name       string
+		createStub func() MenuWithDishes
+		check      func(*MenuWithDishes, error)
+	}{
+		{
+			name: "OK Valid PhotoUrl",
+			createStub: func() MenuWithDishes {
+				return validPhotoUrlMenu
+			},
+			check: func(m *MenuWithDishes, err error) {
+
+				require.NoError(t, err)
+				require.NotNil(t, m)
+				requireEqualMenuWithDishes(t, validPhotoUrlMenu, *m)
+			},
+		},
+		{
+			name: "OK Invalid PhotoUrl",
+			createStub: func() MenuWithDishes {
+				return invalidPhotoUrlMenu
+			},
+			check: func(m *MenuWithDishes, err error) {
+				require.NoError(t, err)
+				require.NotNil(t, m)
+
+				requireEqualMenuWithDishes(t, invalidPhotoUrlMenu, *m)
+			},
+		},
+		{
+			name: "OK Empty Dishes",
+			createStub: func() MenuWithDishes {
+				return emptyDishesMenu
+			},
+			check: func(m *MenuWithDishes, err error) {
+				require.NoError(t, err)
+				require.NotNil(t, m)
+				requireEqualMenuWithDishes(t, emptyDishesMenu, *m)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			stub := tc.createStub()
+
+			b, err := stub.MarshalJSON()
+			require.NoError(t, err)
+
+			m := &MenuWithDishes{}
+			err = m.UnmarshalJSON(b)
+
+			tc.check(m, err)
+		})
+	}
+}
+
+func randomMenu(t *testing.T, valid bool) Menu {
+	if valid {
+		return Menu{
+			ID:                       util.NewUlid(),
+			OfferedAt:                time.Now(),
+			PhotoUrl:                 sql.NullString{String: "http://example.com", Valid: true},
+			ElementarySchoolCalories: 100,
+			JuniorHighSchoolCalories: 200,
+			CityCode:                 1,
+		}
+	}
+	return Menu{
+		ID:                       util.NewUlid(),
+		OfferedAt:                time.Now(),
+		PhotoUrl:                 sql.NullString{String: "", Valid: false},
+		ElementarySchoolCalories: 100,
+		JuniorHighSchoolCalories: 200,
+		CityCode:                 1,
+	}
+}
+
+func randomMenuWithDishes(t *testing.T, valid bool, empty bool) MenuWithDishes {
+	menu := randomMenu(t, valid)
+
+	if empty {
+		return MenuWithDishes{
+			Menu:   menu,
+			Dishes: nil,
+		}
+	}
+
+	var dishes []*Dish
+
+	for i := 0; i < 1; i++ {
+		dishes = append(dishes, &Dish{
+			ID:     "dish",
+			Name:   "dish",
+			MenuID: "menu",
+		})
+	}
+
+	return MenuWithDishes{
+		Menu:   menu,
+		Dishes: dishes,
+	}
+}
+
+func requireEqualMenuJSON(t *testing.T, m Menu, actual []byte) {
+	var photoUrlStr string
+	if m.PhotoUrl.Valid {
+		photoUrlStr = fmt.Sprintf(`"%s"`, m.PhotoUrl.String)
+	} else {
+		photoUrlStr = "null"
+	}
+
+	expect := fmt.Sprintf(`{"id":"%s","offered_at":"%s","photo_url":%s,"elementary_school_calories":%d,"junior_high_school_calories":%d,"city_code":%d}`,
+		m.ID,
+		m.OfferedAt.Format("2006-01-02"),
+		photoUrlStr,
+		m.ElementarySchoolCalories,
+		m.JuniorHighSchoolCalories,
+		m.CityCode,
+	)
+
+	require.Equal(t, expect, string(actual))
+}
+
+func requireEqualMenuWithDishesJSON(t *testing.T, m MenuWithDishes, actual []byte) {
+	var photoUrlStr string
+	if m.PhotoUrl.Valid {
+		photoUrlStr = fmt.Sprintf(`"%s"`, m.PhotoUrl.String)
+	} else {
+		photoUrlStr = "null"
+	}
+
+	expect := fmt.Sprintf(`{"id":"%s","offered_at":"%s","photo_url":%s,"elementary_school_calories":%d,"junior_high_school_calories":%d,"city_code":%d,"dishes":[{"id":"%s","menu_id":"%s","name":"%s"}]}`,
+		m.ID,
+		m.OfferedAt.Format("2006-01-02"),
+		photoUrlStr,
+		m.ElementarySchoolCalories,
+		m.JuniorHighSchoolCalories,
+		m.CityCode,
+		m.Dishes[0].ID,
+		m.Dishes[0].MenuID,
+		m.Dishes[0].Name,
+	)
+
+	require.Equal(t, expect, string(actual))
+}
+
+func requireEqualMenuWithEmptyDishesJSON(t *testing.T, m MenuWithDishes, actual []byte) {
+	var photoUrlStr string
+	if m.PhotoUrl.Valid {
+		photoUrlStr = fmt.Sprintf(`"%s"`, m.PhotoUrl.String)
+	} else {
+		photoUrlStr = "null"
+	}
+
+	expect := fmt.Sprintf(`{"id":"%s","offered_at":"%s","photo_url":%s,"elementary_school_calories":%d,"junior_high_school_calories":%d,"city_code":%d,"dishes":[]}`,
+		m.ID,
+		m.OfferedAt.Format("2006-01-02"),
+		photoUrlStr,
+		m.ElementarySchoolCalories,
+		m.JuniorHighSchoolCalories,
+		m.CityCode,
+	)
+
+	require.Equal(t, expect, string(actual))
+}
+
+func requireEqualMenu(t *testing.T, expect Menu, actual Menu) {
+	require.Equal(t, expect.ID, actual.ID)
+	require.Equal(t, expect.OfferedAt.Format("2006-01-02"), actual.OfferedAt.Format("2006-01-02"))
+	require.Equal(t, expect.PhotoUrl.String, actual.PhotoUrl.String)
+	require.Equal(t, expect.PhotoUrl.Valid, actual.PhotoUrl.Valid)
+	require.Equal(t, expect.ElementarySchoolCalories, actual.ElementarySchoolCalories)
+	require.Equal(t, expect.JuniorHighSchoolCalories, actual.JuniorHighSchoolCalories)
+	require.Equal(t, expect.CityCode, actual.CityCode)
+}
+
+func requireEqualMenuWithDishes(t *testing.T, expect MenuWithDishes, actual MenuWithDishes) {
+	requireEqualMenu(t, expect.Menu, actual.Menu)
+	require.Len(t, actual.Dishes, len(expect.Dishes))
 }
