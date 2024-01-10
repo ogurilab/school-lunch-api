@@ -8,13 +8,13 @@ import (
 	"github.com/ogurilab/school-lunch-api/domain/errors"
 )
 
-type CityController struct {
-	CityUsecase domain.CityUsecase
+type cityController struct {
+	cityUsecase domain.CityUsecase
 }
 
 func NewCityController(cu domain.CityUsecase) domain.CityController {
-	return &CityController{
-		CityUsecase: cu,
+	return &cityController{
+		cityUsecase: cu,
 	}
 }
 
@@ -22,7 +22,7 @@ type getCityRequest struct {
 	CityCode int32 `param:"code" validate:"required,gt=0"`
 }
 
-func (cc *CityController) GetByCityCode(c echo.Context) error {
+func (cc *cityController) GetByCityCode(c echo.Context) error {
 	var req getCityRequest
 
 	if err := c.Bind(&req); err != nil {
@@ -37,7 +37,7 @@ func (cc *CityController) GetByCityCode(c echo.Context) error {
 
 	ctx := c.Request().Context()
 
-	city, err := cc.CityUsecase.GetByCityCode(ctx, req.CityCode)
+	city, err := cc.cityUsecase.GetByCityCode(ctx, req.CityCode)
 
 	if err != nil {
 
@@ -57,7 +57,7 @@ type fetchCityRequest struct {
 	Offset int32  `query:"offset" validate:"gte=0"`
 }
 
-func (cc *CityController) Fetch(c echo.Context) error {
+func (cc *cityController) Fetch(c echo.Context) error {
 	var req fetchCityRequest
 
 	if err := c.Bind(&req); err != nil {
@@ -78,7 +78,7 @@ func (cc *CityController) Fetch(c echo.Context) error {
 
 	ctx := c.Request().Context()
 
-	cities, err := cc.CityUsecase.Fetch(ctx, req.Limit, req.Offset, req.Search)
+	cities, err := cc.cityUsecase.Fetch(ctx, req.Limit, req.Offset, req.Search)
 
 	if err != nil {
 		return c.JSON(errors.NewInternalServerError(err))
@@ -94,7 +94,7 @@ type fetchCityByPrefectureCodeRequest struct {
 	Offset         int32 `query:"offset" validate:"gte=0"`
 }
 
-func (cc *CityController) FetchByPrefectureCode(c echo.Context) error {
+func (cc *cityController) FetchByPrefectureCode(c echo.Context) error {
 	var req fetchCityByPrefectureCodeRequest
 
 	if err := c.Bind(&req); err != nil {
@@ -116,7 +116,7 @@ func (cc *CityController) FetchByPrefectureCode(c echo.Context) error {
 
 	ctx := c.Request().Context()
 
-	cities, err := cc.CityUsecase.FetchByPrefectureCode(ctx, req.Limit, req.Offset, req.PrefectureCode)
+	cities, err := cc.cityUsecase.FetchByPrefectureCode(ctx, req.Limit, req.Offset, req.PrefectureCode)
 
 	if err != nil {
 		return c.JSON(errors.NewInternalServerError(err))

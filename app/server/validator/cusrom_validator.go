@@ -2,8 +2,9 @@ package validator
 
 import (
 	"net/http"
+	"time"
 
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
@@ -12,7 +13,12 @@ type CustomValidator struct {
 }
 
 func NewCustomValidator() *CustomValidator {
-	return &CustomValidator{validator: validator.New()}
+
+	validator := validator.New()
+
+	validator.RegisterValidation("YYYY-MM-DD", ValidDateFormat)
+
+	return &CustomValidator{validator: validator}
 }
 
 func (cv *CustomValidator) Validate(i interface{}) error {
@@ -22,4 +28,12 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 	}
 
 	return nil
+}
+
+func ValidDateFormat(fl validator.FieldLevel) bool {
+	date := fl.Field().String()
+
+	_, err := time.Parse("2006-01-02", date)
+
+	return err == nil
 }
