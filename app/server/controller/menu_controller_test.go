@@ -292,7 +292,7 @@ func TestFetchMenuByCity(t *testing.T) {
 		CityCode int32
 		Limit    sql.NullInt32
 		Offset   sql.NullInt32
-		Offered  sql.NullString
+		Offered  string
 	}
 
 	testCases := []struct {
@@ -307,7 +307,7 @@ func TestFetchMenuByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -327,7 +327,7 @@ func TestFetchMenuByCity(t *testing.T) {
 				CityCode: -1,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				uc.EXPECT().FetchByCity(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
@@ -342,7 +342,7 @@ func TestFetchMenuByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: -1, Valid: true},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				uc.EXPECT().FetchByCity(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
@@ -357,7 +357,7 @@ func TestFetchMenuByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: -1, Valid: true},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				uc.EXPECT().FetchByCity(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
@@ -372,7 +372,7 @@ func TestFetchMenuByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: "invalid-offered", Valid: true},
+				Offered:  "invalid-offered",
 			},
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				uc.EXPECT().FetchByCity(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
@@ -382,20 +382,19 @@ func TestFetchMenuByCity(t *testing.T) {
 			},
 		},
 		{
-			name: "If Offered is not specified, it will be set to the current date.",
+			name: "If Offered is not specified, return 400 error",
 			req: req{
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: "", Valid: false},
+				Offered:  "",
 			},
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 
-				uc.EXPECT().FetchByCity(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(1).Return(menus, nil)
+				uc.EXPECT().FetchByCity(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0).Return(menus, nil)
 			},
 			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
-				require.Equal(t, 200, recorder.Code)
-				requireBodyMatchMenus(t, recorder.Body, menus)
+				require.Equal(t, 400, recorder.Code)
 			},
 		},
 		{
@@ -404,7 +403,7 @@ func TestFetchMenuByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: 0, Valid: false},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -423,7 +422,7 @@ func TestFetchMenuByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: 0, Valid: false},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -442,7 +441,7 @@ func TestFetchMenuByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -460,7 +459,7 @@ func TestFetchMenuByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -505,9 +504,7 @@ func TestFetchMenuByCity(t *testing.T) {
 			q.Set("offset", fmt.Sprintf("%d", tc.req.Offset.Int32))
 		}
 
-		if tc.req.Offered.Valid {
-			q.Set("offered", tc.req.Offered.String)
-		}
+		q.Set("offered", tc.req.Offered)
 
 		url := fmt.Sprintf("/cities/%d/menus/basic?%s", tc.req.CityCode, q.Encode())
 		req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -638,7 +635,7 @@ func TestFetchMenuWithDishes(t *testing.T) {
 	type req struct {
 		Limit   sql.NullInt32
 		Offset  sql.NullInt32
-		Offered sql.NullString
+		Offered string
 	}
 
 	testCases := []struct {
@@ -652,7 +649,7 @@ func TestFetchMenuWithDishes(t *testing.T) {
 			req: req{
 				Limit:   sql.NullInt32{Int32: limit, Valid: true},
 				Offset:  sql.NullInt32{Int32: offset, Valid: true},
-				Offered: sql.NullString{String: offered, Valid: true},
+				Offered: offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -671,7 +668,7 @@ func TestFetchMenuWithDishes(t *testing.T) {
 			req: req{
 				Limit:   sql.NullInt32{Int32: -1, Valid: true},
 				Offset:  sql.NullInt32{Int32: offset, Valid: true},
-				Offered: sql.NullString{String: offered, Valid: true},
+				Offered: offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				uc.EXPECT().Fetch(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
@@ -685,7 +682,7 @@ func TestFetchMenuWithDishes(t *testing.T) {
 			req: req{
 				Limit:   sql.NullInt32{Int32: limit, Valid: true},
 				Offset:  sql.NullInt32{Int32: -1, Valid: true},
-				Offered: sql.NullString{String: offered, Valid: true},
+				Offered: offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				uc.EXPECT().Fetch(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
@@ -699,7 +696,7 @@ func TestFetchMenuWithDishes(t *testing.T) {
 			req: req{
 				Limit:   sql.NullInt32{Int32: limit, Valid: true},
 				Offset:  sql.NullInt32{Int32: offset, Valid: true},
-				Offered: sql.NullString{String: "invalid-offered", Valid: true},
+				Offered: "invalid-offered",
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				uc.EXPECT().Fetch(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
@@ -709,18 +706,17 @@ func TestFetchMenuWithDishes(t *testing.T) {
 			},
 		},
 		{
-			name: "If Offered is not specified, it will be set to the current date.",
+			name: "If Offered is not specified, return 400 error",
 			req: req{
 				Limit:   sql.NullInt32{Int32: limit, Valid: true},
 				Offset:  sql.NullInt32{Int32: offset, Valid: true},
-				Offered: sql.NullString{String: "", Valid: false},
+				Offered: "",
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
-				uc.EXPECT().Fetch(gomock.Any(), gomock.Eq(limit), gomock.Eq(offset), gomock.Any()).Times(1).Return(menus, nil)
+				uc.EXPECT().Fetch(gomock.Any(), gomock.Eq(limit), gomock.Eq(offset), gomock.Any()).Times(0).Return(menus, nil)
 			},
 			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.MenuWithDishes) {
-				require.Equal(t, 200, recorder.Code)
-				requireBodyMatchMenuWithDishesList(t, recorder.Body, menus)
+				require.Equal(t, 400, recorder.Code)
 			},
 		},
 		{
@@ -728,7 +724,7 @@ func TestFetchMenuWithDishes(t *testing.T) {
 			req: req{
 				Limit:   sql.NullInt32{Int32: 0, Valid: false},
 				Offset:  sql.NullInt32{Int32: offset, Valid: true},
-				Offered: sql.NullString{String: offered, Valid: true},
+				Offered: offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -746,7 +742,7 @@ func TestFetchMenuWithDishes(t *testing.T) {
 			req: req{
 				Limit:   sql.NullInt32{Int32: limit, Valid: true},
 				Offset:  sql.NullInt32{Int32: 0, Valid: false},
-				Offered: sql.NullString{String: offered, Valid: true},
+				Offered: offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -764,7 +760,7 @@ func TestFetchMenuWithDishes(t *testing.T) {
 			req: req{
 				Limit:   sql.NullInt32{Int32: limit, Valid: true},
 				Offset:  sql.NullInt32{Int32: offset, Valid: true},
-				Offered: sql.NullString{String: offered, Valid: true},
+				Offered: offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -781,7 +777,7 @@ func TestFetchMenuWithDishes(t *testing.T) {
 			req: req{
 				Limit:   sql.NullInt32{Int32: limit, Valid: true},
 				Offset:  sql.NullInt32{Int32: offset, Valid: true},
-				Offered: sql.NullString{String: offered, Valid: true},
+				Offered: offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -826,9 +822,7 @@ func TestFetchMenuWithDishes(t *testing.T) {
 			q.Set("offset", fmt.Sprintf("%d", tc.req.Offset.Int32))
 		}
 
-		if tc.req.Offered.Valid {
-			q.Set("offered", tc.req.Offered.String)
-		}
+		q.Set("offered", tc.req.Offered)
 
 		url := fmt.Sprintf("/menus?%s", q.Encode())
 		req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -860,7 +854,7 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 		CityCode int32
 		Limit    sql.NullInt32
 		Offset   sql.NullInt32
-		Offered  sql.NullString
+		Offered  string
 	}
 
 	testCases := []struct {
@@ -875,7 +869,7 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -895,7 +889,7 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 				CityCode: -1,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				uc.EXPECT().FetchByCity(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
@@ -910,7 +904,7 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: -1, Valid: true},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				uc.EXPECT().FetchByCity(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
@@ -925,7 +919,7 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: -1, Valid: true},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				uc.EXPECT().FetchByCity(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
@@ -940,7 +934,7 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: "invalid-offered", Valid: true},
+				Offered:  "invalid-offered",
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				uc.EXPECT().FetchByCity(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
@@ -950,19 +944,18 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 			},
 		},
 		{
-			name: "If Offered is not specified, it will be set to the current date.",
+			name: "If Offered is not specified, return 400 error",
 			req: req{
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: "", Valid: false},
+				Offered:  "",
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
-				uc.EXPECT().FetchByCity(gomock.Any(), gomock.Eq(limit), gomock.Eq(offset), gomock.Any(), gomock.Eq(cityCode)).Times(1).Return(menus, nil)
+				uc.EXPECT().FetchByCity(gomock.Any(), gomock.Eq(limit), gomock.Eq(offset), gomock.Any(), gomock.Eq(cityCode)).Times(0).Return(menus, nil)
 			},
 			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.MenuWithDishes) {
-				require.Equal(t, 200, recorder.Code)
-				requireBodyMatchMenuWithDishesList(t, recorder.Body, menus)
+				require.Equal(t, 400, recorder.Code)
 			},
 		},
 		{
@@ -971,7 +964,7 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: 0, Valid: false},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -990,7 +983,7 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: 0, Valid: false},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -1009,7 +1002,7 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -1027,7 +1020,7 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 				CityCode: cityCode,
 				Limit:    sql.NullInt32{Int32: limit, Valid: true},
 				Offset:   sql.NullInt32{Int32: offset, Valid: true},
-				Offered:  sql.NullString{String: offered, Valid: true},
+				Offered:  offered,
 			},
 			buildStub: func(uc *mocks.MockMenuWithDishesUsecase) {
 				parsedOffered, err := util.ParseDate(offered)
@@ -1072,9 +1065,7 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 			q.Set("offset", fmt.Sprintf("%d", tc.req.Offset.Int32))
 		}
 
-		if tc.req.Offered.Valid {
-			q.Set("offered", tc.req.Offered.String)
-		}
+		q.Set("offered", tc.req.Offered)
 
 		url := fmt.Sprintf("/cities/%d/menus?%s", tc.req.CityCode, q.Encode())
 		req, err := http.NewRequest(http.MethodGet, url, nil)

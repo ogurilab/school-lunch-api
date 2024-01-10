@@ -101,7 +101,7 @@ type fetchMenuRequest struct {
 	CityCode int32  `param:"code" validate:"required,gt=0"`
 	Limit    int32  `query:"limit" validate:"gt=0"`
 	Offset   int32  `query:"offset" validate:"gte=0"`
-	Offered  string `query:"offered" validate:"YYYY-MM-DD"`
+	Offered  string `query:"offered" validate:"YYYY-MM-DD,required"`
 }
 
 type fetchMenuResponse struct {
@@ -122,10 +122,6 @@ func (mc *menuController) FetchByCity(c echo.Context) error {
 
 	if req.Offset == 0 {
 		req.Offset = domain.DEFAULT_OFFSET
-	}
-
-	if req.Offered == "" {
-		req.Offered = util.NowDate()
 	}
 
 	if err := c.Validate(&req); err != nil {
@@ -215,7 +211,7 @@ type fetchMenuWithDishesByCityRequest struct {
 	CityCode int32  `param:"code" validate:"required,gt=0"`
 	Limit    int32  `query:"limit" validate:"gt=0"`
 	Offset   int32  `query:"offset" validate:"gte=0"`
-	Offered  string `query:"offered" validate:"YYYY-MM-DD"`
+	Offered  string `query:"offered" validate:"YYYY-MM-DD,required"`
 }
 
 type fetchMenuWithDishesResponse struct {
@@ -236,10 +232,6 @@ func (mc *menuWithDishesController) FetchByCity(c echo.Context) error {
 
 	if req.Offset == 0 {
 		req.Offset = domain.DEFAULT_OFFSET
-	}
-
-	if req.Offered == "" {
-		req.Offered = util.NowDate()
 	}
 
 	if err := c.Validate(&req); err != nil {
@@ -283,7 +275,7 @@ func (mc *menuWithDishesController) FetchByCity(c echo.Context) error {
 type fetchMenuWithDishesRequest struct {
 	Limit   int32  `query:"limit" validate:"gt=0"`
 	Offset  int32  `query:"offset" validate:"gte=0"`
-	Offered string `query:"offered" validate:"YYYY-MM-DD"`
+	Offered string `query:"offered" validate:"YYYY-MM-DD,required"`
 }
 
 func (mc *menuWithDishesController) Fetch(c echo.Context) error {
@@ -299,10 +291,6 @@ func (mc *menuWithDishesController) Fetch(c echo.Context) error {
 
 	if req.Offset == 0 {
 		req.Offset = domain.DEFAULT_OFFSET
-	}
-
-	if req.Offered == "" {
-		req.Offered = util.NowDate()
 	}
 
 	if err := c.Validate(&req); err != nil {
