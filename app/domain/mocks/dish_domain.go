@@ -53,6 +53,21 @@ func (mr *MockDishRepositoryMockRecorder) Create(ctx, dish any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockDishRepository)(nil).Create), ctx, dish)
 }
 
+// Fetch mocks base method.
+func (m *MockDishRepository) Fetch(ctx context.Context, limit, offset int32) ([]*domain.Dish, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Fetch", ctx, limit, offset)
+	ret0, _ := ret[0].([]*domain.Dish)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Fetch indicates an expected call of Fetch.
+func (mr *MockDishRepositoryMockRecorder) Fetch(ctx, limit, offset any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockDishRepository)(nil).Fetch), ctx, limit, offset)
+}
+
 // FetchByMenuID mocks base method.
 func (m *MockDishRepository) FetchByMenuID(ctx context.Context, menuID string) ([]*domain.Dish, error) {
 	m.ctrl.T.Helper()
@@ -68,19 +83,19 @@ func (mr *MockDishRepositoryMockRecorder) FetchByMenuID(ctx, menuID any) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByMenuID", reflect.TypeOf((*MockDishRepository)(nil).FetchByMenuID), ctx, menuID)
 }
 
-// FetchByNames mocks base method.
-func (m *MockDishRepository) FetchByNames(ctx context.Context, names []string, limit, offset int32) ([]*domain.Dish, error) {
+// FetchByName mocks base method.
+func (m *MockDishRepository) FetchByName(ctx context.Context, search string, limit, offset int32) ([]*domain.Dish, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchByNames", ctx, names, limit, offset)
+	ret := m.ctrl.Call(m, "FetchByName", ctx, search, limit, offset)
 	ret0, _ := ret[0].([]*domain.Dish)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FetchByNames indicates an expected call of FetchByNames.
-func (mr *MockDishRepositoryMockRecorder) FetchByNames(ctx, names, limit, offset any) *gomock.Call {
+// FetchByName indicates an expected call of FetchByName.
+func (mr *MockDishRepositoryMockRecorder) FetchByName(ctx, search, limit, offset any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByNames", reflect.TypeOf((*MockDishRepository)(nil).FetchByNames), ctx, names, limit, offset)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByName", reflect.TypeOf((*MockDishRepository)(nil).FetchByName), ctx, search, limit, offset)
 }
 
 // GetByID mocks base method.
@@ -135,6 +150,21 @@ func (mr *MockDishUsecaseMockRecorder) Create(ctx, dish any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockDishUsecase)(nil).Create), ctx, dish)
 }
 
+// Fetch mocks base method.
+func (m *MockDishUsecase) Fetch(ctx context.Context, limit, offset int32) ([]*domain.Dish, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Fetch", ctx, limit, offset)
+	ret0, _ := ret[0].([]*domain.Dish)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Fetch indicates an expected call of Fetch.
+func (mr *MockDishUsecaseMockRecorder) Fetch(ctx, limit, offset any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockDishUsecase)(nil).Fetch), ctx, limit, offset)
+}
+
 // FetchByMenuID mocks base method.
 func (m *MockDishUsecase) FetchByMenuID(ctx context.Context, menuID string) ([]*domain.Dish, error) {
 	m.ctrl.T.Helper()
@@ -150,19 +180,19 @@ func (mr *MockDishUsecaseMockRecorder) FetchByMenuID(ctx, menuID any) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByMenuID", reflect.TypeOf((*MockDishUsecase)(nil).FetchByMenuID), ctx, menuID)
 }
 
-// FetchByNames mocks base method.
-func (m *MockDishUsecase) FetchByNames(ctx context.Context, names []string, limit, offset int32) ([]*domain.Dish, error) {
+// FetchByName mocks base method.
+func (m *MockDishUsecase) FetchByName(ctx context.Context, search string, limit, offset int32) ([]*domain.Dish, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchByNames", ctx, names, limit, offset)
+	ret := m.ctrl.Call(m, "FetchByName", ctx, search, limit, offset)
 	ret0, _ := ret[0].([]*domain.Dish)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FetchByNames indicates an expected call of FetchByNames.
-func (mr *MockDishUsecaseMockRecorder) FetchByNames(ctx, names, limit, offset any) *gomock.Call {
+// FetchByName indicates an expected call of FetchByName.
+func (mr *MockDishUsecaseMockRecorder) FetchByName(ctx, search, limit, offset any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByNames", reflect.TypeOf((*MockDishUsecase)(nil).FetchByNames), ctx, names, limit, offset)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByName", reflect.TypeOf((*MockDishUsecase)(nil).FetchByName), ctx, search, limit, offset)
 }
 
 // GetByID mocks base method.

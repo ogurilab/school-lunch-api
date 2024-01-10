@@ -17,14 +17,16 @@ type DishRepository interface {
 	Create(ctx context.Context, dish *Dish) error
 	GetByID(ctx context.Context, id string) (*Dish, error)
 	FetchByMenuID(ctx context.Context, menuID string) ([]*Dish, error)
-	FetchByNames(ctx context.Context, names []string, limit, offset int32) ([]*Dish, error)
+	FetchByName(ctx context.Context, search string, limit int32, offset int32) ([]*Dish, error)
+	Fetch(ctx context.Context, limit int32, offset int32) ([]*Dish, error)
 }
 
 type DishUsecase interface {
 	Create(ctx context.Context, dish *Dish) error
 	GetByID(ctx context.Context, id string) (*Dish, error)
 	FetchByMenuID(ctx context.Context, menuID string) ([]*Dish, error)
-	FetchByNames(ctx context.Context, names []string, limit, offset int32) ([]*Dish, error)
+	FetchByName(ctx context.Context, search string, limit int32, offset int32) ([]*Dish, error)
+	Fetch(ctx context.Context, limit int32, offset int32) ([]*Dish, error)
 }
 
 func newDish(id string, menuID string, name string) (*Dish, error) {
