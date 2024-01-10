@@ -12,15 +12,21 @@ FROM dishes
 WHERE id = sqlc.arg(id)
 LIMIT 1;
 
--- name: ListDishes :many
+-- name: ListDishByMenuID :many
 SELECT *
 FROM dishes
 WHERE menu_id = sqlc.arg(menu_id)
 ORDER BY id;
 
--- name: GetDishByNames :many
+-- name: ListDishByName :many
 SELECT *
 FROM dishes
-WHERE name IN (sqlc.slice(names))
+WHERE name LIKE ?
+ORDER BY id
+LIMIT ? OFFSET ?;
+
+-- name: ListDish :many
+SELECT *
+FROM dishes
 ORDER BY id
 LIMIT ? OFFSET ?;

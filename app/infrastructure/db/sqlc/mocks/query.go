@@ -111,21 +111,6 @@ func (mr *MockQueryMockRecorder) GetDish(ctx, id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDish", reflect.TypeOf((*MockQuery)(nil).GetDish), ctx, id)
 }
 
-// GetDishByNames mocks base method.
-func (m *MockQuery) GetDishByNames(ctx context.Context, arg db.GetDishByNamesParams) ([]db.Dish, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDishByNames", ctx, arg)
-	ret0, _ := ret[0].([]db.Dish)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetDishByNames indicates an expected call of GetDishByNames.
-func (mr *MockQueryMockRecorder) GetDishByNames(ctx, arg any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDishByNames", reflect.TypeOf((*MockQuery)(nil).GetDishByNames), ctx, arg)
-}
-
 // GetMenu mocks base method.
 func (m *MockQuery) GetMenu(ctx context.Context, arg db.GetMenuParams) (db.Menu, error) {
 	m.ctrl.T.Helper()
@@ -201,19 +186,49 @@ func (mr *MockQueryMockRecorder) ListCitiesByPrefecture(ctx, arg any) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListCitiesByPrefecture", reflect.TypeOf((*MockQuery)(nil).ListCitiesByPrefecture), ctx, arg)
 }
 
-// ListDishes mocks base method.
-func (m *MockQuery) ListDishes(ctx context.Context, menuID string) ([]db.Dish, error) {
+// ListDish mocks base method.
+func (m *MockQuery) ListDish(ctx context.Context, arg db.ListDishParams) ([]db.Dish, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListDishes", ctx, menuID)
+	ret := m.ctrl.Call(m, "ListDish", ctx, arg)
 	ret0, _ := ret[0].([]db.Dish)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListDishes indicates an expected call of ListDishes.
-func (mr *MockQueryMockRecorder) ListDishes(ctx, menuID any) *gomock.Call {
+// ListDish indicates an expected call of ListDish.
+func (mr *MockQueryMockRecorder) ListDish(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListDishes", reflect.TypeOf((*MockQuery)(nil).ListDishes), ctx, menuID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListDish", reflect.TypeOf((*MockQuery)(nil).ListDish), ctx, arg)
+}
+
+// ListDishByMenuID mocks base method.
+func (m *MockQuery) ListDishByMenuID(ctx context.Context, menuID string) ([]db.Dish, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListDishByMenuID", ctx, menuID)
+	ret0, _ := ret[0].([]db.Dish)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListDishByMenuID indicates an expected call of ListDishByMenuID.
+func (mr *MockQueryMockRecorder) ListDishByMenuID(ctx, menuID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListDishByMenuID", reflect.TypeOf((*MockQuery)(nil).ListDishByMenuID), ctx, menuID)
+}
+
+// ListDishByName mocks base method.
+func (m *MockQuery) ListDishByName(ctx context.Context, arg db.ListDishByNameParams) ([]db.Dish, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListDishByName", ctx, arg)
+	ret0, _ := ret[0].([]db.Dish)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListDishByName indicates an expected call of ListDishByName.
+func (mr *MockQueryMockRecorder) ListDishByName(ctx, arg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListDishByName", reflect.TypeOf((*MockQuery)(nil).ListDishByName), ctx, arg)
 }
 
 // ListMenuByCity mocks base method.

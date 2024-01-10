@@ -20,7 +20,7 @@ func TestCreateMenu(t *testing.T) {
 		ctx  context.Context
 	}
 
-	menu := randomMenu()
+	menu := randomMenu(t)
 	testCases := []struct {
 		name      string
 		input     input
@@ -68,7 +68,7 @@ func TestGetMenuByID(t *testing.T) {
 		ctx  context.Context
 	}
 
-	menu := randomMenu()
+	menu := randomMenu(t)
 	testCases := []struct {
 		name      string
 		input     input
@@ -143,7 +143,7 @@ func TestFetchMenu(t *testing.T) {
 		ctx     context.Context
 	}
 
-	menu := randomMenu()
+	menu := randomMenu(t)
 	testCases := []struct {
 		name      string
 		input     input
@@ -245,7 +245,7 @@ func TestGetMenuWithDishesByID(t *testing.T) {
 		ctx  context.Context
 	}
 
-	menu := randomMenuWithDishes()
+	menu := randomMenuWithDishes(t)
 	testCases := []struct {
 		name      string
 		input     input
@@ -319,7 +319,7 @@ func TestMenuWithDishesFetch(t *testing.T) {
 		ctx     context.Context
 	}
 
-	menu := randomMenuWithDishes()
+	menu := randomMenuWithDishes(t)
 	testCases := []struct {
 		name      string
 		input     input
@@ -416,7 +416,7 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 		ctx     context.Context
 	}
 
-	menu := randomMenuWithDishes()
+	menu := randomMenuWithDishes(t)
 	testCases := []struct {
 		name      string
 		input     input
@@ -524,32 +524,25 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 	}
 }
 
-func randomMenu() *domain.Menu {
-	menu, _ := domain.NewMenu(
+func randomMenu(t *testing.T) *domain.Menu {
+	menu, err := domain.NewMenu(
 		util.RandomDate(),
 		util.RandomNullURL(),
 		util.RandomInt32(),
 		util.RandomInt32(),
-		util.RandomCityCode(),
+		util.RandomInt32(),
 	)
+
+	require.NoError(t, err)
 
 	return menu
 }
 
-func randomDish() *domain.Dish {
-	dish, _ := domain.NewDish(
-		util.RandomUlid(),
-		util.RandomString(10),
-	)
-
-	return dish
-}
-
-func randomMenuWithDishes() *domain.MenuWithDishes {
+func randomMenuWithDishes(t *testing.T) *domain.MenuWithDishes {
 	var dishes []*domain.Dish
 
 	for i := 0; i < 10; i++ {
-		dishes = append(dishes, randomDish())
+		dishes = append(dishes, randomDish(t))
 	}
 	menu, _ := domain.ReNewMenuWithDishes(
 		util.RandomUlid(),
