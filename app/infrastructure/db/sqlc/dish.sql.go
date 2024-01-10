@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"strings"
 )
 
 const createDish = `-- name: CreateDish :exec
@@ -49,34 +48,20 @@ func (q *Queries) GetDish(ctx context.Context, id string) (Dish, error) {
 	return i, err
 }
 
-const getDishByNames = `-- name: GetDishByNames :many
+const listDish = `-- name: ListDish :many
 SELECT id, menu_id, name, created_at
 FROM dishes
-WHERE name IN (/*SLICE:names*/?)
 ORDER BY id
 LIMIT ? OFFSET ?
 `
 
-type GetDishByNamesParams struct {
-	Names  []string `json:"names"`
-	Limit  int32    `json:"limit"`
-	Offset int32    `json:"offset"`
+type ListDishParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
 }
 
-func (q *Queries) GetDishByNames(ctx context.Context, arg GetDishByNamesParams) ([]Dish, error) {
-	query := getDishByNames
-	var queryParams []interface{}
-	if len(arg.Names) > 0 {
-		for _, v := range arg.Names {
-			queryParams = append(queryParams, v)
-		}
-		query = strings.Replace(query, "/*SLICE:names*/?", strings.Repeat(",?", len(arg.Names))[1:], 1)
-	} else {
-		query = strings.Replace(query, "/*SLICE:names*/?", "NULL", 1)
-	}
-	queryParams = append(queryParams, arg.Limit)
-	queryParams = append(queryParams, arg.Offset)
-	rows, err := q.db.QueryContext(ctx, query, queryParams...)
+func (q *Queries) ListDish(ctx context.Context, arg ListDishParams) ([]Dish, error) {
+	rows, err := q.db.QueryContext(ctx, listDish, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -103,15 +88,57 @@ func (q *Queries) GetDishByNames(ctx context.Context, arg GetDishByNamesParams) 
 	return items, nil
 }
 
-const listDishes = `-- name: ListDishes :many
+const listDishByMenuID = `-- name: ListDishByMenuID :many
 SELECT id, menu_id, name, created_at
 FROM dishes
 WHERE menu_id = ?
 ORDER BY id
 `
 
-func (q *Queries) ListDishes(ctx context.Context, menuID string) ([]Dish, error) {
-	rows, err := q.db.QueryContext(ctx, listDishes, menuID)
+func (q *Queries) ListDishByMenuID(ctx context.Context, menuID string) ([]Dish, error) {
+	rows, err := q.db.QueryContext(ctx, listDishByMenuID, menuID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Dish{}
+	for rows.Next() {
+		var i Dish
+		if err := rows.Scan(
+			&i.ID,
+			&i.MenuID,
+			&i.Name,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listDishByName = `-- name: ListDishByName :many
+SELECT id, menu_id, name, created_at
+FROM dishes
+WHERE name LIKE ?
+ORDER BY id
+LIMIT ? OFFSET ?
+`
+
+type ListDishByNameParams struct {
+	Name   string `json:"name"`
+	Limit  int32  `json:"limit"`
+	Offset int32  `json:"offset"`
+}
+
+func (q *Queries) ListDishByName(ctx context.Context, arg ListDishByNameParams) ([]Dish, error) {
+	rows, err := q.db.QueryContext(ctx, listDishByName, arg.Name, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

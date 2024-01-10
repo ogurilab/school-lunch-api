@@ -28,61 +28,78 @@ func TestGetDish(t *testing.T) {
 
 }
 
-func TestFetchMenuByID(t *testing.T) {
+func TestFetchDishByMenuID(t *testing.T) {
 	menu := createRandomMenu(t)
 	for i := 0; i < 10; i++ {
 		createRandomDish(t, menu.ID)
 	}
 
-	dishes, err := testQuery.ListDishes(context.Background(), menu.ID)
+	dishes, err := testQuery.ListDishByMenuID(context.Background(), menu.ID)
 
 	require.NoError(t, err)
 	require.Len(t, dishes, 10)
 
 	for _, dish := range dishes {
-		require.NotEmpty(t, dish)
-		require.NotEmpty(t, dish.ID)
-		require.NotEmpty(t, dish.MenuID)
-		require.NotEmpty(t, dish.Name)
-		require.NotEmpty(t, dish.CreatedAt)
+		require.Equal(t, menu.ID, dish.MenuID)
 	}
 }
 
-func TestFetchByNames(t *testing.T) {
+func TestFetchDishesByName(t *testing.T) {
 	menu := createRandomMenu(t)
 
-	var names []string
+	var mockDishes []*domain.Dish
 
 	for i := 0; i < 10; i++ {
-		dish := createRandomDish(t, menu.ID)
-		names = append(names, dish.Name)
+		mockDishes = append(mockDishes, createRandomDish(t, menu.ID))
+
 	}
 
-	arg := GetDishByNamesParams{
-		Names:  names,
+	arg := ListDishByNameParams{
+		Name:   mockDishes[0].Name,
+		Limit:  5,
+		Offset: 0,
+	}
+
+	dishes, err := testQuery.ListDishByName(context.Background(), arg)
+
+	require.NoError(t, err)
+	require.Len(t, dishes, 1)
+
+	for _, dish := range dishes {
+		require.Equal(t, mockDishes[0].Name, dish.Name)
+		require.Equal(t, arg.Name, dish.Name)
+		require.Equal(t, mockDishes[0].MenuID, dish.MenuID)
+		require.Equal(t, mockDishes[0].ID, dish.ID)
+	}
+}
+
+func TestFetchDishes(t *testing.T) {
+
+	var mockDishes []*domain.Dish
+
+	for i := 0; i < 10; i++ {
+		dish := createRandomDish(t, util.RandomUlid())
+		mockDishes = append(mockDishes, dish)
+	}
+
+	require.Len(t, mockDishes, 10)
+
+	arg := ListDishParams{
 		Limit:  5,
 		Offset: 5,
 	}
 
-	dishes, err := testQuery.GetDishByNames(context.Background(), arg)
+	dishes, err := testQuery.ListDish(context.Background(), arg)
 
 	require.NoError(t, err)
 	require.Len(t, dishes, 5)
 
-	containsNames := names[5:]
-	notContainsNames := names[:5]
-
 	for _, dish := range dishes {
-		require.NotEmpty(t, dish)
 		require.NotEmpty(t, dish.ID)
 		require.NotEmpty(t, dish.MenuID)
 		require.NotEmpty(t, dish.Name)
-		require.NotEmpty(t, dish.CreatedAt)
 
-		require.Contains(t, containsNames, dish.Name)
-		require.NotContains(t, notContainsNames, dish.Name)
 	}
-
 }
 
 func createRandomDish(t *testing.T, menuID string) *domain.Dish {
