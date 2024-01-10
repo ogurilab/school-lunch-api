@@ -1176,17 +1176,6 @@ func randomMenu(t *testing.T) *domain.Menu {
 	return menu
 }
 
-func randomDish(t *testing.T) *domain.Dish {
-	dish, err := domain.NewDish(
-		util.RandomUlid(),
-		util.RandomString(10),
-	)
-
-	require.NoError(t, err)
-
-	return dish
-}
-
 func randomMenuWithDishes(t *testing.T) *domain.MenuWithDishes {
 	var dishes []*domain.Dish
 
