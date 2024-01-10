@@ -13,5 +13,5 @@ func InitRoutes(env bootstrap.Env, timeout time.Duration, e *echo.Echo, query db
 
 	NewSwaggerRouter(v1)
 	NewCityRouter(v1, timeout, query)
-
+	NewMenuRouter(v1, timeout, query)
 }
