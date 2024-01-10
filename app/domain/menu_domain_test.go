@@ -445,7 +445,6 @@ func TestMenuWithDishesMarshalJSON(t *testing.T) {
 			check: func(b []byte, err error) {
 				require.NoError(t, err)
 				require.NotNil(t, b)
-				fmt.Println(string(b))
 				requireEqualMenuWithEmptyDishesJSON(t, emptyDishesMenu, b)
 			},
 		},
