@@ -151,18 +151,18 @@ func (mr *MockDishUsecaseMockRecorder) Create(ctx, dish any) *gomock.Call {
 }
 
 // Fetch mocks base method.
-func (m *MockDishUsecase) Fetch(ctx context.Context, limit, offset int32) ([]*domain.Dish, error) {
+func (m *MockDishUsecase) Fetch(ctx context.Context, search string, limit, offset int32) ([]*domain.Dish, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Fetch", ctx, limit, offset)
+	ret := m.ctrl.Call(m, "Fetch", ctx, search, limit, offset)
 	ret0, _ := ret[0].([]*domain.Dish)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Fetch indicates an expected call of Fetch.
-func (mr *MockDishUsecaseMockRecorder) Fetch(ctx, limit, offset any) *gomock.Call {
+func (mr *MockDishUsecaseMockRecorder) Fetch(ctx, search, limit, offset any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockDishUsecase)(nil).Fetch), ctx, limit, offset)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockDishUsecase)(nil).Fetch), ctx, search, limit, offset)
 }
 
 // FetchByMenuID mocks base method.
@@ -178,21 +178,6 @@ func (m *MockDishUsecase) FetchByMenuID(ctx context.Context, menuID string) ([]*
 func (mr *MockDishUsecaseMockRecorder) FetchByMenuID(ctx, menuID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByMenuID", reflect.TypeOf((*MockDishUsecase)(nil).FetchByMenuID), ctx, menuID)
-}
-
-// FetchByName mocks base method.
-func (m *MockDishUsecase) FetchByName(ctx context.Context, search string, limit, offset int32) ([]*domain.Dish, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchByName", ctx, search, limit, offset)
-	ret0, _ := ret[0].([]*domain.Dish)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// FetchByName indicates an expected call of FetchByName.
-func (mr *MockDishUsecaseMockRecorder) FetchByName(ctx, search, limit, offset any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByName", reflect.TypeOf((*MockDishUsecase)(nil).FetchByName), ctx, search, limit, offset)
 }
 
 // GetByID mocks base method.
