@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/labstack/echo/v4"
 	"github.com/ogurilab/school-lunch-api/util"
 )
 
@@ -26,6 +27,12 @@ type DishUsecase interface {
 	GetByID(ctx context.Context, id string) (*Dish, error)
 	FetchByMenuID(ctx context.Context, menuID string) ([]*Dish, error)
 	Fetch(ctx context.Context, search string, limit int32, offset int32) ([]*Dish, error)
+}
+
+type DishController interface {
+	GetByID(c echo.Context) error
+	FetchByMenuID(c echo.Context) error
+	Fetch(c echo.Context) error
 }
 
 func newDish(id string, menuID string, name string) (*Dish, error) {

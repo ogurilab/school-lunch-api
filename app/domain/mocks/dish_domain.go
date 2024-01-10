@@ -12,6 +12,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	echo "github.com/labstack/echo/v4"
 	domain "github.com/ogurilab/school-lunch-api/domain"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -193,4 +194,69 @@ func (m *MockDishUsecase) GetByID(ctx context.Context, id string) (*domain.Dish,
 func (mr *MockDishUsecaseMockRecorder) GetByID(ctx, id any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockDishUsecase)(nil).GetByID), ctx, id)
+}
+
+// MockDishController is a mock of DishController interface.
+type MockDishController struct {
+	ctrl     *gomock.Controller
+	recorder *MockDishControllerMockRecorder
+}
+
+// MockDishControllerMockRecorder is the mock recorder for MockDishController.
+type MockDishControllerMockRecorder struct {
+	mock *MockDishController
+}
+
+// NewMockDishController creates a new mock instance.
+func NewMockDishController(ctrl *gomock.Controller) *MockDishController {
+	mock := &MockDishController{ctrl: ctrl}
+	mock.recorder = &MockDishControllerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockDishController) EXPECT() *MockDishControllerMockRecorder {
+	return m.recorder
+}
+
+// Fetch mocks base method.
+func (m *MockDishController) Fetch(c echo.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Fetch", c)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Fetch indicates an expected call of Fetch.
+func (mr *MockDishControllerMockRecorder) Fetch(c any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockDishController)(nil).Fetch), c)
+}
+
+// FetchByMenuID mocks base method.
+func (m *MockDishController) FetchByMenuID(c echo.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FetchByMenuID", c)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// FetchByMenuID indicates an expected call of FetchByMenuID.
+func (mr *MockDishControllerMockRecorder) FetchByMenuID(c any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByMenuID", reflect.TypeOf((*MockDishController)(nil).FetchByMenuID), c)
+}
+
+// GetByID mocks base method.
+func (m *MockDishController) GetByID(c echo.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByID", c)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GetByID indicates an expected call of GetByID.
+func (mr *MockDishControllerMockRecorder) GetByID(c any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockDishController)(nil).GetByID), c)
 }
