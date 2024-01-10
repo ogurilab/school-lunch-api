@@ -274,7 +274,7 @@ func TestGetByIDWithDishes(t *testing.T) {
 					CityCode: 1,
 				}
 
-				dishes := randomDish(dishID)
+				dishes := randomDishJson(dishID)
 
 				result := db.GetMenuWithDishesRow{
 					ID:        arg.ID,
@@ -709,7 +709,7 @@ func randomResults(length int) []db.Menu {
 	return menus
 }
 
-func randomDish(id string) json.RawMessage {
+func randomDishJson(id string) json.RawMessage {
 	dishes := fmt.Sprintf(`[{"id":"%s","name":"dish","menu_id":"%d"}]`, id, 1)
 	return json.RawMessage(dishes)
 
@@ -726,7 +726,7 @@ func randomWithDishesResult(length int) []db.ListMenuWithDishesRow {
 			PhotoUrl:                 util.RandomNullURL(),
 			ElementarySchoolCalories: util.RandomInt32(),
 			JuniorHighSchoolCalories: util.RandomInt32(),
-			Dishes:                   randomDish(util.NewUlid()),
+			Dishes:                   randomDishJson(util.NewUlid()),
 		})
 	}
 
@@ -744,7 +744,7 @@ func randomWithDishesByCityResult(length int) []db.ListMenuWithDishesByCityRow {
 			PhotoUrl:                 util.RandomNullURL(),
 			ElementarySchoolCalories: util.RandomInt32(),
 			JuniorHighSchoolCalories: util.RandomInt32(),
-			Dishes:                   randomDish(util.NewUlid()),
+			Dishes:                   randomDishJson(util.NewUlid()),
 		})
 	}
 
