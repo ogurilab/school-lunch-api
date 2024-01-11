@@ -34,17 +34,32 @@ func (cu *cityUsecase) Fetch(ctx context.Context, limit int32, offset int32, sea
 	ctx, cancel := context.WithTimeout(ctx, cu.contextTimeout)
 	defer cancel()
 
-	r, err := cu.cityRepo.Fetch(ctx, limit, offset, search)
+	if search != "" {
+		like := "%" + search + "%"
+		result, err := cu.cityRepo.FetchByName(ctx, limit, offset, like)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if len(result) == 0 {
+			return []*domain.City{}, nil
+		}
+
+		return result, nil
+	}
+
+	result, err := cu.cityRepo.Fetch(ctx, limit, offset)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if len(r) == 0 {
+	if len(result) == 0 {
 		return []*domain.City{}, nil
 	}
 
-	return r, nil
+	return result, nil
 }
 
 func (cu *cityUsecase) FetchByPrefectureCode(ctx context.Context, limit int32, offset int32, prefectureCode int32) ([]*domain.City, error) {

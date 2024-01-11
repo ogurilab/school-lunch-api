@@ -16,7 +16,8 @@ type City struct {
 
 type CityRepository interface {
 	GetByCityCode(ctx context.Context, code int32) (*City, error)
-	Fetch(ctx context.Context, limit int32, offset int32, search string) ([]*City, error)
+	FetchByName(ctx context.Context, limit int32, offset int32, search string) ([]*City, error)
+	Fetch(ctx context.Context, limit int32, offset int32) ([]*City, error)
 	FetchByPrefectureCode(ctx context.Context, limit int32, offset int32, prefectureCode int32) ([]*City, error)
 }
 

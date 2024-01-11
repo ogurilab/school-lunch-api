@@ -36,40 +36,15 @@ func (r *cityRepository) GetByCityCode(ctx context.Context, code int32) (*domain
 
 }
 
-func (r *cityRepository) Fetch(ctx context.Context, limit int32, offset int32, search string) ([]*domain.City, error) {
+func (r *cityRepository) FetchByName(ctx context.Context, limit int32, offset int32, search string) ([]*domain.City, error) {
 
-	if search != "" {
-		arg := db.ListCitiesByNameParams{
-			Limit:    limit,
-			Offset:   offset,
-			CityName: search,
-		}
-
-		result, err := r.query.ListCitiesByName(ctx, arg)
-		if err != nil {
-			return nil, err
-		}
-
-		var cities []*domain.City
-
-		for _, city := range result {
-			cities = append(cities, domain.NewCity(
-				city.CityCode,
-				city.CityName,
-				city.PrefectureCode,
-				city.PrefectureName,
-			))
-		}
-
-		return cities, nil
+	arg := db.ListCitiesByNameParams{
+		Limit:    limit,
+		Offset:   offset,
+		CityName: search,
 	}
 
-	arg := db.ListCitiesParams{
-		Limit:  limit,
-		Offset: offset,
-	}
-
-	result, err := r.query.ListCities(ctx, arg)
+	result, err := r.query.ListCitiesByName(ctx, arg)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +61,32 @@ func (r *cityRepository) Fetch(ctx context.Context, limit int32, offset int32, s
 	}
 
 	return cities, nil
+}
 
+func (r *cityRepository) Fetch(ctx context.Context, limit int32, offset int32) ([]*domain.City, error) {
+	arg := db.ListCitiesParams{
+		Limit:  limit,
+		Offset: offset,
+	}
+
+	result, err := r.query.ListCities(ctx, arg)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var cities []*domain.City
+
+	for _, city := range result {
+		cities = append(cities, domain.NewCity(
+			city.CityCode,
+			city.CityName,
+			city.PrefectureCode,
+			city.PrefectureName,
+		))
+	}
+
+	return cities, nil
 }
 
 func (r *cityRepository) FetchByPrefectureCode(ctx context.Context, limit int32, offset int32, prefectureCode int32) ([]*domain.City, error) {

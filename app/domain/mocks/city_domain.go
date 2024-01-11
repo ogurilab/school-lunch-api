@@ -41,18 +41,33 @@ func (m *MockCityRepository) EXPECT() *MockCityRepositoryMockRecorder {
 }
 
 // Fetch mocks base method.
-func (m *MockCityRepository) Fetch(ctx context.Context, limit, offset int32, search string) ([]*domain.City, error) {
+func (m *MockCityRepository) Fetch(ctx context.Context, limit, offset int32) ([]*domain.City, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Fetch", ctx, limit, offset, search)
+	ret := m.ctrl.Call(m, "Fetch", ctx, limit, offset)
 	ret0, _ := ret[0].([]*domain.City)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Fetch indicates an expected call of Fetch.
-func (mr *MockCityRepositoryMockRecorder) Fetch(ctx, limit, offset, search any) *gomock.Call {
+func (mr *MockCityRepositoryMockRecorder) Fetch(ctx, limit, offset any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockCityRepository)(nil).Fetch), ctx, limit, offset, search)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockCityRepository)(nil).Fetch), ctx, limit, offset)
+}
+
+// FetchByName mocks base method.
+func (m *MockCityRepository) FetchByName(ctx context.Context, limit, offset int32, search string) ([]*domain.City, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FetchByName", ctx, limit, offset, search)
+	ret0, _ := ret[0].([]*domain.City)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FetchByName indicates an expected call of FetchByName.
+func (mr *MockCityRepositoryMockRecorder) FetchByName(ctx, limit, offset, search any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByName", reflect.TypeOf((*MockCityRepository)(nil).FetchByName), ctx, limit, offset, search)
 }
 
 // FetchByPrefectureCode mocks base method.

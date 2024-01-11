@@ -48,7 +48,7 @@ func (cc *cityController) GetByCityCode(c echo.Context) error {
 		return c.JSON(errors.NewInternalServerError(err))
 	}
 
-	return c.JSON(200, domain.NewResponse(city))
+	return c.JSON(200, city)
 }
 
 type fetchCityRequest struct {
@@ -84,7 +84,7 @@ func (cc *cityController) Fetch(c echo.Context) error {
 		return c.JSON(errors.NewInternalServerError(err))
 	}
 
-	return c.JSON(200, domain.NewResponse(cities))
+	return c.JSON(200, cities)
 
 }
 
@@ -122,6 +122,6 @@ func (cc *cityController) FetchByPrefectureCode(c echo.Context) error {
 		return c.JSON(errors.NewInternalServerError(err))
 	}
 
-	return c.JSON(200, domain.NewResponse(cities))
+	return c.JSON(200, cities)
 
 }

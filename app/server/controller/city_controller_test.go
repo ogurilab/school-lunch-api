@@ -463,25 +463,25 @@ func requireBodyMatchCities(t *testing.T, body *bytes.Buffer, cities []*domain.C
 	data, err := io.ReadAll(body)
 	require.NoError(t, err)
 
-	var response struct {
-		Data []*domain.City `json:"data"`
-	}
+	var citiesData []*domain.City
 
-	err = json.Unmarshal(data, &response)
+	err = json.Unmarshal(data, &citiesData)
 	require.NoError(t, err)
-	require.Equal(t, cities, response.Data)
+	require.Equal(t, cities, citiesData)
+	require.Equal(t, len(cities), len(citiesData))
 }
 
 func requireBodyMatchCity(t *testing.T, body *bytes.Buffer, city *domain.City) {
 	data, err := io.ReadAll(body)
 	require.NoError(t, err)
 
-	var response struct {
-		Data *domain.City `json:"data"`
-	}
+	var cityData domain.City
 
-	err = json.Unmarshal(data, &response)
+	err = json.Unmarshal(data, &cityData)
 	require.NoError(t, err)
-	require.Equal(t, city, response.Data)
+	require.Equal(t, city.CityCode, cityData.CityCode)
+	require.Equal(t, city.CityName, cityData.CityName)
+	require.Equal(t, city.PrefectureCode, cityData.PrefectureCode)
+	require.Equal(t, city.PrefectureName, cityData.PrefectureName)
 
 }
