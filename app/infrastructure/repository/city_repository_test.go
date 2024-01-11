@@ -13,7 +13,7 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestGetByCityCode(t *testing.T) {
+func TestGetCityByCityCode(t *testing.T) {
 	code := util.RandomCityCode()
 
 	type input struct {
@@ -89,7 +89,7 @@ func TestGetByCityCode(t *testing.T) {
 	}
 }
 
-func TestFetch(t *testing.T) {
+func TestFetchCityByName(t *testing.T) {
 	limit := util.RandomInt32()
 	offset := util.RandomInt32()
 	search := util.RandomString(10)
@@ -134,7 +134,13 @@ func TestFetch(t *testing.T) {
 					},
 				}
 
-				query.EXPECT().ListCitiesByName(gomock.Any(), gomock.Any()).Times(1).Return(cities, nil)
+				arg := db.ListCitiesByNameParams{
+					Limit:    limit,
+					Offset:   offset,
+					CityName: search,
+				}
+
+				query.EXPECT().ListCitiesByName(gomock.Any(), gomock.Eq(arg)).Times(1).Return(cities, nil)
 			},
 			check: func(t *testing.T, cities []*domain.City, err error) {
 				require.NoError(t, err)
@@ -149,12 +155,132 @@ func TestFetch(t *testing.T) {
 				}
 			},
 		},
+		// {
+		// 	name: "Ok By No Search",
+		// 	input: input{
+		// 		limit:  limit,
+		// 		offset: offset,
+		// 		search: "",
+		// 		ctx:    context.Background(),
+		// 	},
+		// 	buildStub: func(query *mocks.MockQuery) {
+
+		// 		cities := []db.City{
+		// 			{
+		// 				CityCode:                 util.RandomCityCode(),
+		// 				CityName:                 "city_name",
+		// 				PrefectureCode:           1,
+		// 				PrefectureName:           "prefecture_name",
+		// 				SchoolLunchInfoAvailable: false,
+		// 			},
+		// 			{
+		// 				CityCode:                 util.RandomCityCode(),
+		// 				CityName:                 "city_name",
+		// 				PrefectureCode:           1,
+		// 				PrefectureName:           "prefecture_name",
+		// 				SchoolLunchInfoAvailable: false,
+		// 			},
+		// 		}
+
+		// 		query.EXPECT().ListCities(gomock.Any(), gomock.Any()).Times(1).Return(cities, nil)
+		// 	},
+		// 	check: func(t *testing.T, cities []*domain.City, err error) {
+		// 		require.NoError(t, err)
+		// 		require.NotNil(t, cities)
+
+		// 		require.Len(t, cities, 2)
+
+		// 		for _, city := range cities {
+		// 			require.Equal(t, "city_name", city.CityName)
+		// 			require.Equal(t, int32(1), city.PrefectureCode)
+		// 			require.Equal(t, "prefecture_name", city.PrefectureName)
+		// 		}
+		// 	},
+		// },
+		{
+			name: "Bad Search",
+			input: input{
+				limit:  limit,
+				offset: offset,
+				search: search,
+				ctx:    context.Background(),
+			},
+			buildStub: func(query *mocks.MockQuery) {
+
+				arg := db.ListCitiesByNameParams{
+					Limit:    limit,
+					Offset:   offset,
+					CityName: search,
+				}
+
+				query.EXPECT().ListCitiesByName(gomock.Any(), gomock.Eq(arg)).Return([]db.City{}, sql.ErrConnDone)
+			},
+			check: func(t *testing.T, cities []*domain.City, err error) {
+				require.Error(t, err)
+				require.ErrorIs(t, err, sql.ErrConnDone)
+				require.Nil(t, cities)
+			},
+		},
+		// {
+		// 	name: "Bad No Search",
+		// 	input: input{
+		// 		limit:  limit,
+		// 		offset: offset,
+		// 		search: "",
+		// 		ctx:    context.Background(),
+		// 	},
+		// 	buildStub: func(query *mocks.MockQuery) {
+
+		// 		query.EXPECT().ListCities(gomock.Any(), gomock.Any()).Return([]db.City{}, sql.ErrConnDone)
+		// 	},
+		// 	check: func(t *testing.T, cities []*domain.City, err error) {
+		// 		require.Error(t, err)
+		// 		require.ErrorIs(t, err, sql.ErrConnDone)
+		// 		require.Nil(t, cities)
+		// 	},
+		// },
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			query := mocks.NewMockQuery(ctrl)
+			tc.buildStub(query)
+
+			repo := NewCityRepository(query)
+
+			cities, err := repo.FetchByName(tc.input.ctx, tc.input.limit, tc.input.offset, tc.input.search)
+			tc.check(t, cities, err)
+		})
+	}
+}
+
+func TestFetchCity(t *testing.T) {
+	limit := util.RandomInt32()
+	offset := util.RandomInt32()
+
+	type input struct {
+		limit  int32
+		offset int32
+
+		ctx context.Context
+	}
+
+	testCases := []struct {
+		name      string
+		input     input
+		buildStub func(query *mocks.MockQuery)
+		check     func(t *testing.T, cities []*domain.City, err error)
+	}{
+
 		{
 			name: "Ok By No Search",
 			input: input{
 				limit:  limit,
 				offset: offset,
-				search: "",
 				ctx:    context.Background(),
 			},
 			buildStub: func(query *mocks.MockQuery) {
@@ -176,7 +302,12 @@ func TestFetch(t *testing.T) {
 					},
 				}
 
-				query.EXPECT().ListCities(gomock.Any(), gomock.Any()).Times(1).Return(cities, nil)
+				arg := db.ListCitiesParams{
+					Limit:  limit,
+					Offset: offset,
+				}
+
+				query.EXPECT().ListCities(gomock.Any(), gomock.Eq(arg)).Times(1).Return(cities, nil)
 			},
 			check: func(t *testing.T, cities []*domain.City, err error) {
 				require.NoError(t, err)
@@ -192,34 +323,20 @@ func TestFetch(t *testing.T) {
 			},
 		},
 		{
-			name: "Bad Search",
+			name: "Bad",
 			input: input{
 				limit:  limit,
 				offset: offset,
-				search: search,
 				ctx:    context.Background(),
 			},
 			buildStub: func(query *mocks.MockQuery) {
 
-				query.EXPECT().ListCitiesByName(gomock.Any(), gomock.Any()).Return([]db.City{}, sql.ErrConnDone)
-			},
-			check: func(t *testing.T, cities []*domain.City, err error) {
-				require.Error(t, err)
-				require.ErrorIs(t, err, sql.ErrConnDone)
-				require.Nil(t, cities)
-			},
-		},
-		{
-			name: "Bad No Search",
-			input: input{
-				limit:  limit,
-				offset: offset,
-				search: "",
-				ctx:    context.Background(),
-			},
-			buildStub: func(query *mocks.MockQuery) {
+				arg := db.ListCitiesParams{
+					Limit:  limit,
+					Offset: offset,
+				}
 
-				query.EXPECT().ListCities(gomock.Any(), gomock.Any()).Return([]db.City{}, sql.ErrConnDone)
+				query.EXPECT().ListCities(gomock.Any(), gomock.Eq(arg)).Return([]db.City{}, sql.ErrConnDone)
 			},
 			check: func(t *testing.T, cities []*domain.City, err error) {
 				require.Error(t, err)
@@ -240,13 +357,13 @@ func TestFetch(t *testing.T) {
 
 			repo := NewCityRepository(query)
 
-			cities, err := repo.Fetch(tc.input.ctx, tc.input.limit, tc.input.offset, tc.input.search)
+			cities, err := repo.Fetch(tc.input.ctx, tc.input.limit, tc.input.offset)
 			tc.check(t, cities, err)
 		})
 	}
 }
 
-func TestFetchByPrefectureCode(t *testing.T) {
+func TestFetchCityByPrefectureCode(t *testing.T) {
 	limit := util.RandomInt32()
 	offset := util.RandomInt32()
 	prefectureCode := util.RandomInt32()
