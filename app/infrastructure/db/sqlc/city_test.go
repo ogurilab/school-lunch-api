@@ -126,6 +126,7 @@ func createRandomCity(t *testing.T) *domain.City {
 		CityCode:       cityCode,
 		CityName:       util.RandomString(10),
 		PrefectureCode: util.RandomInt32(),
+		PrefectureName: util.RandomString(10),
 	}
 
 	err := testQuery.CreateCity(context.Background(), arg)
