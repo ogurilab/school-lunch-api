@@ -1,10 +1,8 @@
 # school-lunch-api
 
-## Description
-
 Docker と Make Command がインストールされている環境であれば、どの環境でも動作するようにしています。
 
-## Usage
+### Usage - API を利用する開発者向け（Line Bot 開発者向け）
 
 1. リポジトリをクローンします。
 
@@ -36,3 +34,59 @@ make prod
 5. localhost:8080/v1/swagger/ にアクセスすると Swagger UI が表示されます。
 
 [http://localhost:8080/v1/swagger/](http://localhost:8080/v1/swagger/)
+
+6. Docker のコンテナを停止する場合は、以下のコマンドを実行します。
+
+```bash
+make prod_stop
+```
+
+### Usage - API を開発する開発者向け
+
+1. Go のインストール [https://golang.org/doc/install](https://golang.org/doc/install)
+
+```bash
+brew install go
+
+go version
+```
+
+2. リポジトリをクローンします。
+
+```bash
+git clone https://github.com/ogurilab/school-lunch-api.git
+```
+
+3. サブモジュールを更新します。
+
+```bash
+git submodule update --init --recursive
+```
+
+4. .env ファイルの作成
+
+```bash
+cp app/.env.example app/.env
+```
+
+5. データベースの起動
+
+```bash
+make up
+```
+
+6. サーバーの起動
+
+```bash
+make start
+```
+
+7. localhost:8080/v1/swagger/ にアクセスすると Swagger UI が表示されます。
+
+[http://localhost:8080/v1/swagger/](http://localhost:8080/v1/swagger/)
+
+8. データベースの停止
+
+```bash
+make down
+```
