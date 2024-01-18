@@ -3,8 +3,13 @@ package bootstrap
 import (
 	// mysql driver
 	"database/sql"
+	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/mysql"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -48,4 +53,21 @@ func CloseDatabase(db *sql.DB) {
 
 	log.Info().Msg("Successfully disconnected from database")
 
+}
+
+func RunMigration(migrationURL, dbSource string) {
+
+	db := fmt.Sprintf("mysql://%s", dbSource)
+
+	migration, err := migrate.New(migrationURL, db)
+
+	if err != nil {
+		log.Fatal().Err(err).Msg("cannot create migration")
+	}
+
+	if err := migration.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatal().Err(err).Msg("cannot migrate db")
+	}
+
+	log.Info().Msg("migration completed")
 }

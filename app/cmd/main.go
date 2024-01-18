@@ -11,6 +11,7 @@ func main() {
 	env := app.Env
 
 	query := db.NewQuery(app.DB)
+	bootstrap.RunMigration(env.MigrationURL, env.DBSource)
 	defer bootstrap.CloseDatabase(app.DB)
 
 	server.Run(env, query)
