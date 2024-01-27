@@ -96,8 +96,9 @@ func TestGetWithDishes(t *testing.T) {
 }
 
 func TestFetchMenuWithDishesByCity(t *testing.T) {
+	start := time.Now()
 	for i := 0; i < 10; i++ {
-		menu := createRandomMenu(t)
+		menu := createRandomMenuFromStart(t, start)
 
 		for j := 0; j < 10; j++ {
 			createRandomDish(t, menu.ID)
@@ -105,9 +106,10 @@ func TestFetchMenuWithDishesByCity(t *testing.T) {
 	}
 
 	arg := ListMenuWithDishesByCityParams{
-		Limit:    5,
-		Offset:   5,
-		CityCode: cityCode,
+		Limit:     5,
+		Offset:    5,
+		CityCode:  cityCode,
+		OfferedAt: start,
 	}
 
 	results, err := testQuery.ListMenuWithDishesByCity(context.Background(), arg)

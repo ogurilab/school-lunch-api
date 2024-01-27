@@ -70,7 +70,7 @@ func RandomYYYYMMDD() string {
 func RandomDateFromStart(start time.Time) time.Time {
 	// YYYY-MM-DD
 
-	year := RandomInt(start.Year(), start.Year()+1000)
+	year := RandomInt(start.Year()-1000, start.Year())
 	month := RandomInt(1, 12)
 	day := RandomInt(1, 31)
 

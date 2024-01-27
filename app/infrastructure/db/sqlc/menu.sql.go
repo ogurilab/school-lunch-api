@@ -134,8 +134,8 @@ const listMenuByCity = `-- name: ListMenuByCity :many
 SELECT id, offered_at, photo_url, created_at, elementary_school_calories, junior_high_school_calories, city_code
 FROM menus AS m
 WHERE city_code = ?
-  AND offered_at >= ?
-ORDER BY offered_at
+  AND offered_at <= ?
+ORDER BY offered_at DESC
 LIMIT ? OFFSET ?
 `
 
@@ -196,9 +196,9 @@ SELECT m.id, m.offered_at, m.photo_url, m.created_at, m.elementary_school_calori
   ) AS dishes
 FROM menus AS m
   LEFT JOIN dishes AS d ON m.id = d.menu_id
-WHERE m.offered_at >= ?
+WHERE m.offered_at <= ?
 GROUP BY m.id
-ORDER BY offered_at
+ORDER BY offered_at DESC
 LIMIT ? OFFSET ?
 `
 
@@ -266,9 +266,9 @@ SELECT m.id, m.offered_at, m.photo_url, m.created_at, m.elementary_school_calori
 FROM menus AS m
   LEFT JOIN dishes AS d ON m.id = d.menu_id
 WHERE m.city_code = ?
-  AND m.offered_at >= ?
+  AND m.offered_at <= ?
 GROUP BY m.id
-ORDER BY offered_at
+ORDER BY offered_at DESC
 LIMIT ? OFFSET ?
 `
 
