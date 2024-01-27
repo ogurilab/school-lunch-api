@@ -24,3 +24,5 @@ go.work
 .env
 !.env.example
 
+ops/docker/entrypoint/data/*.sql
+
