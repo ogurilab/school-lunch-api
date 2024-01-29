@@ -123,13 +123,6 @@ func (m *MenuWithDishes) MarshalJSON() ([]byte, error) {
 		Dishes                   []*Dish `json:"dishes"`
 	}
 
-	if len(m.Dishes) == 1 {
-		dish := m.Dishes[0]
-		if dish.ID == "" && dish.MenuID == "" && dish.Name == "" {
-			m.Dishes = []*Dish{}
-		}
-	}
-
 	if m.Dishes == nil {
 		m.Dishes = []*Dish{}
 	}

@@ -117,6 +117,7 @@ func TestGetDishByID(t *testing.T) {
 }
 
 func TestFetchDishByMenuID(t *testing.T) {
+	menuID := util.NewUlid()
 	var dishes []*domain.Dish
 
 	for i := 0; i < 10; i++ {
@@ -134,9 +135,9 @@ func TestFetchDishByMenuID(t *testing.T) {
 	}{
 		{
 			name:   "OK",
-			menuID: dishes[0].MenuID,
+			menuID: menuID,
 			buildStubs: func(r *mocks.MockDishRepository) {
-				r.EXPECT().FetchByMenuID(gomock.Any(), gomock.Eq(dishes[0].MenuID)).Times(1).Return(dishes, nil)
+				r.EXPECT().FetchByMenuID(gomock.Any(), gomock.Eq(menuID)).Times(1).Return(dishes, nil)
 			},
 			check: func(t *testing.T, result []*domain.Dish, err error) {
 				require.NoError(t, err)
@@ -145,9 +146,9 @@ func TestFetchDishByMenuID(t *testing.T) {
 		},
 		{
 			name:   "NG",
-			menuID: dishes[0].MenuID,
+			menuID: menuID,
 			buildStubs: func(r *mocks.MockDishRepository) {
-				r.EXPECT().FetchByMenuID(gomock.Any(), gomock.Eq(dishes[0].MenuID)).Times(1).Return(nil, sql.ErrNoRows)
+				r.EXPECT().FetchByMenuID(gomock.Any(), gomock.Eq(menuID)).Times(1).Return(nil, sql.ErrNoRows)
 			},
 			check: func(t *testing.T, result []*domain.Dish, err error) {
 				require.Error(t, err)
@@ -155,9 +156,9 @@ func TestFetchDishByMenuID(t *testing.T) {
 		},
 		{
 			name:   "Empty",
-			menuID: dishes[0].MenuID,
+			menuID: menuID,
 			buildStubs: func(r *mocks.MockDishRepository) {
-				r.EXPECT().FetchByMenuID(gomock.Any(), gomock.Eq(dishes[0].MenuID)).Times(1).Return([]*domain.Dish{}, nil)
+				r.EXPECT().FetchByMenuID(gomock.Any(), gomock.Eq(menuID)).Times(1).Return([]*domain.Dish{}, nil)
 			},
 			check: func(t *testing.T, result []*domain.Dish, err error) {
 				require.NoError(t, err)
@@ -321,10 +322,7 @@ func TestFetchDish(t *testing.T) {
 }
 
 func randomDish(t *testing.T) *domain.Dish {
-	menu := randomMenu(t)
-
 	dish, err := domain.NewDish(
-		menu.ID,
 		util.RandomString(10),
 	)
 
@@ -335,6 +333,5 @@ func randomDish(t *testing.T) *domain.Dish {
 
 func requireDishResult(t *testing.T, expected *domain.Dish, actual *domain.Dish) {
 	require.Equal(t, expected.ID, actual.ID)
-	require.Equal(t, expected.MenuID, actual.MenuID)
 	require.Equal(t, expected.Name, actual.Name)
 }

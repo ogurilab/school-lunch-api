@@ -2,16 +2,14 @@ package domain
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/labstack/echo/v4"
 	"github.com/ogurilab/school-lunch-api/util"
 )
 
 type Dish struct {
-	ID     string `json:"id"`
-	MenuID string `json:"menu_id"`
-	Name   string `json:"name"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type DishRepository interface {
@@ -35,37 +33,24 @@ type DishController interface {
 	Fetch(c echo.Context) error
 }
 
-func newDish(id string, menuID string, name string) (*Dish, error) {
+func newDish(id string, name string) (*Dish, error) {
 
 	if _, err := util.ParseUlid(id); err != nil {
 		return nil, err
 	}
 
 	return &Dish{
-		ID:     id,
-		MenuID: menuID,
-		Name:   name,
+		ID:   id,
+		Name: name,
 	}, nil
 }
 
-func ReNewDish(id string, menuID string, name string) (*Dish, error) {
+func ReNewDish(id string, name string) (*Dish, error) {
 
-	return newDish(id, menuID, name)
+	return newDish(id, name)
 }
-func NewDish(menuID string, name string) (*Dish, error) {
+func NewDish(name string) (*Dish, error) {
 	id := util.NewUlid()
 
-	return newDish(id, menuID, name)
-}
-
-func NewDishesFromJson(
-	input json.RawMessage,
-) ([]*Dish, error) {
-	var dishes []*Dish
-
-	if err := json.Unmarshal(input, &dishes); err != nil {
-		return nil, err
-	}
-
-	return dishes, nil
+	return newDish(id, name)
 }

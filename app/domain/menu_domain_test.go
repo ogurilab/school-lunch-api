@@ -194,9 +194,8 @@ func TestReNewMenuWithDishes(t *testing.T) {
 
 	for i := 0; i < 3; i++ {
 		dishes = append(dishes, &Dish{
-			ID:     util.NewUlid(),
-			Name:   "dish",
-			MenuID: util.NewUlid(),
+			ID:   util.NewUlid(),
+			Name: "dish",
 		})
 	}
 
@@ -563,9 +562,8 @@ func randomMenuWithDishes(t *testing.T, valid bool, empty bool) MenuWithDishes {
 
 	for i := 0; i < 1; i++ {
 		dishes = append(dishes, &Dish{
-			ID:     "dish",
-			Name:   "dish",
-			MenuID: "menu",
+			ID:   "dish",
+			Name: "dish",
 		})
 	}
 
@@ -596,6 +594,7 @@ func requireEqualMenuJSON(t *testing.T, m Menu, actual []byte) {
 }
 
 func requireEqualMenuWithDishesJSON(t *testing.T, m MenuWithDishes, actual []byte) {
+
 	var photoUrlStr string
 	if m.PhotoUrl.Valid {
 		photoUrlStr = fmt.Sprintf(`"%s"`, m.PhotoUrl.String)
@@ -603,7 +602,7 @@ func requireEqualMenuWithDishesJSON(t *testing.T, m MenuWithDishes, actual []byt
 		photoUrlStr = "null"
 	}
 
-	expect := fmt.Sprintf(`{"id":"%s","offered_at":"%s","photo_url":%s,"elementary_school_calories":%d,"junior_high_school_calories":%d,"city_code":%d,"dishes":[{"id":"%s","menu_id":"%s","name":"%s"}]}`,
+	expect := fmt.Sprintf(`{"id":"%s","offered_at":"%s","photo_url":%s,"elementary_school_calories":%d,"junior_high_school_calories":%d,"city_code":%d,"dishes":[{"id":"%s","name":"%s"}]}`,
 		m.ID,
 		m.OfferedAt.Format("2006-01-02"),
 		photoUrlStr,
@@ -611,7 +610,6 @@ func requireEqualMenuWithDishesJSON(t *testing.T, m MenuWithDishes, actual []byt
 		m.JuniorHighSchoolCalories,
 		m.CityCode,
 		m.Dishes[0].ID,
-		m.Dishes[0].MenuID,
 		m.Dishes[0].Name,
 	)
 

@@ -19,6 +19,7 @@ import (
 )
 
 func TestFetchDishByMenuID(t *testing.T) {
+	menuID := util.RandomUlid()
 	var dishes []*domain.Dish
 
 	for i := 0; i < 10; i++ {
@@ -36,10 +37,10 @@ func TestFetchDishByMenuID(t *testing.T) {
 		{
 			name: "OK",
 			req: req{
-				MenuID: dishes[0].MenuID,
+				MenuID: menuID,
 			},
 			buildStub: func(du *mocks.MockDishUsecase) {
-				du.EXPECT().FetchByMenuID(gomock.Any(), dishes[0].MenuID).Times(1).Return(dishes, nil)
+				du.EXPECT().FetchByMenuID(gomock.Any(), menuID).Times(1).Return(dishes, nil)
 			},
 			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dishes []*domain.Dish) {
 				require.Equal(t, http.StatusOK, recorder.Code)
@@ -52,7 +53,7 @@ func TestFetchDishByMenuID(t *testing.T) {
 				MenuID: "invalid",
 			},
 			buildStub: func(du *mocks.MockDishUsecase) {
-				du.EXPECT().FetchByMenuID(gomock.Any(), dishes[0].MenuID).Times(0)
+				du.EXPECT().FetchByMenuID(gomock.Any(), menuID).Times(0)
 			},
 			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dishes []*domain.Dish) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
@@ -61,10 +62,10 @@ func TestFetchDishByMenuID(t *testing.T) {
 		{
 			name: "Internal Server Error",
 			req: req{
-				MenuID: dishes[0].MenuID,
+				MenuID: menuID,
 			},
 			buildStub: func(du *mocks.MockDishUsecase) {
-				du.EXPECT().FetchByMenuID(gomock.Any(), dishes[0].MenuID).Times(1).Return([]*domain.Dish{}, sql.ErrConnDone)
+				du.EXPECT().FetchByMenuID(gomock.Any(), menuID).Times(1).Return([]*domain.Dish{}, sql.ErrConnDone)
 			},
 			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dishes []*domain.Dish) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -340,7 +341,6 @@ func requireBodyMatchDish(t *testing.T, body *bytes.Buffer, dish *domain.Dish) {
 	require.NoError(t, err)
 
 	require.Equal(t, dish.ID, dishData.ID)
-	require.Equal(t, dish.MenuID, dishData.MenuID)
 	require.Equal(t, dish.Name, dishData.Name)
 }
 
@@ -361,7 +361,6 @@ func requireBodyMatchDishes(t *testing.T, body *bytes.Buffer, dishes []*domain.D
 func randomDish(t *testing.T) *domain.Dish {
 	dish, err := domain.NewDish(
 		util.RandomUlid(),
-		util.RandomString(10),
 	)
 
 	require.NoError(t, err)
