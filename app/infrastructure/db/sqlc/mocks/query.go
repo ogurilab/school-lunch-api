@@ -12,6 +12,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	domain "github.com/ogurilab/school-lunch-api/domain"
 	db "github.com/ogurilab/school-lunch-api/infrastructure/db/sqlc"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -65,6 +66,34 @@ func (m *MockQuery) CreateDish(ctx context.Context, arg db.CreateDishParams) err
 func (mr *MockQueryMockRecorder) CreateDish(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDish", reflect.TypeOf((*MockQuery)(nil).CreateDish), ctx, arg)
+}
+
+// CreateDishTx mocks base method.
+func (m *MockQuery) CreateDishTx(ctx context.Context, dish *domain.Dish, menuID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateDishTx", ctx, dish, menuID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateDishTx indicates an expected call of CreateDishTx.
+func (mr *MockQueryMockRecorder) CreateDishTx(ctx, dish, menuID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDishTx", reflect.TypeOf((*MockQuery)(nil).CreateDishTx), ctx, dish, menuID)
+}
+
+// CreateDishesTx mocks base method.
+func (m *MockQuery) CreateDishesTx(ctx context.Context, dishes []*domain.Dish, menuID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateDishesTx", ctx, dishes, menuID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateDishesTx indicates an expected call of CreateDishesTx.
+func (mr *MockQueryMockRecorder) CreateDishesTx(ctx, dishes, menuID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDishesTx", reflect.TypeOf((*MockQuery)(nil).CreateDishesTx), ctx, dishes, menuID)
 }
 
 // CreateMenu mocks base method.

@@ -12,6 +12,10 @@ type TestQuery interface {
 	Query
 	truncateMenusTable() error
 	truncateCitiesTable() error
+	truncateDishesTable() error
+	truncateMenuDishesTable() error
+	getMenuDishes(menuID string, dishID string) (MenuDish, error)
+	getMenuDishesAllCount(menuID string) (int, error)
 }
 
 type query struct {
@@ -41,6 +45,41 @@ func (q *query) truncateCitiesTable() error {
 	_, err := q.db.Exec("TRUNCATE TABLE cities")
 
 	return err
+}
+
+func (q *query) truncateDishesTable() error {
+	_, err := q.db.Exec("TRUNCATE TABLE dishes")
+
+	return err
+}
+
+func (q *query) truncateMenuDishesTable() error {
+	_, err := q.db.Exec("TRUNCATE TABLE menu_dishes")
+
+	return err
+}
+
+func (q *query) getMenuDishes(menuID string, dishID string) (MenuDish, error) {
+	var menuDish MenuDish
+
+	row := q.db.QueryRow("SELECT * FROM menu_dishes WHERE menu_id = ? AND dish_id = ?", menuID, dishID)
+
+	err := row.Scan(
+		&menuDish.MenuID,
+		&menuDish.DishID,
+	)
+
+	return menuDish, err
+}
+
+func (q *query) getMenuDishesAllCount(menuID string) (int, error) {
+	var count int
+
+	row := q.db.QueryRow("SELECT COUNT(*) FROM menu_dishes WHERE menu_id = ?", menuID)
+
+	err := row.Scan(&count)
+
+	return count, err
 }
 
 func TestMain(m *testing.M) {
