@@ -8,7 +8,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"time"
 )
 
@@ -79,23 +78,19 @@ func (q *Queries) GetMenu(ctx context.Context, arg GetMenuParams) (Menu, error) 
 	return i, err
 }
 
-const getMenuWithDishes = `-- name: GetMenuWithDishes :one
+const getMenuWithDishes = `-- name: GetMenuWithDishes :many
 SELECT m.id, m.offered_at, m.photo_url, m.created_at, m.elementary_school_calories, m.junior_high_school_calories, m.city_code,
-  JSON_ARRAYAGG(
-    JSON_OBJECT(
-      'id',
-      d.id,
-      'name',
-      d.name,
-      'menu_id',
-      d.menu_id
-    )
-  ) AS dishes
-FROM menus AS m
-  LEFT JOIN dishes AS d ON m.id = d.menu_id
-WHERE m.id = ?
-  AND m.city_code = ?
-GROUP BY m.id
+  d.id AS dish_id,
+  d.name AS dish_name
+FROM (
+    SELECT id, offered_at, photo_url, created_at, elementary_school_calories, junior_high_school_calories, city_code
+    FROM menus
+    WHERE menus.id = ?
+      AND city_code = ?
+  ) AS m
+  INNER JOIN menu_dishes AS md ON m.id = md.menu_id
+  INNER JOIN dishes AS d ON md.dish_id = d.id
+ORDER BY d.id ASC
 `
 
 type GetMenuWithDishesParams struct {
@@ -104,30 +99,48 @@ type GetMenuWithDishesParams struct {
 }
 
 type GetMenuWithDishesRow struct {
-	ID                       string          `json:"id"`
-	OfferedAt                time.Time       `json:"offered_at"`
-	PhotoUrl                 sql.NullString  `json:"photo_url"`
-	CreatedAt                time.Time       `json:"created_at"`
-	ElementarySchoolCalories int32           `json:"elementary_school_calories"`
-	JuniorHighSchoolCalories int32           `json:"junior_high_school_calories"`
-	CityCode                 int32           `json:"city_code"`
-	Dishes                   json.RawMessage `json:"dishes"`
+	ID                       string         `json:"id"`
+	OfferedAt                time.Time      `json:"offered_at"`
+	PhotoUrl                 sql.NullString `json:"photo_url"`
+	CreatedAt                time.Time      `json:"created_at"`
+	ElementarySchoolCalories int32          `json:"elementary_school_calories"`
+	JuniorHighSchoolCalories int32          `json:"junior_high_school_calories"`
+	CityCode                 int32          `json:"city_code"`
+	DishID                   string         `json:"dish_id"`
+	DishName                 string         `json:"dish_name"`
 }
 
-func (q *Queries) GetMenuWithDishes(ctx context.Context, arg GetMenuWithDishesParams) (GetMenuWithDishesRow, error) {
-	row := q.db.QueryRowContext(ctx, getMenuWithDishes, arg.ID, arg.CityCode)
-	var i GetMenuWithDishesRow
-	err := row.Scan(
-		&i.ID,
-		&i.OfferedAt,
-		&i.PhotoUrl,
-		&i.CreatedAt,
-		&i.ElementarySchoolCalories,
-		&i.JuniorHighSchoolCalories,
-		&i.CityCode,
-		&i.Dishes,
-	)
-	return i, err
+func (q *Queries) GetMenuWithDishes(ctx context.Context, arg GetMenuWithDishesParams) ([]GetMenuWithDishesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMenuWithDishes, arg.ID, arg.CityCode)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetMenuWithDishesRow{}
+	for rows.Next() {
+		var i GetMenuWithDishesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.OfferedAt,
+			&i.PhotoUrl,
+			&i.CreatedAt,
+			&i.ElementarySchoolCalories,
+			&i.JuniorHighSchoolCalories,
+			&i.CityCode,
+			&i.DishID,
+			&i.DishName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listMenuByCity = `-- name: ListMenuByCity :many
@@ -184,22 +197,17 @@ func (q *Queries) ListMenuByCity(ctx context.Context, arg ListMenuByCityParams) 
 
 const listMenuWithDishes = `-- name: ListMenuWithDishes :many
 SELECT m.id, m.offered_at, m.photo_url, m.created_at, m.elementary_school_calories, m.junior_high_school_calories, m.city_code,
-  JSON_ARRAYAGG(
-    JSON_OBJECT(
-      'id',
-      d.id,
-      'name',
-      d.name,
-      'menu_id',
-      d.menu_id
-    )
-  ) AS dishes
-FROM menus AS m
-  LEFT JOIN dishes AS d ON m.id = d.menu_id
-WHERE m.offered_at <= ?
-GROUP BY m.id
-ORDER BY offered_at DESC
-LIMIT ? OFFSET ?
+  d.id AS dish_id,
+  d.name AS dish_name
+FROM (
+    SELECT id, offered_at, photo_url, created_at, elementary_school_calories, junior_high_school_calories, city_code
+    FROM menus AS m
+    WHERE offered_at <= ?
+    ORDER BY offered_at DESC
+    LIMIT ? OFFSET ?
+  ) AS m
+  INNER JOIN menu_dishes AS md ON m.id = md.menu_id
+  INNER JOIN dishes AS d ON md.dish_id = d.id
 `
 
 type ListMenuWithDishesParams struct {
@@ -209,14 +217,15 @@ type ListMenuWithDishesParams struct {
 }
 
 type ListMenuWithDishesRow struct {
-	ID                       string          `json:"id"`
-	OfferedAt                time.Time       `json:"offered_at"`
-	PhotoUrl                 sql.NullString  `json:"photo_url"`
-	CreatedAt                time.Time       `json:"created_at"`
-	ElementarySchoolCalories int32           `json:"elementary_school_calories"`
-	JuniorHighSchoolCalories int32           `json:"junior_high_school_calories"`
-	CityCode                 int32           `json:"city_code"`
-	Dishes                   json.RawMessage `json:"dishes"`
+	ID                       string         `json:"id"`
+	OfferedAt                time.Time      `json:"offered_at"`
+	PhotoUrl                 sql.NullString `json:"photo_url"`
+	CreatedAt                time.Time      `json:"created_at"`
+	ElementarySchoolCalories int32          `json:"elementary_school_calories"`
+	JuniorHighSchoolCalories int32          `json:"junior_high_school_calories"`
+	CityCode                 int32          `json:"city_code"`
+	DishID                   string         `json:"dish_id"`
+	DishName                 string         `json:"dish_name"`
 }
 
 func (q *Queries) ListMenuWithDishes(ctx context.Context, arg ListMenuWithDishesParams) ([]ListMenuWithDishesRow, error) {
@@ -236,7 +245,8 @@ func (q *Queries) ListMenuWithDishes(ctx context.Context, arg ListMenuWithDishes
 			&i.ElementarySchoolCalories,
 			&i.JuniorHighSchoolCalories,
 			&i.CityCode,
-			&i.Dishes,
+			&i.DishID,
+			&i.DishName,
 		); err != nil {
 			return nil, err
 		}
@@ -253,23 +263,18 @@ func (q *Queries) ListMenuWithDishes(ctx context.Context, arg ListMenuWithDishes
 
 const listMenuWithDishesByCity = `-- name: ListMenuWithDishesByCity :many
 SELECT m.id, m.offered_at, m.photo_url, m.created_at, m.elementary_school_calories, m.junior_high_school_calories, m.city_code,
-  JSON_ARRAYAGG(
-    JSON_OBJECT(
-      'id',
-      d.id,
-      'name',
-      d.name,
-      'menu_id',
-      d.menu_id
-    )
-  ) AS dishes
-FROM menus AS m
-  LEFT JOIN dishes AS d ON m.id = d.menu_id
-WHERE m.city_code = ?
-  AND m.offered_at <= ?
-GROUP BY m.id
-ORDER BY offered_at DESC
-LIMIT ? OFFSET ?
+  d.id AS dish_id,
+  d.name AS dish_name
+FROM (
+    SELECT id, offered_at, photo_url, created_at, elementary_school_calories, junior_high_school_calories, city_code
+    FROM menus AS m
+    WHERE city_code = ?
+      AND offered_at <= ?
+    ORDER BY offered_at DESC
+    LIMIT ? OFFSET ?
+  ) AS m
+  INNER JOIN menu_dishes md ON m.id = md.menu_id
+  INNER JOIN dishes d ON md.dish_id = d.id
 `
 
 type ListMenuWithDishesByCityParams struct {
@@ -280,14 +285,15 @@ type ListMenuWithDishesByCityParams struct {
 }
 
 type ListMenuWithDishesByCityRow struct {
-	ID                       string          `json:"id"`
-	OfferedAt                time.Time       `json:"offered_at"`
-	PhotoUrl                 sql.NullString  `json:"photo_url"`
-	CreatedAt                time.Time       `json:"created_at"`
-	ElementarySchoolCalories int32           `json:"elementary_school_calories"`
-	JuniorHighSchoolCalories int32           `json:"junior_high_school_calories"`
-	CityCode                 int32           `json:"city_code"`
-	Dishes                   json.RawMessage `json:"dishes"`
+	ID                       string         `json:"id"`
+	OfferedAt                time.Time      `json:"offered_at"`
+	PhotoUrl                 sql.NullString `json:"photo_url"`
+	CreatedAt                time.Time      `json:"created_at"`
+	ElementarySchoolCalories int32          `json:"elementary_school_calories"`
+	JuniorHighSchoolCalories int32          `json:"junior_high_school_calories"`
+	CityCode                 int32          `json:"city_code"`
+	DishID                   string         `json:"dish_id"`
+	DishName                 string         `json:"dish_name"`
 }
 
 func (q *Queries) ListMenuWithDishesByCity(ctx context.Context, arg ListMenuWithDishesByCityParams) ([]ListMenuWithDishesByCityRow, error) {
@@ -312,7 +318,8 @@ func (q *Queries) ListMenuWithDishesByCity(ctx context.Context, arg ListMenuWith
 			&i.ElementarySchoolCalories,
 			&i.JuniorHighSchoolCalories,
 			&i.CityCode,
-			&i.Dishes,
+			&i.DishID,
+			&i.DishName,
 		); err != nil {
 			return nil, err
 		}

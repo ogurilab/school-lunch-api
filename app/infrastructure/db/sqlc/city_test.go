@@ -47,6 +47,10 @@ func TestGetCity(t *testing.T) {
 }
 
 func TestListCities(t *testing.T) {
+	err := testQuery.truncateCitiesTable()
+
+	require.NoError(t, err)
+
 	for i := 0; i < 10; i++ {
 		createRandomCity(t)
 	}
@@ -67,6 +71,9 @@ func TestListCities(t *testing.T) {
 }
 
 func TestListCitiesByName(t *testing.T) {
+	err := testQuery.truncateCitiesTable()
+
+	require.NoError(t, err)
 
 	var names []string
 

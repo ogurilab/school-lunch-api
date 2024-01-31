@@ -26,7 +26,6 @@ type City struct {
 
 type Dish struct {
 	ID        string    `json:"id"`
-	MenuID    string    `json:"menu_id"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
 }
@@ -59,6 +58,11 @@ type Menu struct {
 	ElementarySchoolCalories int32          `json:"elementary_school_calories"`
 	JuniorHighSchoolCalories int32          `json:"junior_high_school_calories"`
 	CityCode                 int32          `json:"city_code"`
+}
+
+type MenuDish struct {
+	MenuID string `json:"menu_id"`
+	DishID string `json:"dish_id"`
 }
 
 type User struct {

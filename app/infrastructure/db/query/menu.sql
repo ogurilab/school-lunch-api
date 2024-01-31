@@ -30,59 +30,45 @@ WHERE city_code = sqlc.arg(city_code)
 ORDER BY offered_at DESC
 LIMIT ? OFFSET ?;
 
--- name: GetMenuWithDishes :one
+-- name: GetMenuWithDishes :many
 SELECT m.*,
-  JSON_ARRAYAGG(
-    JSON_OBJECT(
-      'id',
-      d.id,
-      'name',
-      d.name,
-      'menu_id',
-      d.menu_id
-    )
-  ) AS dishes
-FROM menus AS m
-  LEFT JOIN dishes AS d ON m.id = d.menu_id
-WHERE m.id = sqlc.arg(id)
-  AND m.city_code = sqlc.arg(city_code)
-GROUP BY m.id;
+  d.id AS dish_id,
+  d.name AS dish_name
+FROM (
+    SELECT *
+    FROM menus
+    WHERE menus.id = sqlc.arg(id)
+      AND city_code = sqlc.arg(city_code)
+  ) AS m
+  INNER JOIN menu_dishes AS md ON m.id = md.menu_id
+  INNER JOIN dishes AS d ON md.dish_id = d.id
+ORDER BY d.id ASC;
 
 -- name: ListMenuWithDishesByCity :many
 SELECT m.*,
-  JSON_ARRAYAGG(
-    JSON_OBJECT(
-      'id',
-      d.id,
-      'name',
-      d.name,
-      'menu_id',
-      d.menu_id
-    )
-  ) AS dishes
-FROM menus AS m
-  LEFT JOIN dishes AS d ON m.id = d.menu_id
-WHERE m.city_code = sqlc.arg(city_code)
-  AND m.offered_at <= sqlc.arg(offered_at)
-GROUP BY m.id
-ORDER BY offered_at DESC
-LIMIT ? OFFSET ?;
+  d.id AS dish_id,
+  d.name AS dish_name
+FROM (
+    SELECT *
+    FROM menus AS m
+    WHERE city_code = sqlc.arg(city_code)
+      AND offered_at <= sqlc.arg(offered_at)
+    ORDER BY offered_at DESC
+    LIMIT ? OFFSET ?
+  ) AS m
+  INNER JOIN menu_dishes md ON m.id = md.menu_id
+  INNER JOIN dishes d ON md.dish_id = d.id;
 
 -- name: ListMenuWithDishes :many
 SELECT m.*,
-  JSON_ARRAYAGG(
-    JSON_OBJECT(
-      'id',
-      d.id,
-      'name',
-      d.name,
-      'menu_id',
-      d.menu_id
-    )
-  ) AS dishes
-FROM menus AS m
-  LEFT JOIN dishes AS d ON m.id = d.menu_id
-WHERE m.offered_at <= sqlc.arg(offered_at)
-GROUP BY m.id
-ORDER BY offered_at DESC
-LIMIT ? OFFSET ?;
+  d.id AS dish_id,
+  d.name AS dish_name
+FROM (
+    SELECT *
+    FROM menus AS m
+    WHERE offered_at <= sqlc.arg(offered_at)
+    ORDER BY offered_at DESC
+    LIMIT ? OFFSET ?
+  ) AS m
+  INNER JOIN menu_dishes AS md ON m.id = md.menu_id
+  INNER JOIN dishes AS d ON md.dish_id = d.id;

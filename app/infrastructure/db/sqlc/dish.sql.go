@@ -10,46 +10,43 @@ import (
 )
 
 const createDish = `-- name: CreateDish :exec
-INSERT INTO dishes (id, menu_id, name)
-VALUES (
-    ?,
-    ?,
-    ?
-  )
+INSERT INTO dishes (id, name)
+VALUES (?, ?)
 `
 
 type CreateDishParams struct {
-	ID     string `json:"id"`
-	MenuID string `json:"menu_id"`
-	Name   string `json:"name"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 func (q *Queries) CreateDish(ctx context.Context, arg CreateDishParams) error {
-	_, err := q.db.ExecContext(ctx, createDish, arg.ID, arg.MenuID, arg.Name)
+	_, err := q.db.ExecContext(ctx, createDish, arg.ID, arg.Name)
 	return err
 }
 
 const getDish = `-- name: GetDish :one
-SELECT id, menu_id, name, created_at
+SELECT dishes.id,
+  dishes.name
 FROM dishes
 WHERE id = ?
 LIMIT 1
 `
 
-func (q *Queries) GetDish(ctx context.Context, id string) (Dish, error) {
+type GetDishRow struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+func (q *Queries) GetDish(ctx context.Context, id string) (GetDishRow, error) {
 	row := q.db.QueryRowContext(ctx, getDish, id)
-	var i Dish
-	err := row.Scan(
-		&i.ID,
-		&i.MenuID,
-		&i.Name,
-		&i.CreatedAt,
-	)
+	var i GetDishRow
+	err := row.Scan(&i.ID, &i.Name)
 	return i, err
 }
 
 const listDish = `-- name: ListDish :many
-SELECT id, menu_id, name, created_at
+SELECT dishes.id,
+  dishes.name
 FROM dishes
 ORDER BY id
 LIMIT ? OFFSET ?
@@ -60,21 +57,21 @@ type ListDishParams struct {
 	Offset int32 `json:"offset"`
 }
 
-func (q *Queries) ListDish(ctx context.Context, arg ListDishParams) ([]Dish, error) {
+type ListDishRow struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+func (q *Queries) ListDish(ctx context.Context, arg ListDishParams) ([]ListDishRow, error) {
 	rows, err := q.db.QueryContext(ctx, listDish, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Dish{}
+	items := []ListDishRow{}
 	for rows.Next() {
-		var i Dish
-		if err := rows.Scan(
-			&i.ID,
-			&i.MenuID,
-			&i.Name,
-			&i.CreatedAt,
-		); err != nil {
+		var i ListDishRow
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -89,27 +86,32 @@ func (q *Queries) ListDish(ctx context.Context, arg ListDishParams) ([]Dish, err
 }
 
 const listDishByMenuID = `-- name: ListDishByMenuID :many
-SELECT id, menu_id, name, created_at
+SELECT dishes.id,
+  dishes.name
 FROM dishes
-WHERE menu_id = ?
+WHERE id IN (
+    SELECT dish_id
+    FROM menu_dishes
+    WHERE menu_id = ?
+  )
 ORDER BY id
 `
 
-func (q *Queries) ListDishByMenuID(ctx context.Context, menuID string) ([]Dish, error) {
+type ListDishByMenuIDRow struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+func (q *Queries) ListDishByMenuID(ctx context.Context, menuID string) ([]ListDishByMenuIDRow, error) {
 	rows, err := q.db.QueryContext(ctx, listDishByMenuID, menuID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Dish{}
+	items := []ListDishByMenuIDRow{}
 	for rows.Next() {
-		var i Dish
-		if err := rows.Scan(
-			&i.ID,
-			&i.MenuID,
-			&i.Name,
-			&i.CreatedAt,
-		); err != nil {
+		var i ListDishByMenuIDRow
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -124,7 +126,8 @@ func (q *Queries) ListDishByMenuID(ctx context.Context, menuID string) ([]Dish, 
 }
 
 const listDishByName = `-- name: ListDishByName :many
-SELECT id, menu_id, name, created_at
+SELECT dishes.id,
+  dishes.name
 FROM dishes
 WHERE name LIKE ?
 ORDER BY id
@@ -137,21 +140,21 @@ type ListDishByNameParams struct {
 	Offset int32  `json:"offset"`
 }
 
-func (q *Queries) ListDishByName(ctx context.Context, arg ListDishByNameParams) ([]Dish, error) {
+type ListDishByNameRow struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+func (q *Queries) ListDishByName(ctx context.Context, arg ListDishByNameParams) ([]ListDishByNameRow, error) {
 	rows, err := q.db.QueryContext(ctx, listDishByName, arg.Name, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Dish{}
+	items := []ListDishByNameRow{}
 	for rows.Next() {
-		var i Dish
-		if err := rows.Scan(
-			&i.ID,
-			&i.MenuID,
-			&i.Name,
-			&i.CreatedAt,
-		); err != nil {
+		var i ListDishByNameRow
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
