@@ -13,7 +13,7 @@ type Dish struct {
 }
 
 type DishRepository interface {
-	Create(ctx context.Context, dish *Dish) error
+	Create(ctx context.Context, dish *Dish, menuID string) error
 	GetByID(ctx context.Context, id string) (*Dish, error)
 	FetchByMenuID(ctx context.Context, menuID string) ([]*Dish, error)
 	FetchByName(ctx context.Context, search string, limit int32, offset int32) ([]*Dish, error)
@@ -21,7 +21,7 @@ type DishRepository interface {
 }
 
 type DishUsecase interface {
-	Create(ctx context.Context, dish *Dish) error
+	Create(ctx context.Context, dish *Dish, menuID string) error
 	GetByID(ctx context.Context, id string) (*Dish, error)
 	FetchByMenuID(ctx context.Context, menuID string) ([]*Dish, error)
 	Fetch(ctx context.Context, search string, limit int32, offset int32) ([]*Dish, error)

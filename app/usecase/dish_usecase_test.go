@@ -15,6 +15,7 @@ import (
 
 func TestCreateDish(t *testing.T) {
 	dish := randomDish(t)
+	menu := randomMenu(t)
 	timeout := time.Second * 10
 	ctx := context.Background()
 
@@ -28,7 +29,7 @@ func TestCreateDish(t *testing.T) {
 			name: "OK",
 			dish: dish,
 			buildStubs: func(r *mocks.MockDishRepository) {
-				r.EXPECT().Create(gomock.Any(), gomock.Eq(dish)).Times(1).Return(nil)
+				r.EXPECT().Create(gomock.Any(), gomock.Eq(dish), gomock.Eq(menu.ID)).Times(1).Return(nil)
 			},
 			check: func(err error) {
 				require.NoError(t, err)
@@ -38,7 +39,7 @@ func TestCreateDish(t *testing.T) {
 			name: "NG",
 			dish: dish,
 			buildStubs: func(r *mocks.MockDishRepository) {
-				r.EXPECT().Create(gomock.Any(), gomock.Eq(dish)).Times(1).Return(sql.ErrNoRows)
+				r.EXPECT().Create(gomock.Any(), gomock.Eq(dish), gomock.Eq(menu.ID)).Times(1).Return(sql.ErrNoRows)
 			},
 			check: func(err error) {
 				require.Error(t, err)
@@ -57,7 +58,7 @@ func TestCreateDish(t *testing.T) {
 
 			du := NewDishUsecase(repo, timeout)
 
-			err := du.Create(ctx, tc.dish)
+			err := du.Create(ctx, tc.dish, menu.ID)
 
 			tc.check(err)
 		})
