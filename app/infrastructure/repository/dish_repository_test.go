@@ -17,6 +17,7 @@ import (
 func TestCreateDish(t *testing.T) {
 	dish := randomDish(t)
 	ctx := context.Background()
+	menuID := util.RandomString(10)
 
 	testCases := []struct {
 		name       string
@@ -28,12 +29,9 @@ func TestCreateDish(t *testing.T) {
 			name:  "OK",
 			input: dish,
 			buildStubs: func(query *mocks.MockQuery) {
-				arg := db.CreateDishParams{
-					ID:     dish.ID,
-					MenuID: dish.MenuID,
-					Name:   dish.Name,
-				}
-				query.EXPECT().CreateDish(gomock.Any(), gomock.Eq(arg)).Times(1).Return(nil)
+				arg, err := domain.ReNewDish(dish.ID, dish.Name)
+				require.NoError(t, err)
+				query.EXPECT().CreateDishTx(gomock.Any(), gomock.Eq(arg), gomock.Eq(menuID)).Times(1).Return(nil)
 			},
 			check: func(err error) {
 				require.NoError(t, err)
@@ -43,7 +41,7 @@ func TestCreateDish(t *testing.T) {
 			name:  "NG",
 			input: &domain.Dish{},
 			buildStubs: func(query *mocks.MockQuery) {
-				query.EXPECT().CreateDish(gomock.Any(), gomock.Any()).Times(1).Return(sql.ErrConnDone)
+				query.EXPECT().CreateDishTx(gomock.Any(), gomock.Any(), gomock.Eq(menuID)).Times(1).Return(sql.ErrConnDone)
 			},
 			check: func(err error) {
 				require.Error(t, err)
@@ -62,7 +60,7 @@ func TestCreateDish(t *testing.T) {
 
 			repo := NewDishRepository(query)
 
-			err := repo.Create(ctx, tc.input)
+			err := repo.Create(ctx, tc.input, menuID)
 
 			tc.check(err)
 		})
@@ -83,8 +81,12 @@ func TestGetDishByID(t *testing.T) {
 			name: "OK",
 			id:   dish.ID,
 			buildStubs: func(query *mocks.MockQuery) {
+				result := db.GetDishRow{
+					ID:   dish.ID,
+					Name: dish.Name,
+				}
 
-				query.EXPECT().GetDish(gomock.Any(), gomock.Eq(dish.ID)).Times(1).Return(dish, nil)
+				query.EXPECT().GetDish(gomock.Any(), gomock.Eq(dish.ID)).Times(1).Return(result, nil)
 			},
 			check: func(t *testing.T, dish *domain.Dish, err error) {
 				require.NoError(t, err)
@@ -95,7 +97,7 @@ func TestGetDishByID(t *testing.T) {
 			name: "NG",
 			id:   dish.ID,
 			buildStubs: func(query *mocks.MockQuery) {
-				query.EXPECT().GetDish(gomock.Any(), gomock.Any()).Times(1).Return(db.Dish{}, sql.ErrConnDone)
+				query.EXPECT().GetDish(gomock.Any(), gomock.Any()).Times(1).Return(db.GetDishRow{}, sql.ErrConnDone)
 			},
 			check: func(t *testing.T, dish *domain.Dish, err error) {
 				require.Error(t, err)
@@ -123,8 +125,8 @@ func TestGetDishByID(t *testing.T) {
 }
 
 func TestFetchDishByMenuID(t *testing.T) {
-
-	dishes := radomDishResults(t)
+	dishes := randomListDishByMenuIDRow(t, 10)
+	menu := randomMenu(t)
 	ctx := context.Background()
 
 	testCases := []struct {
@@ -135,9 +137,9 @@ func TestFetchDishByMenuID(t *testing.T) {
 	}{
 		{
 			name:   "OK",
-			menuID: dishes[0].MenuID,
+			menuID: menu.ID,
 			buildStubs: func(query *mocks.MockQuery) {
-				query.EXPECT().ListDishByMenuID(gomock.Any(), gomock.Eq(dishes[0].MenuID)).Times(1).Return(dishes, nil)
+				query.EXPECT().ListDishByMenuID(gomock.Any(), gomock.Eq(menu.ID)).Times(1).Return(dishes, nil)
 			},
 			check: func(t *testing.T, dishes []*domain.Dish, err error) {
 				require.NoError(t, err)
@@ -146,9 +148,9 @@ func TestFetchDishByMenuID(t *testing.T) {
 		},
 		{
 			name:   "NG",
-			menuID: dishes[0].MenuID,
+			menuID: menu.ID,
 			buildStubs: func(query *mocks.MockQuery) {
-				query.EXPECT().ListDishByMenuID(gomock.Any(), gomock.Any()).Times(1).Return([]db.Dish{}, sql.ErrConnDone)
+				query.EXPECT().ListDishByMenuID(gomock.Any(), gomock.Any()).Times(1).Return([]db.ListDishByMenuIDRow{}, sql.ErrConnDone)
 			},
 			check: func(t *testing.T, dishes []*domain.Dish, err error) {
 				require.Error(t, err)
@@ -178,7 +180,7 @@ func TestFetchDishByMenuID(t *testing.T) {
 
 func TestFetchDishByName(t *testing.T) {
 
-	dishes := radomDishResults(t)
+	dishes := randomListDishByNameRow(t, 10)
 	ctx := context.Background()
 
 	type input struct {
@@ -221,7 +223,7 @@ func TestFetchDishByName(t *testing.T) {
 				offset: 0,
 			},
 			buildStubs: func(query *mocks.MockQuery) {
-				query.EXPECT().ListDishByName(gomock.Any(), gomock.Any()).Times(1).Return([]db.Dish{}, sql.ErrConnDone)
+				query.EXPECT().ListDishByName(gomock.Any(), gomock.Any()).Times(1).Return([]db.ListDishByNameRow{}, sql.ErrConnDone)
 			},
 			check: func(t *testing.T, dishes []*domain.Dish, err error) {
 				require.Error(t, err)
@@ -251,7 +253,7 @@ func TestFetchDishByName(t *testing.T) {
 
 func TestFetchDish(t *testing.T) {
 
-	dishes := radomDishResults(t)
+	dishes := randomListDishRow(t, 10)
 	ctx := context.Background()
 
 	type input struct {
@@ -290,7 +292,7 @@ func TestFetchDish(t *testing.T) {
 				offset: 0,
 			},
 			buildStubs: func(query *mocks.MockQuery) {
-				query.EXPECT().ListDish(gomock.Any(), gomock.Any()).Times(1).Return([]db.Dish{}, sql.ErrConnDone)
+				query.EXPECT().ListDish(gomock.Any(), gomock.Any()).Times(1).Return([]db.ListDishRow{}, sql.ErrConnDone)
 			},
 			check: func(t *testing.T, dishes []*domain.Dish, err error) {
 				require.Error(t, err)
@@ -322,16 +324,60 @@ func randomDishResult(t *testing.T) db.Dish {
 	dish := randomDish(t)
 
 	return db.Dish{
-		ID:     dish.ID,
-		MenuID: dish.MenuID,
-		Name:   dish.Name,
+		ID:   dish.ID,
+		Name: dish.Name,
 	}
 }
 
-func radomDishResults(t *testing.T) []db.Dish {
-	var dishes []db.Dish
-	for i := 0; i < 10; i++ {
-		dishes = append(dishes, randomDishResult(t))
+func randomListDishByNameRow(t *testing.T, length int) []db.ListDishByNameRow {
+
+	dishes := make([]db.ListDishByNameRow, 0, length)
+
+	for i := 0; i < length; i++ {
+		d := randomDishResult(t)
+
+		data := db.ListDishByNameRow{
+			ID:   d.ID,
+			Name: d.Name,
+		}
+
+		dishes = append(dishes, data)
+	}
+
+	return dishes
+}
+
+func randomListDishByMenuIDRow(t *testing.T, length int) []db.ListDishByMenuIDRow {
+
+	dishes := make([]db.ListDishByMenuIDRow, 0, length)
+
+	for i := 0; i < length; i++ {
+		d := randomDishResult(t)
+
+		data := db.ListDishByMenuIDRow{
+			ID:   d.ID,
+			Name: d.Name,
+		}
+
+		dishes = append(dishes, data)
+	}
+
+	return dishes
+}
+
+func randomListDishRow(t *testing.T, length int) []db.ListDishRow {
+
+	dishes := make([]db.ListDishRow, 0, length)
+
+	for i := 0; i < length; i++ {
+		d := randomDishResult(t)
+
+		data := db.ListDishRow{
+			ID:   d.ID,
+			Name: d.Name,
+		}
+
+		dishes = append(dishes, data)
 	}
 
 	return dishes
@@ -352,10 +398,8 @@ func randomMenu(t *testing.T) *domain.Menu {
 }
 
 func randomDish(t *testing.T) *domain.Dish {
-	menu := randomMenu(t)
 
 	dish, err := domain.NewDish(
-		menu.ID,
 		util.RandomString(10),
 	)
 
@@ -366,6 +410,5 @@ func randomDish(t *testing.T) *domain.Dish {
 
 func requireDishResult(t *testing.T, expected *domain.Dish, actual *domain.Dish) {
 	require.Equal(t, expected.ID, actual.ID)
-	require.Equal(t, expected.MenuID, actual.MenuID)
 	require.Equal(t, expected.Name, actual.Name)
 }

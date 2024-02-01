@@ -3,8 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/ogurilab/school-lunch-api/domain"
@@ -18,14 +16,7 @@ import (
 func TestCreate(t *testing.T) {
 	ctx := context.Background()
 
-	menu := &domain.Menu{
-		ID:                       util.NewUlid(),
-		OfferedAt:                util.RandomDate(),
-		CityCode:                 util.RandomCityCode(),
-		PhotoUrl:                 util.RandomNullURL(),
-		ElementarySchoolCalories: util.RandomInt32(),
-		JuniorHighSchoolCalories: util.RandomInt32(),
-	}
+	menu := randomMenu(t)
 
 	testCases := []struct {
 		name      string
@@ -194,7 +185,7 @@ func TestFetchMenuByCity(t *testing.T) {
 					OfferedAt: offered,
 					CityCode:  1,
 				}
-				results := randomResults(10)
+				results := randomMenuResults(10)
 				query.EXPECT().ListMenuByCity(ctx, arg).Times(1).Return(results, nil)
 			},
 			check: func(t *testing.T, menus []*domain.Menu, err error) {
@@ -253,8 +244,7 @@ func TestFetchMenuByCity(t *testing.T) {
 
 func TestGetByIDWithDishes(t *testing.T) {
 	id := util.NewUlid()
-	date := util.RandomDate()
-	dishID := util.NewUlid()
+	queryResults := randomMenuWithDishesRows()
 
 	testCases := []struct {
 		name      string
@@ -273,111 +263,29 @@ func TestGetByIDWithDishes(t *testing.T) {
 					ID:       id,
 					CityCode: 1,
 				}
-
-				dishes := randomDishJson(dishID)
-
-				result := db.GetMenuWithDishesRow{
-					ID:        arg.ID,
-					OfferedAt: date,
-					CityCode:  arg.CityCode,
-					PhotoUrl: sql.NullString{
-						String: "https://example.com",
-						Valid:  true,
-					},
-					ElementarySchoolCalories: 100,
-					JuniorHighSchoolCalories: 200,
-					Dishes:                   dishes,
-				}
-				query.EXPECT().GetMenuWithDishes(context.Background(), arg).Times(1).Return(result, nil)
+				query.EXPECT().GetMenuWithDishes(context.Background(), arg).Times(1).Return(queryResults, nil)
 			},
 			check: func(t *testing.T, menu *domain.MenuWithDishes, err error) {
+				menuData := queryResults[0]
+
 				require.NoError(t, err)
 				require.NotNil(t, menu)
-				require.Equal(t, int32(1), menu.CityCode)
-				require.Equal(t, date, menu.OfferedAt)
-				require.Equal(t, "https://example.com", menu.PhotoUrl.String)
-				require.Equal(t, true, menu.PhotoUrl.Valid)
-				require.Equal(t, int32(100), menu.ElementarySchoolCalories)
-				require.Equal(t, int32(200), menu.JuniorHighSchoolCalories)
+
+				require.Equal(t, menuData.ID, menu.ID)
+				require.Equal(t, menuData.OfferedAt, menu.OfferedAt)
+				require.Equal(t, menuData.PhotoUrl, menu.PhotoUrl)
+				require.Equal(t, menuData.ElementarySchoolCalories, menu.ElementarySchoolCalories)
+				require.Equal(t, menuData.JuniorHighSchoolCalories, menu.JuniorHighSchoolCalories)
+				require.Equal(t, menuData.CityCode, menu.CityCode)
+
 				require.NotNil(t, menu.Dishes)
-				require.Len(t, menu.Dishes, 1)
+				require.Len(t, menu.Dishes, len(queryResults))
 
-				for _, dish := range menu.Dishes {
-					require.Equal(t, dishID, dish.ID)
-					require.Equal(t, "dish", dish.Name)
-					require.Equal(t, "1", dish.MenuID)
-				}
-			},
-		},
-		{
-			name: "Bad Dishes",
-			input: db.GetMenuWithDishesParams{
-				ID:       id,
-				CityCode: 1,
-			},
-
-			buildStub: func(query *mocks.MockQuery) {
-				arg := db.GetMenuWithDishesParams{
-					ID:       id,
-					CityCode: 1,
+				for i, dish := range menu.Dishes {
+					require.Equal(t, queryResults[i].DishID, dish.ID)
+					require.Equal(t, queryResults[i].DishName, dish.Name)
 				}
 
-				result := db.GetMenuWithDishesRow{
-					ID:        arg.ID,
-					OfferedAt: date,
-					CityCode:  arg.CityCode,
-					PhotoUrl: sql.NullString{
-						String: "https://example.com",
-						Valid:  true,
-					},
-					ElementarySchoolCalories: 100,
-					JuniorHighSchoolCalories: 200,
-					Dishes:                   json.RawMessage(""),
-				}
-				query.EXPECT().GetMenuWithDishes(context.Background(), arg).Times(1).Return(result, nil)
-			},
-			check: func(t *testing.T, menu *domain.MenuWithDishes, err error) {
-				require.Error(t, err)
-				require.Nil(t, menu)
-			},
-		},
-		{
-			name: "No Dishes",
-			input: db.GetMenuWithDishesParams{
-				ID:       id,
-				CityCode: 1,
-			},
-			buildStub: func(query *mocks.MockQuery) {
-				arg := db.GetMenuWithDishesParams{
-					ID:       id,
-					CityCode: 1,
-				}
-
-				result := db.GetMenuWithDishesRow{
-					ID:        arg.ID,
-					OfferedAt: date,
-					CityCode:  arg.CityCode,
-					PhotoUrl: sql.NullString{
-						String: "https://example.com",
-						Valid:  true,
-					},
-					ElementarySchoolCalories: 100,
-					JuniorHighSchoolCalories: 200,
-					Dishes:                   json.RawMessage("[]"),
-				}
-				query.EXPECT().GetMenuWithDishes(context.Background(), arg).Times(1).Return(result, nil)
-			},
-			check: func(t *testing.T, menu *domain.MenuWithDishes, err error) {
-				require.NoError(t, err)
-				require.NotNil(t, menu)
-				require.Equal(t, int32(1), menu.CityCode)
-				require.Equal(t, date, menu.OfferedAt)
-				require.Equal(t, "https://example.com", menu.PhotoUrl.String)
-				require.Equal(t, true, menu.PhotoUrl.Valid)
-				require.Equal(t, int32(100), menu.ElementarySchoolCalories)
-				require.Equal(t, int32(200), menu.JuniorHighSchoolCalories)
-				require.NotNil(t, menu.Dishes)
-				require.Len(t, menu.Dishes, 0)
 			},
 		},
 		{
@@ -391,7 +299,7 @@ func TestGetByIDWithDishes(t *testing.T) {
 					ID:       "bad_id",
 					CityCode: 1,
 				}
-				query.EXPECT().GetMenuWithDishes(context.Background(), arg).Times(1).Return(db.GetMenuWithDishesRow{}, sql.ErrNoRows)
+				query.EXPECT().GetMenuWithDishes(context.Background(), arg).Times(1).Return([]db.GetMenuWithDishesRow{}, sql.ErrNoRows)
 			},
 			check: func(t *testing.T, menu *domain.MenuWithDishes, err error) {
 				require.Error(t, err)
@@ -419,7 +327,7 @@ func TestGetByIDWithDishes(t *testing.T) {
 	}
 }
 
-func TestFetchWithDishes(t *testing.T) {
+func TestFetchByCityWithDishes(t *testing.T) {
 	offered := util.RandomDate()
 
 	testCases := []struct {
@@ -431,19 +339,20 @@ func TestFetchWithDishes(t *testing.T) {
 		{
 			name: "OK",
 			input: db.ListMenuWithDishesByCityParams{
+				CityCode:  1,
 				Limit:     10,
 				Offset:    0,
 				OfferedAt: offered,
-				CityCode:  1,
 			},
 			build: func(query *mocks.MockQuery) {
 				arg := db.ListMenuWithDishesByCityParams{
+					CityCode:  1,
 					Limit:     10,
 					Offset:    0,
 					OfferedAt: offered,
-					CityCode:  1,
 				}
-				results := randomWithDishesByCityResult(10)
+				results := randomWithDishesByCityResults(int(arg.Limit))
+
 				query.EXPECT().ListMenuWithDishesByCity(context.Background(), arg).Times(1).Return(results, nil)
 			},
 			check: func(t *testing.T, menus []*domain.MenuWithDishes, err error) {
@@ -455,17 +364,17 @@ func TestFetchWithDishes(t *testing.T) {
 		{
 			name: "Bad Limit",
 			input: db.ListMenuWithDishesByCityParams{
+				CityCode:  1,
 				Limit:     -1,
 				Offset:    0,
 				OfferedAt: offered,
-				CityCode:  1,
 			},
 			build: func(query *mocks.MockQuery) {
 				arg := db.ListMenuWithDishesByCityParams{
+					CityCode:  1,
 					Limit:     -1,
 					Offset:    0,
 					OfferedAt: offered,
-					CityCode:  1,
 				}
 				query.EXPECT().ListMenuWithDishesByCity(context.Background(), arg).Times(1).Return([]db.ListMenuWithDishesByCityRow{}, sql.ErrNoRows)
 			},
@@ -473,71 +382,6 @@ func TestFetchWithDishes(t *testing.T) {
 				require.Error(t, err)
 				require.ErrorIs(t, err, sql.ErrNoRows)
 				require.Nil(t, menus)
-			},
-		},
-		{
-			name: "Bad Dishes",
-			input: db.ListMenuWithDishesByCityParams{
-				Limit:     10,
-				Offset:    0,
-				OfferedAt: offered,
-				CityCode:  1,
-			},
-			build: func(query *mocks.MockQuery) {
-				arg := db.ListMenuWithDishesByCityParams{
-					Limit:     10,
-					Offset:    0,
-					OfferedAt: offered,
-					CityCode:  1,
-				}
-				results := randomWithDishesByCityResult(10)
-				results[0].Dishes = json.RawMessage("")
-
-				query.EXPECT().ListMenuWithDishesByCity(context.Background(), arg).Times(1).Return(results, nil)
-			},
-			check: func(t *testing.T, menus []*domain.MenuWithDishes, err error) {
-				require.Error(t, err)
-				require.Nil(t, menus)
-			},
-		},
-		{
-			name: "No Dishes",
-			input: db.ListMenuWithDishesByCityParams{
-				Limit:     10,
-				Offset:    0,
-				OfferedAt: offered,
-				CityCode:  1,
-			},
-			build: func(query *mocks.MockQuery) {
-				arg := db.ListMenuWithDishesByCityParams{
-					Limit:     10,
-					Offset:    0,
-					OfferedAt: offered,
-					CityCode:  1,
-				}
-				var results []db.ListMenuWithDishesByCityRow
-
-				for i := 0; i < 10; i++ {
-					results = append(results, db.ListMenuWithDishesByCityRow{
-						ID:                       util.NewUlid(),
-						OfferedAt:                util.RandomDate(),
-						CityCode:                 util.RandomCityCode(),
-						PhotoUrl:                 util.RandomNullURL(),
-						ElementarySchoolCalories: util.RandomInt32(),
-						JuniorHighSchoolCalories: util.RandomInt32(),
-						Dishes:                   json.RawMessage("[]"),
-					})
-				}
-				query.EXPECT().ListMenuWithDishesByCity(context.Background(), arg).Times(1).Return(results, nil)
-			},
-			check: func(t *testing.T, menus []*domain.MenuWithDishes, err error) {
-				require.NoError(t, err)
-				require.NotNil(t, menus)
-				require.Len(t, menus, 10)
-				for _, menu := range menus {
-					require.Empty(t, menu.Dishes)
-					require.Len(t, menu.Dishes, 0)
-				}
 			},
 		},
 	}
@@ -560,7 +404,7 @@ func TestFetchWithDishes(t *testing.T) {
 	}
 }
 
-func TestFetchByCityWithDishes(t *testing.T) {
+func TestFetchWithDishes(t *testing.T) {
 	offered := util.RandomDate()
 
 	testCases := []struct {
@@ -582,7 +426,7 @@ func TestFetchByCityWithDishes(t *testing.T) {
 					Offset:    0,
 					OfferedAt: offered,
 				}
-				results := randomWithDishesResult(10)
+				results := randomWithDishesResults(int(arg.Limit))
 				query.EXPECT().ListMenuWithDishes(context.Background(), arg).Times(1).Return(results, nil)
 			},
 			check: func(t *testing.T, menus []*domain.MenuWithDishes, err error) {
@@ -612,67 +456,6 @@ func TestFetchByCityWithDishes(t *testing.T) {
 				require.Nil(t, menus)
 			},
 		},
-		{
-			name: "Bad Dishes",
-			input: db.ListMenuWithDishesParams{
-				Limit:     10,
-				Offset:    0,
-				OfferedAt: offered,
-			},
-			build: func(query *mocks.MockQuery) {
-				arg := db.ListMenuWithDishesParams{
-					Limit:     10,
-					Offset:    0,
-					OfferedAt: offered,
-				}
-				results := randomWithDishesResult(10)
-				results[0].Dishes = json.RawMessage("")
-
-				query.EXPECT().ListMenuWithDishes(context.Background(), arg).Times(1).Return(results, nil)
-			},
-			check: func(t *testing.T, menus []*domain.MenuWithDishes, err error) {
-				require.Error(t, err)
-				require.Nil(t, menus)
-			},
-		},
-		{
-			name: "No Dishes",
-			input: db.ListMenuWithDishesParams{
-				Limit:     10,
-				Offset:    0,
-				OfferedAt: offered,
-			},
-			build: func(query *mocks.MockQuery) {
-				arg := db.ListMenuWithDishesParams{
-					Limit:     10,
-					Offset:    0,
-					OfferedAt: offered,
-				}
-				var results []db.ListMenuWithDishesRow
-
-				for i := 0; i < 10; i++ {
-					results = append(results, db.ListMenuWithDishesRow{
-						ID:                       util.NewUlid(),
-						OfferedAt:                util.RandomDate(),
-						CityCode:                 util.RandomCityCode(),
-						PhotoUrl:                 util.RandomNullURL(),
-						ElementarySchoolCalories: util.RandomInt32(),
-						JuniorHighSchoolCalories: util.RandomInt32(),
-						Dishes:                   json.RawMessage("[]"),
-					})
-				}
-				query.EXPECT().ListMenuWithDishes(context.Background(), arg).Times(1).Return(results, nil)
-			},
-			check: func(t *testing.T, menus []*domain.MenuWithDishes, err error) {
-				require.NoError(t, err)
-				require.NotNil(t, menus)
-				require.Len(t, menus, 10)
-				for _, menu := range menus {
-					require.Empty(t, menu.Dishes)
-					require.Len(t, menu.Dishes, 0)
-				}
-			},
-		},
 	}
 
 	for _, tc := range testCases {
@@ -693,7 +476,28 @@ func TestFetchByCityWithDishes(t *testing.T) {
 	}
 }
 
-func randomResults(length int) []db.Menu {
+func randomMenuWithDishesRows() []db.GetMenuWithDishesRow {
+	n := 5
+
+	results := make([]db.GetMenuWithDishesRow, n)
+
+	for i := 0; i < n; i++ {
+		results[i] = db.GetMenuWithDishesRow{
+			ID:                       util.NewUlid(),
+			OfferedAt:                util.RandomDate(),
+			CityCode:                 util.RandomCityCode(),
+			PhotoUrl:                 util.RandomNullURL(),
+			ElementarySchoolCalories: util.RandomInt32(),
+			JuniorHighSchoolCalories: util.RandomInt32(),
+			DishID:                   util.NewUlid(),
+			DishName:                 "dish",
+		}
+	}
+
+	return results
+}
+
+func randomMenuResults(length int) []db.Menu {
 	var menus []db.Menu
 	for i := 0; i < length; i++ {
 		menus = append(menus, db.Menu{
@@ -709,14 +513,9 @@ func randomResults(length int) []db.Menu {
 	return menus
 }
 
-func randomDishJson(id string) json.RawMessage {
-	dishes := fmt.Sprintf(`[{"id":"%s","name":"dish","menu_id":"%d"}]`, id, 1)
-	return json.RawMessage(dishes)
+func randomWithDishesResults(length int) []db.ListMenuWithDishesRow {
 
-}
-
-func randomWithDishesResult(length int) []db.ListMenuWithDishesRow {
-	var results []db.ListMenuWithDishesRow
+	results := make([]db.ListMenuWithDishesRow, 0, length)
 
 	for i := 0; i < length; i++ {
 		results = append(results, db.ListMenuWithDishesRow{
@@ -726,26 +525,31 @@ func randomWithDishesResult(length int) []db.ListMenuWithDishesRow {
 			PhotoUrl:                 util.RandomNullURL(),
 			ElementarySchoolCalories: util.RandomInt32(),
 			JuniorHighSchoolCalories: util.RandomInt32(),
-			Dishes:                   randomDishJson(util.NewUlid()),
+			DishID:                   util.NewUlid(),
+			DishName:                 "dish",
 		})
 	}
 
 	return results
 }
 
-func randomWithDishesByCityResult(length int) []db.ListMenuWithDishesByCityRow {
-	var results []db.ListMenuWithDishesByCityRow
+func randomWithDishesByCityResults(length int) []db.ListMenuWithDishesByCityRow {
+
+	results := make([]db.ListMenuWithDishesByCityRow, 0, length)
 
 	for i := 0; i < length; i++ {
-		results = append(results, db.ListMenuWithDishesByCityRow{
+		data := db.ListMenuWithDishesByCityRow{
 			ID:                       util.NewUlid(),
 			OfferedAt:                util.RandomDate(),
 			CityCode:                 util.RandomCityCode(),
 			PhotoUrl:                 util.RandomNullURL(),
 			ElementarySchoolCalories: util.RandomInt32(),
 			JuniorHighSchoolCalories: util.RandomInt32(),
-			Dishes:                   randomDishJson(util.NewUlid()),
-		})
+			DishID:                   util.NewUlid(),
+			DishName:                 "dish",
+		}
+
+		results = append(results, data)
 	}
 
 	return results
