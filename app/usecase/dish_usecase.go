@@ -19,11 +19,11 @@ func NewDishUsecase(dr domain.DishRepository, timeout time.Duration) domain.Dish
 	}
 }
 
-func (du *dishUsecase) Create(ctx context.Context, dish *domain.Dish) error {
+func (du *dishUsecase) Create(ctx context.Context, dish *domain.Dish, menuID string) error {
 	ctx, cancel := context.WithTimeout(ctx, du.contextTimeout)
 	defer cancel()
 
-	return du.dishRepo.Create(ctx, dish)
+	return du.dishRepo.Create(ctx, dish, menuID)
 }
 
 func (du *dishUsecase) GetByID(ctx context.Context, id string) (*domain.Dish, error) {

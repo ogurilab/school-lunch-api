@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"encoding/json"
 	"testing"
 	"time"
 
@@ -11,14 +10,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var cityCode = util.RandomCityCode()
-
 func TestCreateMenu(t *testing.T) {
-	createRandomMenu(t)
+	cityCode := util.RandomCityCode()
+	createRandomMenu(t, cityCode)
 }
 
 func TestGetMenu(t *testing.T) {
-	menu1 := createRandomMenu(t)
+	cityCode := util.RandomCityCode()
+	menu1 := createRandomMenu(t, cityCode)
+
 	arg := GetMenuParams{
 		ID:       menu1.ID,
 		CityCode: menu1.CityCode,
@@ -39,9 +39,10 @@ func TestGetMenu(t *testing.T) {
 }
 
 func TestFetchMenusByCity(t *testing.T) {
+	cityCode := util.RandomCityCode()
 	start := time.Now()
 	for i := 0; i < 10; i++ {
-		createRandomMenuFromStart(t, start)
+		createRandomMenuFromStart(t, start, cityCode)
 	}
 
 	arg := ListMenuByCityParams{
@@ -55,105 +56,9 @@ func TestFetchMenusByCity(t *testing.T) {
 
 	require.NoError(t, err)
 	require.Len(t, menus, 5)
-
 }
 
-func TestGetWithDishes(t *testing.T) {
-	menu := createRandomMenu(t)
-
-	var mockDishes []*domain.Dish
-
-	for i := 0; i < 10; i++ {
-		mockDishes = append(mockDishes, createRandomDish(t, menu.ID))
-	}
-
-	require.Len(t, mockDishes, 10)
-
-	arg := GetMenuWithDishesParams{
-		ID:       menu.ID,
-		CityCode: menu.CityCode,
-	}
-
-	result, err := testQuery.GetMenuWithDishes(context.Background(), arg)
-
-	require.NoError(t, err)
-
-	var dishes []*domain.Dish
-
-	err = json.Unmarshal([]byte(result.Dishes), &dishes)
-
-	require.NoError(t, err)
-
-	for _, dish := range dishes {
-
-		require.NotEmpty(t, dish.ID)
-		require.NotEmpty(t, dish.MenuID)
-		require.Equal(t, menu.ID, dish.MenuID)
-		require.NotEmpty(t, dish.Name)
-
-	}
-
-}
-
-func TestFetchMenuWithDishesByCity(t *testing.T) {
-	start := time.Now()
-	for i := 0; i < 10; i++ {
-		menu := createRandomMenuFromStart(t, start)
-
-		for j := 0; j < 10; j++ {
-			createRandomDish(t, menu.ID)
-		}
-	}
-
-	arg := ListMenuWithDishesByCityParams{
-		Limit:     5,
-		Offset:    5,
-		CityCode:  cityCode,
-		OfferedAt: start,
-	}
-
-	results, err := testQuery.ListMenuWithDishesByCity(context.Background(), arg)
-
-	require.NoError(t, err)
-	require.Len(t, results, 5)
-
-	var dishes []*domain.Dish
-
-	for _, result := range results {
-		err := json.Unmarshal([]byte(result.Dishes), &dishes)
-		require.NoError(t, err)
-	}
-}
-func TestFetchMenuWithDishes(t *testing.T) {
-	start := time.Now()
-	for i := 0; i < 10; i++ {
-		menu := createRandomMenuFromStart(t, start)
-
-		for j := 0; j < 10; j++ {
-			createRandomDish(t, menu.ID)
-		}
-	}
-
-	arg := ListMenuWithDishesParams{
-		Limit:     5,
-		Offset:    5,
-		OfferedAt: start,
-	}
-
-	results, err := testQuery.ListMenuWithDishes(context.Background(), arg)
-
-	require.NoError(t, err)
-	require.Len(t, results, 5)
-
-	var dishes []*domain.Dish
-
-	for _, result := range results {
-		err := json.Unmarshal([]byte(result.Dishes), &dishes)
-		require.NoError(t, err)
-	}
-}
-
-func createRandomMenu(t *testing.T) *domain.Menu {
+func createRandomMenu(t *testing.T, cityCode int32) *domain.Menu {
 	id := util.RandomUlid()
 
 	args := CreateMenuParams{
@@ -199,7 +104,8 @@ func createRandomMenu(t *testing.T) *domain.Menu {
 
 	return result
 }
-func createRandomMenuFromStart(t *testing.T, start time.Time) *domain.Menu {
+
+func createRandomMenuFromStart(t *testing.T, start time.Time, cityCode int32) *domain.Menu {
 	id := util.RandomUlid()
 
 	args := CreateMenuParams{

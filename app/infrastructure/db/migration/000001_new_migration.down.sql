@@ -14,8 +14,6 @@ DROP INDEX `idx_cities_city_name` ON `cities`;
 
 DROP INDEX `idx_dishes_name` ON `dishes`;
 
-DROP INDEX `idx_dishes_menu_id` ON `dishes`;
-
 DROP INDEX `idx_menus_offered_at` ON `menus`;
 
 DROP INDEX `idx_menus_city_code_offered_at` ON `menus`;

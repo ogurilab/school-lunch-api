@@ -10,12 +10,14 @@ import (
 )
 
 func TestCreateDish(t *testing.T) {
-	menu := createRandomMenu(t)
+	cityCode := util.RandomCityCode()
+	menu := createRandomMenu(t, cityCode)
 	createRandomDish(t, menu.ID)
 }
 
 func TestGetDish(t *testing.T) {
-	menu := createRandomMenu(t)
+	cityCode := util.RandomCityCode()
+	menu := createRandomMenu(t, cityCode)
 	dish1 := createRandomDish(t, menu.ID)
 	dish2, err := testQuery.GetDish(context.Background(), dish1.ID)
 
@@ -23,13 +25,12 @@ func TestGetDish(t *testing.T) {
 	require.NotEmpty(t, dish2)
 
 	require.Equal(t, dish1.ID, dish2.ID)
-	require.Equal(t, dish1.MenuID, dish2.MenuID)
 	require.Equal(t, dish1.Name, dish2.Name)
-
 }
 
 func TestFetchDishByMenuID(t *testing.T) {
-	menu := createRandomMenu(t)
+	cityCode := util.RandomCityCode()
+	menu := createRandomMenu(t, cityCode)
 	for i := 0; i < 10; i++ {
 		createRandomDish(t, menu.ID)
 	}
@@ -38,14 +39,11 @@ func TestFetchDishByMenuID(t *testing.T) {
 
 	require.NoError(t, err)
 	require.Len(t, dishes, 10)
-
-	for _, dish := range dishes {
-		require.Equal(t, menu.ID, dish.MenuID)
-	}
 }
 
 func TestFetchDishesByName(t *testing.T) {
-	menu := createRandomMenu(t)
+	cityCode := util.RandomCityCode()
+	menu := createRandomMenu(t, cityCode)
 
 	var mockDishes []*domain.Dish
 
@@ -68,7 +66,6 @@ func TestFetchDishesByName(t *testing.T) {
 	for _, dish := range dishes {
 		require.Equal(t, mockDishes[0].Name, dish.Name)
 		require.Equal(t, arg.Name, dish.Name)
-		require.Equal(t, mockDishes[0].MenuID, dish.MenuID)
 		require.Equal(t, mockDishes[0].ID, dish.ID)
 	}
 }
@@ -96,7 +93,6 @@ func TestFetchDishes(t *testing.T) {
 
 	for _, dish := range dishes {
 		require.NotEmpty(t, dish.ID)
-		require.NotEmpty(t, dish.MenuID)
 		require.NotEmpty(t, dish.Name)
 
 	}
@@ -104,12 +100,20 @@ func TestFetchDishes(t *testing.T) {
 
 func createRandomDish(t *testing.T, menuID string) *domain.Dish {
 	arg := CreateDishParams{
-		ID:     util.RandomUlid(),
-		MenuID: menuID,
-		Name:   util.RandomString(10),
+		ID:   util.RandomUlid(),
+		Name: util.RandomString(10),
 	}
 
 	err := testQuery.CreateDish(context.Background(), arg)
+
+	require.NoError(t, err)
+
+	relationArg := CreateMenuDishParams{
+		MenuID: menuID,
+		DishID: arg.ID,
+	}
+
+	err = testQuery.CreateMenuDish(context.Background(), relationArg)
 
 	require.NoError(t, err)
 
@@ -119,10 +123,10 @@ func createRandomDish(t *testing.T, menuID string) *domain.Dish {
 	require.NotEmpty(t, dish)
 
 	require.Equal(t, arg.ID, dish.ID)
-	require.Equal(t, arg.MenuID, dish.MenuID)
+	require.Equal(t, relationArg.DishID, dish.ID)
 	require.Equal(t, arg.Name, dish.Name)
 
-	result, err := domain.ReNewDish(dish.ID, dish.MenuID, dish.Name)
+	result, err := domain.ReNewDish(dish.ID, dish.Name)
 
 	require.NoError(t, err)
 

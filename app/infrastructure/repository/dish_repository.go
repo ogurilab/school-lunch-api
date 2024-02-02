@@ -17,14 +17,9 @@ func NewDishRepository(query db.Query) domain.DishRepository {
 	}
 }
 
-func (r *dishRepository) Create(ctx context.Context, dish *domain.Dish) error {
-	arg := db.CreateDishParams{
-		ID:     dish.ID,
-		MenuID: dish.MenuID,
-		Name:   dish.Name,
-	}
+func (r *dishRepository) Create(ctx context.Context, dish *domain.Dish, menuID string) error {
 
-	return r.query.CreateDish(ctx, arg)
+	return r.query.CreateDishTx(ctx, dish, menuID)
 }
 
 func (r *dishRepository) GetByID(ctx context.Context, id string) (*domain.Dish, error) {
@@ -37,34 +32,31 @@ func (r *dishRepository) GetByID(ctx context.Context, id string) (*domain.Dish, 
 
 	return domain.ReNewDish(
 		result.ID,
-		result.MenuID,
 		result.Name,
 	)
-
 }
 
 func (r *dishRepository) FetchByMenuID(ctx context.Context, menuID string) ([]*domain.Dish, error) {
 
-	result, err := r.query.ListDishByMenuID(ctx, menuID)
+	results, err := r.query.ListDishByMenuID(ctx, menuID)
 
 	if err != nil {
 		return nil, err
 	}
 
-	var dishes []*domain.Dish
+	dishes := make([]*domain.Dish, 0, len(results))
 
-	for _, dish := range result {
-		d, err := domain.ReNewDish(
-			dish.ID,
-			dish.MenuID,
-			dish.Name,
+	for _, result := range results {
+		dish, err := domain.ReNewDish(
+			result.ID,
+			result.Name,
 		)
 
 		if err != nil {
 			return nil, err
 		}
 
-		dishes = append(dishes, d)
+		dishes = append(dishes, dish)
 	}
 
 	return dishes, nil
@@ -77,26 +69,25 @@ func (r *dishRepository) FetchByName(ctx context.Context, search string, limit i
 		Offset: offset,
 	}
 
-	result, err := r.query.ListDishByName(ctx, arg)
+	results, err := r.query.ListDishByName(ctx, arg)
 
 	if err != nil {
 		return nil, err
 	}
 
-	var dishes []*domain.Dish
+	dishes := make([]*domain.Dish, 0, len(results))
 
-	for _, dish := range result {
-		d, err := domain.ReNewDish(
-			dish.ID,
-			dish.MenuID,
-			dish.Name,
+	for _, result := range results {
+		dish, err := domain.ReNewDish(
+			result.ID,
+			result.Name,
 		)
 
 		if err != nil {
 			return nil, err
 		}
 
-		dishes = append(dishes, d)
+		dishes = append(dishes, dish)
 	}
 
 	return dishes, nil
@@ -108,26 +99,25 @@ func (r *dishRepository) Fetch(ctx context.Context, limit int32, offset int32) (
 		Offset: offset,
 	}
 
-	result, err := r.query.ListDish(ctx, arg)
+	results, err := r.query.ListDish(ctx, arg)
 
 	if err != nil {
 		return nil, err
 	}
 
-	var dishes []*domain.Dish
+	dishes := make([]*domain.Dish, 0, len(results))
 
-	for _, dish := range result {
-		d, err := domain.ReNewDish(
-			dish.ID,
-			dish.MenuID,
-			dish.Name,
+	for _, result := range results {
+		dish, err := domain.ReNewDish(
+			result.ID,
+			result.Name,
 		)
 
 		if err != nil {
 			return nil, err
 		}
 
-		dishes = append(dishes, d)
+		dishes = append(dishes, dish)
 	}
 
 	return dishes, nil

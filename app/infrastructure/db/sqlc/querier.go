@@ -12,16 +12,17 @@ type Querier interface {
 	CreateCity(ctx context.Context, arg CreateCityParams) error
 	CreateDish(ctx context.Context, arg CreateDishParams) error
 	CreateMenu(ctx context.Context, arg CreateMenuParams) error
+	CreateMenuDish(ctx context.Context, arg CreateMenuDishParams) error
 	GetCity(ctx context.Context, cityCode int32) (City, error)
-	GetDish(ctx context.Context, id string) (Dish, error)
+	GetDish(ctx context.Context, id string) (GetDishRow, error)
 	GetMenu(ctx context.Context, arg GetMenuParams) (Menu, error)
-	GetMenuWithDishes(ctx context.Context, arg GetMenuWithDishesParams) (GetMenuWithDishesRow, error)
+	GetMenuWithDishes(ctx context.Context, arg GetMenuWithDishesParams) ([]GetMenuWithDishesRow, error)
 	ListCities(ctx context.Context, arg ListCitiesParams) ([]City, error)
 	ListCitiesByName(ctx context.Context, arg ListCitiesByNameParams) ([]City, error)
 	ListCitiesByPrefecture(ctx context.Context, arg ListCitiesByPrefectureParams) ([]City, error)
-	ListDish(ctx context.Context, arg ListDishParams) ([]Dish, error)
-	ListDishByMenuID(ctx context.Context, menuID string) ([]Dish, error)
-	ListDishByName(ctx context.Context, arg ListDishByNameParams) ([]Dish, error)
+	ListDish(ctx context.Context, arg ListDishParams) ([]ListDishRow, error)
+	ListDishByMenuID(ctx context.Context, menuID string) ([]ListDishByMenuIDRow, error)
+	ListDishByName(ctx context.Context, arg ListDishByNameParams) ([]ListDishByNameRow, error)
 	ListMenuByCity(ctx context.Context, arg ListMenuByCityParams) ([]Menu, error)
 	ListMenuWithDishes(ctx context.Context, arg ListMenuWithDishesParams) ([]ListMenuWithDishesRow, error)
 	ListMenuWithDishesByCity(ctx context.Context, arg ListMenuWithDishesByCityParams) ([]ListMenuWithDishesByCityRow, error)

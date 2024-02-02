@@ -41,17 +41,17 @@ func (m *MockDishRepository) EXPECT() *MockDishRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockDishRepository) Create(ctx context.Context, dish *domain.Dish) error {
+func (m *MockDishRepository) Create(ctx context.Context, dish *domain.Dish, menuID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, dish)
+	ret := m.ctrl.Call(m, "Create", ctx, dish, menuID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockDishRepositoryMockRecorder) Create(ctx, dish any) *gomock.Call {
+func (mr *MockDishRepositoryMockRecorder) Create(ctx, dish, menuID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockDishRepository)(nil).Create), ctx, dish)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockDishRepository)(nil).Create), ctx, dish, menuID)
 }
 
 // Fetch mocks base method.
@@ -138,17 +138,17 @@ func (m *MockDishUsecase) EXPECT() *MockDishUsecaseMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockDishUsecase) Create(ctx context.Context, dish *domain.Dish) error {
+func (m *MockDishUsecase) Create(ctx context.Context, dish *domain.Dish, menuID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, dish)
+	ret := m.ctrl.Call(m, "Create", ctx, dish, menuID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockDishUsecaseMockRecorder) Create(ctx, dish any) *gomock.Call {
+func (mr *MockDishUsecaseMockRecorder) Create(ctx, dish, menuID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockDishUsecase)(nil).Create), ctx, dish)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockDishUsecase)(nil).Create), ctx, dish, menuID)
 }
 
 // Fetch mocks base method.
