@@ -6,26 +6,26 @@ CREATE TABLE `menus` (
   `elementary_school_calories` int NOT NULL DEFAULT 0,
   `junior_high_school_calories` int NOT NULL DEFAULT 0,
   `city_code` SMALLINT NOT NULL
-);
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE `dishes` (
   `id` varchar(255) PRIMARY KEY,
   `menu_id` varchar(255) NOT NULL,
   `name` varchar(255) UNIQUE NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE `allergens` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(255) UNIQUE NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE `dishes_allergens` (
   `allergen_id` INT NOT NULL,
   `dish_id` varchar(255) NOT NULL,
   PRIMARY KEY (`dish_id`, `allergen_id`)
-);
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE `cities` (
   `city_code` SMALLINT PRIMARY KEY,
@@ -33,7 +33,7 @@ CREATE TABLE `cities` (
   `prefecture_code` SMALLINT NOT NULL,
   `prefecture_name` VARCHAR(100) NOT NULL,
   `school_lunch_info_available` boolean NOT NULL DEFAULT FALSE COMMENT '給食のデータが登録されているかどうか'
-);
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE `external_data_sources` (
   `source_id` INT PRIMARY KEY AUTO_INCREMENT,
@@ -44,7 +44,7 @@ CREATE TABLE `external_data_sources` (
   `status` VARCHAR(50) NOT NULL DEFAULT "Inactive" COMMENT 'Status of the data source: Active (currently in use), Inactive (not in use), Updating (currently being updated), Error (an error has occurred)',
   `category` varchar(50) NOT NULL DEFAULT "menu" COMMENT 'menu or dish or allergens',
   `description` TEXT
-);
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE `users` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
@@ -54,7 +54,7 @@ CREATE TABLE `users` (
   `role` VARCHAR(50) NOT NULL DEFAULT "guest" COMMENT 'User roles: municipality (for municipal staff), admin (for system administrators), guest (for general users)',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `city_code` SMALLINT NOT NULL DEFAULT 0
-);
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
 CREATE INDEX `idx_menus_offered_at` ON `menus` (`offered_at`);
 

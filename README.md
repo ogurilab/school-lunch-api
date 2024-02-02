@@ -35,7 +35,17 @@ make prod
 
 [http://localhost:8080/v1/swagger/](http://localhost:8080/v1/swagger/)
 
-6. Docker のコンテナを停止する場合は、以下のコマンドを実行します。
+6. 半田市の学校給食のデータを追加する。
+
+   - ops/docker/entrypoint/data/に init.sql を追加します。
+
+   - make コマンドを実行して、データベースにデータを追加します。
+
+```bash
+make seed_handa
+```
+
+7. Docker のコンテナを停止する場合は、以下のコマンドを実行します。
 
 ```bash
 make prod_stop

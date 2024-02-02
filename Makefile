@@ -83,5 +83,11 @@ test:
 build_swagger:
 	rm -rf ${APP_PATH}/doc/swagger/statik
 	cd ${APP_PATH} && statik -src=./doc/swagger -dest=./doc
+
+# 半田市のデータをデータベースに追加
+seed_handa:
+	docker compose cp ./ops/docker/entrypoint/data/ mysql:tmp/data/
+	docker compose exec mysql bash -c "mysql -u user -ppassword school_lunch < tmp/data/init.sql"
+	docker compose exec mysql bash -c "rm -rf tmp/data/"
 	
 .PHONY: up down start prod prod_stop migrateup migratedown new_migration sqlc test
