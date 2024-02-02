@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"sort"
 	"time"
 
 	"github.com/ogurilab/school-lunch-api/domain"
@@ -149,6 +151,25 @@ func (r *menuWithDishesRepository) GetByID(ctx context.Context, id string, city 
 	)
 }
 
+type mapKey struct {
+	id      string
+	offered time.Time
+}
+
+type processMenuDishesMapInput struct {
+	id                       string
+	offered                  time.Time
+	photoUrl                 sql.NullString
+	elementarySchoolCalories int32
+	juniorHighSchoolCalories int32
+	cityCode                 int32
+	dishID                   string
+	dishName                 string
+	key                      mapKey
+	menuMap                  map[mapKey]*domain.Menu
+	dishesMap                map[mapKey][]*domain.Dish
+}
+
 func (r *menuWithDishesRepository) FetchByCity(ctx context.Context, limit int32, offset int32, offered time.Time, city int32) ([]*domain.MenuWithDishes, error) {
 	arg := db.ListMenuWithDishesByCityParams{
 		Limit:     limit,
@@ -163,35 +184,29 @@ func (r *menuWithDishesRepository) FetchByCity(ctx context.Context, limit int32,
 		return nil, err
 	}
 
-	menusMap := make(map[string]*domain.Menu)
-	dishesMap := make(map[string][]*domain.Dish)
+	menusMap := make(map[mapKey]*domain.Menu)
+	dishesMap := make(map[mapKey][]*domain.Dish)
 
 	for _, result := range results {
-		if _, exists := menusMap[result.ID]; !exists {
-			menu, err := domain.ReNewMenu(
-				result.ID,
-				result.OfferedAt,
-				result.PhotoUrl,
-				result.ElementarySchoolCalories,
-				result.JuniorHighSchoolCalories,
-				result.CityCode,
-			)
-			if err != nil {
+		key := mapKey{id: result.ID, offered: result.OfferedAt}
 
-				return nil, err
-			}
-			menusMap[result.ID] = menu
-		}
+		err := processMenuDishesMap(processMenuDishesMapInput{
+			id:                       result.ID,
+			offered:                  result.OfferedAt,
+			photoUrl:                 result.PhotoUrl,
+			elementarySchoolCalories: result.ElementarySchoolCalories,
+			juniorHighSchoolCalories: result.JuniorHighSchoolCalories,
+			cityCode:                 result.CityCode,
+			dishID:                   result.DishID,
+			dishName:                 result.DishName,
+			key:                      key,
+			menuMap:                  menusMap,
+			dishesMap:                dishesMap,
+		})
 
-		dish, err := domain.ReNewDish(
-			result.DishID,
-			result.DishName,
-		)
 		if err != nil {
 			return nil, err
 		}
-
-		dishesMap[result.ID] = append(dishesMap[result.ID], dish)
 	}
 
 	return processMenuWithDishesResults(menusMap, dishesMap, len(menusMap))
@@ -210,61 +225,104 @@ func (r *menuWithDishesRepository) Fetch(ctx context.Context, limit int32, offse
 		return nil, err
 	}
 
-	menusMap := make(map[string]*domain.Menu)
-	dishesMap := make(map[string][]*domain.Dish)
+	menusMap := make(map[mapKey]*domain.Menu)
+	dishesMap := make(map[mapKey][]*domain.Dish)
 
 	for _, result := range results {
-		if _, exists := menusMap[result.ID]; !exists {
-			menu, err := domain.ReNewMenu(
-				result.ID,
-				result.OfferedAt,
-				result.PhotoUrl,
-				result.ElementarySchoolCalories,
-				result.JuniorHighSchoolCalories,
-				result.CityCode,
-			)
-			if err != nil {
+		key := mapKey{id: result.ID, offered: result.OfferedAt}
 
-				return nil, err
-			}
+		err := processMenuDishesMap(processMenuDishesMapInput{
+			id:                       result.ID,
+			offered:                  result.OfferedAt,
+			photoUrl:                 result.PhotoUrl,
+			elementarySchoolCalories: result.ElementarySchoolCalories,
+			juniorHighSchoolCalories: result.JuniorHighSchoolCalories,
+			cityCode:                 result.CityCode,
+			dishID:                   result.DishID,
+			dishName:                 result.DishName,
+			key:                      key,
+			menuMap:                  menusMap,
+			dishesMap:                dishesMap,
+		})
 
-			menusMap[result.ID] = menu
-		}
-
-		dish, err := domain.ReNewDish(
-			result.DishID,
-			result.DishName,
-		)
 		if err != nil {
 			return nil, err
 		}
-
-		dishesMap[result.ID] = append(dishesMap[result.ID], dish)
 	}
 
 	return processMenuWithDishesResults(menusMap, dishesMap, len(menusMap))
 }
 
-func processMenuWithDishesResults(menuMap map[string]*domain.Menu, dishesMap map[string][]*domain.Dish, length int) ([]*domain.MenuWithDishes, error) {
+func processMenuDishesMap(
+	input processMenuDishesMapInput,
+) error {
+	menusMap := input.menuMap
+	dishesMap := input.dishesMap
+
+	key := input.key
+	if _, exists := menusMap[key]; !exists {
+		menu, err := domain.ReNewMenu(
+			input.id,
+			input.offered,
+			input.photoUrl,
+			input.elementarySchoolCalories,
+			input.juniorHighSchoolCalories,
+			input.cityCode,
+		)
+		if err != nil {
+
+			return err
+		}
+
+		menusMap[key] = menu
+	}
+
+	dish, err := domain.ReNewDish(
+		input.dishID,
+		input.dishName,
+	)
+	if err != nil {
+		return err
+	}
+
+	dishesMap[key] = append(dishesMap[key], dish)
+
+	return nil
+}
+
+func processMenuWithDishesResults(menuMap map[mapKey]*domain.Menu, dishesMap map[mapKey][]*domain.Dish, length int) ([]*domain.MenuWithDishes, error) {
+
+	keys := make([]mapKey, 0, length)
+
+	for key := range menuMap {
+		keys = append(keys, key)
+	}
+
+	sort.Slice(keys, func(i, j int) bool {
+		return keys[i].offered.After(keys[j].offered)
+	})
 
 	menus := make([]*domain.MenuWithDishes, 0, length)
 
-	for id, menu := range menuMap {
-		withDishes, err := domain.ReNewMenuWithDishes(
+	for _, key := range keys {
+		menu := menuMap[key]
+		dishes := dishesMap[key]
+
+		menuWithDishes, err := domain.ReNewMenuWithDishes(
 			menu.ID,
 			menu.OfferedAt,
 			menu.PhotoUrl,
 			menu.ElementarySchoolCalories,
 			menu.JuniorHighSchoolCalories,
 			menu.CityCode,
-			dishesMap[id],
+			dishes,
 		)
 
 		if err != nil {
 			return nil, err
 		}
 
-		menus = append(menus, withDishes)
+		menus = append(menus, menuWithDishes)
 	}
 
 	return menus, nil
