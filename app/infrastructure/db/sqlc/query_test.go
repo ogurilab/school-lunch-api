@@ -254,7 +254,14 @@ func requireCreatedDishAndMenuDish(t *testing.T, ctx context.Context, menu *doma
 	require.Equal(t, menuDish.DishID, result.menuDish.DishID)
 
 	// Dishを取得して、データが正しく保存されているか確認する
-	dish, err := testQuery.GetDish(ctx, result.dish.ID)
+	arg := GetDishParams{
+		ID:     result.dish.ID,
+		Limit:  1,
+		Offset: 0,
+	}
+	res, err := testQuery.GetDish(ctx, arg)
+
+	dish := res[0]
 
 	require.NoError(t, err)
 
@@ -287,13 +294,18 @@ func requireCreatedDishesAndMenuDishes(t *testing.T, ctx context.Context, menu *
 
 	// Dishを取得して、データが正しく保存されているか確認する
 	for _, dish := range result.dishes {
-		res, err := testQuery.GetDish(ctx, dish.ID)
+		arg := GetDishParams{
+			ID:     dish.ID,
+			Limit:  1,
+			Offset: 0,
+		}
+		res, err := testQuery.GetDish(ctx, arg)
 
 		require.NoError(t, err)
 
 		require.NotEmpty(t, dish.ID)
 		require.NotEmpty(t, dish.Name)
-		require.Equal(t, dish.ID, res.ID)
-		require.Equal(t, dish.Name, res.Name)
+		require.Equal(t, dish.ID, res[0].ID)
+		require.Equal(t, dish.Name, res[0].Name)
 	}
 }

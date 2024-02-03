@@ -17,15 +17,75 @@ func TestCreateDish(t *testing.T) {
 
 func TestGetDish(t *testing.T) {
 	cityCode := util.RandomCityCode()
-	menu := createRandomMenu(t, cityCode)
-	dish1 := createRandomDish(t, menu.ID)
-	dish2, err := testQuery.GetDish(context.Background(), dish1.ID)
+	dish := createRandomDish(t, util.RandomUlid())
+	testQuery.truncateMenuDishesTable()
+
+	length := 10
+	menuIDs := createMenuDishesByDishID(t, dish.ID, cityCode, length)
+
+	getArg := GetDishParams{
+		ID:     dish.ID,
+		Limit:  int32(length),
+		Offset: 0,
+	}
+
+	results, err := testQuery.GetDish(context.Background(), getArg)
 
 	require.NoError(t, err)
-	require.NotEmpty(t, dish2)
 
-	require.Equal(t, dish1.ID, dish2.ID)
-	require.Equal(t, dish1.Name, dish2.Name)
+	resMenuIDs := make([]string, 0, length)
+
+	for _, result := range results {
+		resMenuIDs = append(resMenuIDs, result.MenuID)
+	}
+
+	require.Len(t, results, length)
+	require.ElementsMatch(t, menuIDs, resMenuIDs)
+
+	for _, result := range results {
+		require.NotEmpty(t, result.ID)
+		require.NotEmpty(t, result.Name)
+
+		require.Equal(t, dish.ID, result.ID)
+		require.Equal(t, dish.Name, result.Name)
+	}
+}
+
+func TestGetDishInCity(t *testing.T) {
+	cityCode := util.RandomCityCode()
+	dish := createRandomDish(t, util.RandomUlid())
+	testQuery.truncateMenuDishesTable()
+
+	length := 10
+	menuIDs := createMenuDishesByDishID(t, dish.ID, cityCode, length)
+
+	getArg := GetDishInCityParams{
+		ID:       dish.ID,
+		CityCode: cityCode,
+		Limit:    int32(length),
+		Offset:   0,
+	}
+
+	results, err := testQuery.GetDishInCity(context.Background(), getArg)
+
+	require.NoError(t, err)
+
+	resMenuIDs := make([]string, 0, length)
+
+	for _, result := range results {
+		resMenuIDs = append(resMenuIDs, result.MenuID)
+	}
+
+	require.Len(t, results, length)
+	require.ElementsMatch(t, menuIDs, resMenuIDs)
+
+	for _, result := range results {
+		require.NotEmpty(t, result.ID)
+		require.NotEmpty(t, result.Name)
+
+		require.Equal(t, dish.ID, result.ID)
+		require.Equal(t, dish.Name, result.Name)
+	}
 }
 
 func TestFetchDishByMenuID(t *testing.T) {
@@ -98,6 +158,35 @@ func TestFetchDishes(t *testing.T) {
 	}
 }
 
+func createMenuDishesByDishID(t *testing.T, dishID string, cityCode int32, length int) []string {
+
+	menus := make([]*domain.Menu, 0, length)
+
+	for i := 0; i < length; i++ {
+		menu := createRandomMenu(t, cityCode)
+		menus = append(menus, menu)
+	}
+
+	for _, menu := range menus {
+		relationArg := CreateMenuDishParams{
+			MenuID: menu.ID,
+			DishID: dishID,
+		}
+
+		err := testQuery.CreateMenuDish(context.Background(), relationArg)
+
+		require.NoError(t, err)
+	}
+
+	menuIDs := make([]string, 0, length)
+
+	for _, menu := range menus {
+		menuIDs = append(menuIDs, menu.ID)
+	}
+
+	return menuIDs
+}
+
 func createRandomDish(t *testing.T, menuID string) *domain.Dish {
 	arg := CreateDishParams{
 		ID:   util.RandomUlid(),
@@ -117,8 +206,15 @@ func createRandomDish(t *testing.T, menuID string) *domain.Dish {
 
 	require.NoError(t, err)
 
-	dish, err := testQuery.GetDish(context.Background(), arg.ID)
+	getArg := GetDishParams{
+		ID:     arg.ID,
+		Limit:  1,
+		Offset: 0,
+	}
 
+	res, err := testQuery.GetDish(context.Background(), getArg)
+
+	dish := res[0]
 	require.NoError(t, err)
 	require.NotEmpty(t, dish)
 

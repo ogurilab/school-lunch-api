@@ -24,24 +24,104 @@ func (q *Queries) CreateDish(ctx context.Context, arg CreateDishParams) error {
 	return err
 }
 
-const getDish = `-- name: GetDish :one
+const getDish = `-- name: GetDish :many
 SELECT dishes.id,
-  dishes.name
+  dishes.name,
+  md.menu_id AS menu_id
 FROM dishes
-WHERE id = ?
-LIMIT 1
+  INNER JOIN menu_dishes AS md ON dishes.id = md.dish_id
+WHERE dishes.id = ?
+ORDER BY dishes.id
+LIMIT ? OFFSET ?
 `
 
-type GetDishRow struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+type GetDishParams struct {
+	ID     string `json:"id"`
+	Limit  int32  `json:"limit"`
+	Offset int32  `json:"offset"`
 }
 
-func (q *Queries) GetDish(ctx context.Context, id string) (GetDishRow, error) {
-	row := q.db.QueryRowContext(ctx, getDish, id)
-	var i GetDishRow
-	err := row.Scan(&i.ID, &i.Name)
-	return i, err
+type GetDishRow struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	MenuID string `json:"menu_id"`
+}
+
+func (q *Queries) GetDish(ctx context.Context, arg GetDishParams) ([]GetDishRow, error) {
+	rows, err := q.db.QueryContext(ctx, getDish, arg.ID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetDishRow{}
+	for rows.Next() {
+		var i GetDishRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.MenuID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getDishInCity = `-- name: GetDishInCity :many
+SELECT dishes.id,
+  dishes.name,
+  md.menu_id AS menu_id
+FROM dishes
+  INNER JOIN menu_dishes AS md ON dishes.id = md.dish_id
+  INNER JOIN menus AS m ON md.menu_id = m.id
+WHERE dishes.id = ?
+  AND m.city_code = ?
+ORDER BY dishes.id
+LIMIT ? OFFSET ?
+`
+
+type GetDishInCityParams struct {
+	ID       string `json:"id"`
+	CityCode int32  `json:"city_code"`
+	Limit    int32  `json:"limit"`
+	Offset   int32  `json:"offset"`
+}
+
+type GetDishInCityRow struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	MenuID string `json:"menu_id"`
+}
+
+func (q *Queries) GetDishInCity(ctx context.Context, arg GetDishInCityParams) ([]GetDishInCityRow, error) {
+	rows, err := q.db.QueryContext(ctx, getDishInCity,
+		arg.ID,
+		arg.CityCode,
+		arg.Limit,
+		arg.Offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []GetDishInCityRow{}
+	for rows.Next() {
+		var i GetDishInCityRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.MenuID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listDish = `-- name: ListDish :many
