@@ -131,14 +131,14 @@ func (r *menuRepository) Fetch(ctx context.Context, limit int32, offset int32, o
 }
 
 func (r *menuRepository) FetchByIDs(ctx context.Context, limit int32, offset int32, offered time.Time, ids []string) ([]*domain.Menu, error) {
-	arg := db.ListMenuByIDsParams{
+	arg := db.ListMenuInIdsParams{
 		Limit:     limit,
 		Offset:    offset,
 		OfferedAt: offered,
-		IDs:       ids,
+		Ids:       ids,
 	}
 
-	results, err := r.query.ListMenuByIDs(ctx, arg)
+	results, err := r.query.ListMenuInIds(ctx, arg)
 
 	if err != nil {
 		return nil, err

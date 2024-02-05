@@ -238,6 +238,177 @@ func TestFetchMenuByCity(t *testing.T) {
 	}
 }
 
+func TestFetchMenu(t *testing.T) {
+	ctx := context.Background()
+	offered := util.RandomDate()
+
+	testCases := []struct {
+		name      string
+		input     db.ListMenuParams
+		buildStub func(query *mocks.MockQuery)
+		check     func(t *testing.T, menus []*domain.Menu, err error)
+	}{
+		{
+			name: "OK",
+			input: db.ListMenuParams{
+				Limit:     10,
+				Offset:    0,
+				OfferedAt: offered,
+			},
+			buildStub: func(query *mocks.MockQuery) {
+				arg := db.ListMenuParams{
+					Limit:     10,
+					Offset:    0,
+					OfferedAt: offered,
+				}
+				results := randomMenuResults(10)
+				query.EXPECT().ListMenu(ctx, arg).Times(1).Return(results, nil)
+			},
+			check: func(t *testing.T, menus []*domain.Menu, err error) {
+				require.NoError(t, err)
+				require.NotNil(t, menus)
+				require.Len(t, menus, 10)
+			},
+		},
+		{
+			name: "Bad Limit",
+			input: db.ListMenuParams{
+				Limit:     -1,
+				Offset:    0,
+				OfferedAt: offered,
+			},
+			buildStub: func(query *mocks.MockQuery) {
+				arg := db.ListMenuParams{
+					Limit:     -1,
+					Offset:    0,
+					OfferedAt: offered,
+				}
+
+				query.EXPECT().ListMenu(ctx, arg).Times(1).Return([]db.Menu{}, sql.ErrNoRows)
+			},
+			check: func(t *testing.T, menus []*domain.Menu, err error) {
+				require.Error(t, err)
+				require.ErrorIs(t, err, sql.ErrNoRows)
+				require.Nil(t, menus)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			query := mocks.NewMockQuery(ctrl)
+
+			tc.buildStub(query)
+
+			repo := NewMenuRepository(query)
+
+			menus, err := repo.Fetch(ctx, tc.input.Limit, tc.input.Offset, tc.input.OfferedAt)
+
+			tc.check(t, menus, err)
+
+		})
+	}
+}
+
+func TestFetchMenuInIds(t *testing.T) {
+	ctx := context.Background()
+	offered := util.RandomDate()
+	results := randomMenuResults(10)
+	splitResults := results[:5]
+
+	ids := make([]string, 0, 5)
+
+	for i := 0; i < 5; i++ {
+		ids = append(ids, splitResults[i].ID)
+	}
+
+	testCases := []struct {
+		name      string
+		input     db.ListMenuInIdsParams
+		buildStub func(query *mocks.MockQuery)
+		check     func(t *testing.T, menus []*domain.Menu, err error)
+	}{
+		{
+			name: "OK",
+			input: db.ListMenuInIdsParams{
+				Ids:       ids,
+				OfferedAt: offered,
+				Limit:     10,
+				Offset:    0,
+			},
+			buildStub: func(query *mocks.MockQuery) {
+				arg := db.ListMenuInIdsParams{
+					Ids:       ids,
+					OfferedAt: offered,
+					Limit:     10,
+					Offset:    0,
+				}
+
+				query.EXPECT().ListMenuInIds(ctx, arg).Times(1).Return(splitResults, nil)
+			},
+			check: func(t *testing.T, menus []*domain.Menu, err error) {
+				require.NoError(t, err)
+				require.NotNil(t, menus)
+				require.Len(t, menus, 5)
+
+				resIds := make([]string, 0, 5)
+
+				for i := 0; i < 5; i++ {
+					resIds = append(resIds, menus[i].ID)
+				}
+
+				require.ElementsMatch(t, ids, resIds)
+			},
+		},
+		{
+			name: "Bad Limit",
+			input: db.ListMenuInIdsParams{
+				Ids:       ids,
+				OfferedAt: offered,
+				Limit:     -1,
+				Offset:    0,
+			},
+			buildStub: func(query *mocks.MockQuery) {
+				arg := db.ListMenuInIdsParams{
+					Ids:       ids,
+					OfferedAt: offered,
+					Limit:     -1,
+					Offset:    0,
+				}
+
+				query.EXPECT().ListMenuInIds(ctx, arg).Times(1).Return([]db.Menu{}, sql.ErrNoRows)
+			},
+			check: func(t *testing.T, menus []*domain.Menu, err error) {
+				require.Error(t, err)
+				require.ErrorIs(t, err, sql.ErrNoRows)
+				require.Nil(t, menus)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			query := mocks.NewMockQuery(ctrl)
+
+			tc.buildStub(query)
+
+			repo := NewMenuRepository(query)
+
+			menus, err := repo.FetchByIDs(ctx, tc.input.Limit, tc.input.Offset, tc.input.OfferedAt, tc.input.Ids)
+
+			tc.check(t, menus, err)
+
+		})
+
+	}
+}
+
 func randomMenuResults(length int) []db.Menu {
 	var menus []db.Menu
 	for i := 0; i < length; i++ {
