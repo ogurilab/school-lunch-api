@@ -50,3 +50,36 @@ func (mu *menuUsecase) FetchByCity(ctx context.Context, limit int32, offset int3
 
 	return r, nil
 }
+
+func (mu *menuUsecase) Fetch(ctx context.Context, limit int32, offset int32, offered time.Time, ids []string) ([]*domain.Menu, error) {
+
+	ctx, cancel := context.WithTimeout(ctx, mu.contextTimeout)
+	defer cancel()
+	isId := len(ids) > 0
+
+	if isId {
+		menus, err := mu.menuRepo.FetchByIDs(ctx, limit, offset, offered, ids)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if len(menus) == 0 {
+			return []*domain.Menu{}, nil
+		}
+
+		return menus, nil
+	}
+
+	menus, err := mu.menuRepo.Fetch(ctx, limit, offset, offered)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(menus) == 0 {
+		return []*domain.Menu{}, nil
+	}
+
+	return menus, nil
+}
