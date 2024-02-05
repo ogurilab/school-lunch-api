@@ -17,4 +17,5 @@ func NewDishRouter(group *echo.Group, timeout time.Duration, query db.Query) {
 	group.GET("/menus/:menuID/dishes", dc.FetchByMenuID)
 	group.GET("/dishes/:id", dc.GetByID)
 	group.GET("/dishes", dc.Fetch)
+	group.GET("/cities/:code/dishes/:id", dc.GetByIdInCity)
 }
