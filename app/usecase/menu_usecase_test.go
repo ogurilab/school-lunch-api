@@ -132,7 +132,7 @@ func TestGetMenuByID(t *testing.T) {
 	}
 }
 
-func TestFetchMenu(t *testing.T) {
+func TestFetchMenuByCity(t *testing.T) {
 	ctxTime := time.Duration(10 * time.Second)
 
 	type input struct {
@@ -231,6 +231,213 @@ func TestFetchMenu(t *testing.T) {
 			tc.check(t, menus, err)
 		})
 	}
+}
+
+func TestFetchMenu(t *testing.T) {
+	ctxTime := time.Duration(10 * time.Second)
+
+	type input struct {
+		limit   int32
+		offset  int32
+		offered time.Time
+		ids     []string
+		ctx     context.Context
+	}
+
+	menus := make([]*domain.Menu, 0, 10)
+
+	for i := 0; i < 10; i++ {
+		menus = append(menus, randomMenu(t))
+	}
+
+	ids := make([]string, 0, 10)
+
+	for _, menu := range menus {
+		ids = append(ids, menu.ID)
+	}
+
+	testCases := []struct {
+		name      string
+		input     input
+		buildStub func(query *mocks.MockMenuRepository)
+		check     func(t *testing.T, menus []*domain.Menu, err error)
+	}{
+		{
+			name: "OK",
+			input: input{
+				limit:   10,
+				offset:  0,
+				offered: menus[0].OfferedAt,
+				ids:     ids,
+				ctx:     context.Background(),
+			},
+			buildStub: func(repo *mocks.MockMenuRepository) {
+
+				arg := input{
+					limit:   10,
+					offset:  0,
+					offered: menus[0].OfferedAt,
+					ids:     ids,
+					ctx:     context.Background(),
+				}
+
+				repo.EXPECT().FetchByIDs(gomock.Any(), gomock.Eq(arg.limit), gomock.Eq(arg.offset), gomock.Eq(arg.offered), gomock.Eq(arg.ids)).Times(1).Return(menus, nil)
+			},
+			check: func(t *testing.T, menus []*domain.Menu, err error) {
+				require.NoError(t, err)
+				require.NotNil(t, menus)
+
+				require.Len(t, menus, 10)
+			},
+		},
+		{
+			name: "if ids is empty, call Fetch",
+			input: input{
+				limit:   10,
+				offset:  0,
+				offered: menus[0].OfferedAt,
+				ids:     []string{},
+				ctx:     context.Background(),
+			},
+			buildStub: func(repo *mocks.MockMenuRepository) {
+				arg := input{
+					limit:   10,
+					offset:  0,
+					offered: menus[0].OfferedAt,
+					ids:     []string{},
+					ctx:     context.Background(),
+				}
+
+				repo.EXPECT().Fetch(gomock.Any(), gomock.Eq(arg.limit), gomock.Eq(arg.offset), gomock.Eq(arg.offered)).Times(1).Return(menus, nil)
+			},
+			check: func(t *testing.T, menus []*domain.Menu, err error) {},
+		},
+		{
+			name: "Empty Result By FetchByIDs",
+			input: input{
+				limit:   10,
+				offset:  0,
+				offered: menus[0].OfferedAt,
+				ids:     ids,
+				ctx:     context.Background(),
+			},
+			buildStub: func(repo *mocks.MockMenuRepository) {
+				arg := input{
+					limit:   10,
+					offset:  0,
+					offered: menus[0].OfferedAt,
+					ids:     ids,
+					ctx:     context.Background(),
+				}
+
+				repo.EXPECT().FetchByIDs(gomock.Any(), gomock.Eq(arg.limit), gomock.Eq(arg.offset), gomock.Eq(arg.offered), gomock.Eq(arg.ids)).Times(1).Return([]*domain.Menu{}, nil)
+			},
+			check: func(t *testing.T, menus []*domain.Menu, err error) {
+				require.NoError(t, err)
+				require.NotNil(t, menus)
+
+				require.Len(t, menus, 0)
+				require.Empty(t, menus)
+			},
+		},
+		{
+			name: "Empty Result By Fetch",
+			input: input{
+				limit:   10,
+				offset:  0,
+				offered: menus[0].OfferedAt,
+				ids:     []string{},
+				ctx:     context.Background(),
+			},
+			buildStub: func(repo *mocks.MockMenuRepository) {
+				arg := input{
+					limit:   10,
+					offset:  0,
+					offered: menus[0].OfferedAt,
+					ids:     []string{},
+					ctx:     context.Background(),
+				}
+
+				repo.EXPECT().Fetch(gomock.Any(), gomock.Eq(arg.limit), gomock.Eq(arg.offset), gomock.Eq(arg.offered)).Times(1).Return([]*domain.Menu{}, nil)
+			},
+			check: func(t *testing.T, menus []*domain.Menu, err error) {
+				require.NoError(t, err)
+				require.NotNil(t, menus)
+
+				require.Len(t, menus, 0)
+				require.Empty(t, menus)
+			},
+		},
+		{
+
+			name: "NG FetchByIDs",
+			input: input{
+				limit:   10,
+				offset:  0,
+				offered: menus[0].OfferedAt,
+				ids:     ids,
+				ctx:     context.Background(),
+			},
+			buildStub: func(repo *mocks.MockMenuRepository) {
+				arg := input{
+					limit:   10,
+					offset:  0,
+					offered: menus[0].OfferedAt,
+					ids:     ids,
+					ctx:     context.Background(),
+				}
+
+				repo.EXPECT().FetchByIDs(gomock.Any(), gomock.Eq(arg.limit), gomock.Eq(arg.offset), gomock.Eq(arg.offered), gomock.Eq(arg.ids)).Times(1).Return(nil, sql.ErrNoRows)
+			},
+			check: func(t *testing.T, menus []*domain.Menu, err error) {
+				require.Error(t, err)
+				require.Nil(t, menus)
+			},
+		},
+		{
+			name: "NG Fetch",
+			input: input{
+				limit:   10,
+				offset:  0,
+				offered: menus[0].OfferedAt,
+				ids:     []string{},
+				ctx:     context.Background(),
+			},
+			buildStub: func(repo *mocks.MockMenuRepository) {
+				arg := input{
+					limit:   10,
+					offset:  0,
+					offered: menus[0].OfferedAt,
+					ids:     []string{},
+					ctx:     context.Background(),
+				}
+
+				repo.EXPECT().Fetch(gomock.Any(), gomock.Eq(arg.limit), gomock.Eq(arg.offset), gomock.Eq(arg.offered)).Times(1).Return(nil, sql.ErrNoRows)
+			},
+			check: func(t *testing.T, menus []*domain.Menu, err error) {
+				require.Error(t, err)
+				require.Nil(t, menus)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			repo := mocks.NewMockMenuRepository(ctrl)
+
+			tc.buildStub(repo)
+
+			uc := NewMenuUsecase(repo, ctxTime)
+
+			menus, err := uc.Fetch(tc.input.ctx, tc.input.limit, tc.input.offset, tc.input.offered, tc.input.ids)
+
+			tc.check(t, menus, err)
+		})
+	}
+
 }
 
 func randomMenu(t *testing.T) *domain.Menu {

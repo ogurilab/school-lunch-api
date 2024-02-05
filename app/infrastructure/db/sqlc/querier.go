@@ -24,7 +24,9 @@ type Querier interface {
 	ListDish(ctx context.Context, arg ListDishParams) ([]ListDishRow, error)
 	ListDishByMenuID(ctx context.Context, menuID string) ([]ListDishByMenuIDRow, error)
 	ListDishByName(ctx context.Context, arg ListDishByNameParams) ([]ListDishByNameRow, error)
+	ListMenu(ctx context.Context, arg ListMenuParams) ([]Menu, error)
 	ListMenuByCity(ctx context.Context, arg ListMenuByCityParams) ([]Menu, error)
+	ListMenuInIds(ctx context.Context, arg ListMenuInIdsParams) ([]Menu, error)
 	ListMenuWithDishes(ctx context.Context, arg ListMenuWithDishesParams) ([]ListMenuWithDishesRow, error)
 	ListMenuWithDishesByCity(ctx context.Context, arg ListMenuWithDishesByCityParams) ([]ListMenuWithDishesByCityRow, error)
 	UpdateAvailable(ctx context.Context, cityCode int32) error

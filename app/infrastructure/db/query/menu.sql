@@ -29,3 +29,18 @@ WHERE city_code = sqlc.arg(city_code)
   AND offered_at <= sqlc.arg(offered_at)
 ORDER BY offered_at DESC
 LIMIT ? OFFSET ?;
+
+-- name: ListMenuInIds :many
+SELECT *
+FROM menus
+WHERE id IN (sqlc.slice(ids))
+  AND offered_at <= sqlc.arg(offered_at)
+ORDER BY offered_at DESC
+LIMIT ? OFFSET ?;
+
+-- name: ListMenu :many
+SELECT *
+FROM menus
+WHERE offered_at <= sqlc.arg(offered_at)
+ORDER BY offered_at DESC
+LIMIT ? OFFSET ?;
