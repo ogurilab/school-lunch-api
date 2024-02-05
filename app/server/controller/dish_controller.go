@@ -43,7 +43,9 @@ func (dc *dishController) FetchByMenuID(c echo.Context) error {
 }
 
 type getDishRequest struct {
-	ID string `param:"id" validate:"required,ulid"`
+	ID     string `param:"id" validate:"required,ulid"`
+	Limit  int32  `query:"limit" validate:"gt=0"`
+	Offset int32  `query:"offset" validate:"gte=0"`
 }
 
 func (dc *dishController) GetByID(c echo.Context) error {
@@ -53,13 +55,58 @@ func (dc *dishController) GetByID(c echo.Context) error {
 		return c.JSON(errors.NewBadRequestError(err))
 	}
 
+	if req.Limit == 0 {
+		req.Limit = domain.DEFAULT_LIMIT
+	}
+
+	if req.Offset == 0 {
+		req.Offset = domain.DEFAULT_OFFSET
+	}
+
 	if err := c.Validate(&req); err != nil {
 		return c.JSON(errors.NewBadRequestError(err))
 	}
 
 	ctx := c.Request().Context()
 
-	dish, err := dc.du.GetByID(ctx, req.ID)
+	dish, err := dc.du.GetByID(ctx, req.ID, req.Limit, req.Offset)
+
+	if err != nil {
+		return c.JSON(errors.NewInternalServerError(err))
+	}
+
+	return c.JSON(200, dish)
+}
+
+type getDishInCityRequest struct {
+	ID       string `param:"id" validate:"required,ulid"`
+	Limit    int32  `query:"limit" validate:"gt=0"`
+	Offset   int32  `query:"offset" validate:"gte=0"`
+	CityCode int32  `param:"code" validate:"required,gte=0"`
+}
+
+func (dc *dishController) GetByIdInCity(c echo.Context) error {
+	var req getDishInCityRequest
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(errors.NewBadRequestError(err))
+	}
+
+	if req.Limit == 0 {
+		req.Limit = domain.DEFAULT_LIMIT
+	}
+
+	if req.Offset == 0 {
+		req.Offset = domain.DEFAULT_OFFSET
+	}
+
+	if err := c.Validate(&req); err != nil {
+		return c.JSON(errors.NewBadRequestError(err))
+	}
+
+	ctx := c.Request().Context()
+
+	dish, err := dc.du.GetByIdInCity(ctx, req.ID, req.Limit, req.Offset, req.CityCode)
 
 	if err != nil {
 		return c.JSON(errors.NewInternalServerError(err))
