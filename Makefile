@@ -79,10 +79,12 @@ sqlc:
 test:
 	cd ${APP_PATH} && DB_SOURCE="${TEST_DB_URL}"	go test -count=1 -v -short -cover ./...
 
-# swaggerのビルド
-build_swagger:
-	rm -rf ${APP_PATH}/doc/swagger/statik
-	cd ${APP_PATH} && statik -src=./doc/swagger -dest=./doc
+# statikを実行
+build_statik:
+	rm -rf ${APP_PATH}/doc/statiks
+	cd ${APP_PATH} && statik -src=./doc/swagger -dest=./doc/statiks -p swagger -ns swagger
+	cd ${APP_PATH} && statik -src=./doc/document/dist -dest=./doc/statiks -p document -ns document
+	
 
 rebuild_prod:
 	$(DOCKER_COMPOSE) -f docker-compose.yaml down
