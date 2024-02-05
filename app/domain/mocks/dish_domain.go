@@ -100,18 +100,33 @@ func (mr *MockDishRepositoryMockRecorder) FetchByName(ctx, search, limit, offset
 }
 
 // GetByID mocks base method.
-func (m *MockDishRepository) GetByID(ctx context.Context, id string) (*domain.Dish, error) {
+func (m *MockDishRepository) GetByID(ctx context.Context, id string, limit, offset int32) (*domain.DishWithMenuIDs, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByID", ctx, id)
-	ret0, _ := ret[0].(*domain.Dish)
+	ret := m.ctrl.Call(m, "GetByID", ctx, id, limit, offset)
+	ret0, _ := ret[0].(*domain.DishWithMenuIDs)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockDishRepositoryMockRecorder) GetByID(ctx, id any) *gomock.Call {
+func (mr *MockDishRepositoryMockRecorder) GetByID(ctx, id, limit, offset any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockDishRepository)(nil).GetByID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockDishRepository)(nil).GetByID), ctx, id, limit, offset)
+}
+
+// GetByIdInCity mocks base method.
+func (m *MockDishRepository) GetByIdInCity(ctx context.Context, id string, limit, offset, city int32) (*domain.DishWithMenuIDs, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByIdInCity", ctx, id, limit, offset, city)
+	ret0, _ := ret[0].(*domain.DishWithMenuIDs)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByIdInCity indicates an expected call of GetByIdInCity.
+func (mr *MockDishRepositoryMockRecorder) GetByIdInCity(ctx, id, limit, offset, city any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByIdInCity", reflect.TypeOf((*MockDishRepository)(nil).GetByIdInCity), ctx, id, limit, offset, city)
 }
 
 // MockDishUsecase is a mock of DishUsecase interface.
@@ -182,18 +197,33 @@ func (mr *MockDishUsecaseMockRecorder) FetchByMenuID(ctx, menuID any) *gomock.Ca
 }
 
 // GetByID mocks base method.
-func (m *MockDishUsecase) GetByID(ctx context.Context, id string) (*domain.Dish, error) {
+func (m *MockDishUsecase) GetByID(ctx context.Context, id string, limit, offset int32) (*domain.DishWithMenuIDs, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByID", ctx, id)
-	ret0, _ := ret[0].(*domain.Dish)
+	ret := m.ctrl.Call(m, "GetByID", ctx, id, limit, offset)
+	ret0, _ := ret[0].(*domain.DishWithMenuIDs)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetByID indicates an expected call of GetByID.
-func (mr *MockDishUsecaseMockRecorder) GetByID(ctx, id any) *gomock.Call {
+func (mr *MockDishUsecaseMockRecorder) GetByID(ctx, id, limit, offset any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockDishUsecase)(nil).GetByID), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockDishUsecase)(nil).GetByID), ctx, id, limit, offset)
+}
+
+// GetByIdInCity mocks base method.
+func (m *MockDishUsecase) GetByIdInCity(ctx context.Context, id string, limit, offset, city int32) (*domain.DishWithMenuIDs, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByIdInCity", ctx, id, limit, offset, city)
+	ret0, _ := ret[0].(*domain.DishWithMenuIDs)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByIdInCity indicates an expected call of GetByIdInCity.
+func (mr *MockDishUsecaseMockRecorder) GetByIdInCity(ctx, id, limit, offset, city any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByIdInCity", reflect.TypeOf((*MockDishUsecase)(nil).GetByIdInCity), ctx, id, limit, offset, city)
 }
 
 // MockDishController is a mock of DishController interface.
@@ -259,4 +289,18 @@ func (m *MockDishController) GetByID(c echo.Context) error {
 func (mr *MockDishControllerMockRecorder) GetByID(c any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockDishController)(nil).GetByID), c)
+}
+
+// GetByIdInCity mocks base method.
+func (m *MockDishController) GetByIdInCity(c echo.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByIdInCity", c)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GetByIdInCity indicates an expected call of GetByIdInCity.
+func (mr *MockDishControllerMockRecorder) GetByIdInCity(c any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByIdInCity", reflect.TypeOf((*MockDishController)(nil).GetByIdInCity), c)
 }
