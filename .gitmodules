@@ -1,3 +1,6 @@
 [submodule "app/doc/api"]
 	path = app/doc/api
 	url = https://github.com/ogurilab/school-lunch-open-api.git
+[submodule "app/doc/document"]
+	path = app/doc/document
+	url = https://github.com/ogurilab/school-lunch-api-document.git
