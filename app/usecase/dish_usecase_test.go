@@ -66,34 +66,55 @@ func TestCreateDish(t *testing.T) {
 }
 
 func TestGetDishByID(t *testing.T) {
-	dish := randomDish(t)
+	dish := randomDishWithMenuIDs(t)
 	timeout := time.Second * 10
 	ctx := context.Background()
 
+	type input struct {
+		limit  int32
+		offset int32
+		id     string
+	}
+
 	testCases := []struct {
 		name       string
-		dish       *domain.Dish
+		input      input
 		buildStubs func(r *mocks.MockDishRepository)
-		check      func(result *domain.Dish, err error)
+		check      func(result *domain.DishWithMenuIDs, err error)
 	}{
 		{
 			name: "OK",
-			dish: dish,
-			buildStubs: func(r *mocks.MockDishRepository) {
-				r.EXPECT().GetByID(gomock.Any(), gomock.Eq(dish.ID)).Times(1).Return(dish, nil)
+			input: input{
+				limit:  10,
+				offset: 0,
+				id:     dish.ID,
 			},
-			check: func(result *domain.Dish, err error) {
+			buildStubs: func(r *mocks.MockDishRepository) {
+
+				arg := input{
+					limit:  10,
+					offset: 0,
+					id:     dish.ID,
+				}
+
+				r.EXPECT().GetByID(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit), gomock.Eq(arg.offset)).Times(1).Return(dish, nil)
+			},
+			check: func(result *domain.DishWithMenuIDs, err error) {
 				require.NoError(t, err)
-				requireDishResult(t, dish, result)
+				requireDishWithMenuIDsResult(t, dish, result)
 			},
 		},
 		{
 			name: "NG",
-			dish: dish,
-			buildStubs: func(r *mocks.MockDishRepository) {
-				r.EXPECT().GetByID(gomock.Any(), gomock.Eq(dish.ID)).Times(1).Return(nil, sql.ErrNoRows)
+			input: input{
+				limit:  10,
+				offset: 0,
+				id:     dish.ID,
 			},
-			check: func(result *domain.Dish, err error) {
+			buildStubs: func(r *mocks.MockDishRepository) {
+				r.EXPECT().GetByID(gomock.Any(), gomock.Eq(dish.ID), gomock.Eq(int32(10)), gomock.Eq(int32(0))).Times(1).Return(nil, sql.ErrNoRows)
+			},
+			check: func(result *domain.DishWithMenuIDs, err error) {
 				require.Error(t, err)
 			},
 		},
@@ -110,11 +131,99 @@ func TestGetDishByID(t *testing.T) {
 
 			du := NewDishUsecase(repo, timeout)
 
-			result, err := du.GetByID(ctx, tc.dish.ID)
+			result, err := du.GetByID(ctx, tc.input.id, tc.input.limit, tc.input.offset)
 
 			tc.check(result, err)
 		})
 	}
+}
+
+func TestGetDishByIdInCity(t *testing.T) {
+	cityCode := util.RandomCityCode()
+
+	dish := randomDishWithMenuIDs(t)
+	timeout := time.Second * 10
+	ctx := context.Background()
+
+	type input struct {
+		limit  int32
+		offset int32
+		id     string
+		city   int32
+	}
+
+	testCases := []struct {
+		name       string
+		input      input
+		buildStubs func(r *mocks.MockDishRepository)
+		check      func(result *domain.DishWithMenuIDs, err error)
+	}{
+		{
+			name: "OK",
+			input: input{
+				limit:  10,
+				offset: 0,
+				id:     dish.ID,
+				city:   cityCode,
+			},
+			buildStubs: func(r *mocks.MockDishRepository) {
+
+				arg := input{
+					limit:  10,
+					offset: 0,
+					id:     dish.ID,
+					city:   cityCode,
+				}
+
+				r.EXPECT().GetByIdInCity(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit), gomock.Eq(arg.offset), gomock.Eq(arg.city)).Times(1).Return(dish, nil)
+			},
+
+			check: func(result *domain.DishWithMenuIDs, err error) {
+				require.NoError(t, err)
+				requireDishWithMenuIDsResult(t, dish, result)
+			},
+		},
+		{
+			name: "NG",
+			input: input{
+				limit:  10,
+				offset: 0,
+				id:     dish.ID,
+				city:   cityCode,
+			},
+			buildStubs: func(r *mocks.MockDishRepository) {
+				arg := input{
+					limit:  10,
+					offset: 0,
+					id:     dish.ID,
+					city:   cityCode,
+				}
+				r.EXPECT().GetByIdInCity(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit), gomock.Eq(arg.offset), gomock.Eq(arg.city)).Times(1).Return(nil, sql.ErrNoRows)
+			},
+
+			check: func(result *domain.DishWithMenuIDs, err error) {
+				require.Error(t, err)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			repo := mocks.NewMockDishRepository(ctrl)
+			tc.buildStubs(repo)
+
+			du := NewDishUsecase(repo, timeout)
+
+			result, err := du.GetByIdInCity(ctx, tc.input.id, tc.input.limit, tc.input.offset, tc.input.city)
+
+			tc.check(result, err)
+		})
+	}
+
 }
 
 func TestFetchDishByMenuID(t *testing.T) {
@@ -332,7 +441,30 @@ func randomDish(t *testing.T) *domain.Dish {
 	return dish
 }
 
-func requireDishResult(t *testing.T, expected *domain.Dish, actual *domain.Dish) {
+func randomDishWithMenuIDs(t *testing.T) *domain.DishWithMenuIDs {
+	dish := randomDish(t)
+
+	n := 10
+
+	menuIDs := make([]string, 0, n)
+
+	for i := 0; i < n; i++ {
+		menuIDs = append(menuIDs, util.NewUlid())
+	}
+
+	dishWithMenuIDs, err := domain.ReNewDishWithMenuIDs(
+		dish.ID,
+		dish.Name,
+		menuIDs,
+	)
+
+	require.NoError(t, err)
+
+	return dishWithMenuIDs
+}
+
+func requireDishWithMenuIDsResult(t *testing.T, expected *domain.DishWithMenuIDs, actual *domain.DishWithMenuIDs) {
 	require.Equal(t, expected.ID, actual.ID)
 	require.Equal(t, expected.Name, actual.Name)
+	require.ElementsMatch(t, expected.MenuIDs, actual.MenuIDs)
 }
