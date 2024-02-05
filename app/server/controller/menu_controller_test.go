@@ -520,6 +520,288 @@ func TestFetchMenuByCity(t *testing.T) {
 	}
 }
 
+func TestFetchMenu(t *testing.T) {
+	type NullStrings struct {
+		Valid   bool
+		Strings []string
+	}
+	type req struct {
+		Limit   sql.NullInt32
+		Offset  sql.NullInt32
+		Offered string
+		IDs     NullStrings
+	}
+
+	limit := int32(10)
+
+	var menus []*domain.Menu
+
+	for i := 0; i < int(limit); i++ {
+		menus = append(menus, randomMenu(t))
+	}
+
+	offered := menus[0].OfferedAt.Format("2006-01-02")
+	defaultIds := []string{util.NewUlid(), util.NewUlid()}
+
+	testCases := []struct {
+		name      string
+		req       req
+		buildStub func(uc *mocks.MockMenuUsecase)
+		check     func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu)
+	}{
+		{
+			name: "OK",
+			req: req{
+				Limit:   sql.NullInt32{Int32: limit, Valid: true},
+				Offset:  sql.NullInt32{Int32: 0, Valid: true},
+				Offered: offered,
+				IDs:     NullStrings{Valid: false},
+			},
+			buildStub: func(uc *mocks.MockMenuUsecase) {
+				parsedOffered, err := util.ParseDate(offered)
+
+				require.NoError(t, err)
+
+				uc.EXPECT().Fetch(gomock.Any(), gomock.Eq(limit), gomock.Eq(int32(0)), gomock.Eq(parsedOffered), gomock.Eq([]string{})).Times(1).Return(menus, nil)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
+				require.Equal(t, 200, recorder.Code)
+				requireBodyMatchMenus(t, recorder.Body, menus)
+			},
+		},
+		{
+			name: "OK - With IDs",
+			req: req{
+				Limit:   sql.NullInt32{Int32: limit, Valid: true},
+				Offset:  sql.NullInt32{Int32: 0, Valid: true},
+				Offered: offered,
+				IDs:     NullStrings{Valid: true, Strings: defaultIds},
+			},
+			buildStub: func(uc *mocks.MockMenuUsecase) {
+				parsedOffered, err := util.ParseDate(offered)
+
+				require.NoError(t, err)
+
+				uc.EXPECT().Fetch(gomock.Any(), gomock.Eq(limit), gomock.Eq(int32(0)), gomock.Eq(parsedOffered), gomock.Eq(defaultIds)).Times(1).Return(menus, nil)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
+				require.Equal(t, 200, recorder.Code)
+				requireBodyMatchMenus(t, recorder.Body, menus)
+			},
+		},
+
+		{
+			name: "Bad Request - Invalid Limit",
+			req: req{
+				Limit: sql.NullInt32{Int32: -1, Valid: true},
+				Offset: sql.NullInt32{
+					Int32: 0,
+					Valid: true,
+				},
+				Offered: offered,
+				IDs:     NullStrings{Valid: false},
+			},
+			buildStub: func(uc *mocks.MockMenuUsecase) {
+				uc.EXPECT().Fetch(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
+				require.Equal(t, 400, recorder.Code)
+			},
+		},
+		{
+			name: "Bad Request - Invalid Offset",
+			req: req{
+				Limit:   sql.NullInt32{Int32: limit, Valid: true},
+				Offset:  sql.NullInt32{Int32: -1, Valid: true},
+				Offered: offered,
+				IDs:     NullStrings{Valid: false},
+			},
+			buildStub: func(uc *mocks.MockMenuUsecase) {
+				uc.EXPECT().Fetch(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
+				require.Equal(t, 400, recorder.Code)
+			},
+		},
+		{
+			name: "Bad Request - Invalid Offered",
+			req: req{
+				Limit:   sql.NullInt32{Int32: limit, Valid: true},
+				Offset:  sql.NullInt32{Int32: 0, Valid: true},
+				Offered: "invalid-offered",
+				IDs:     NullStrings{Valid: false},
+			},
+			buildStub: func(uc *mocks.MockMenuUsecase) {
+				uc.EXPECT().Fetch(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
+				require.Equal(t, 400, recorder.Code)
+			},
+		},
+		{
+			name: "Bad Request - Invalid IDs",
+			req: req{
+				Limit:   sql.NullInt32{Int32: limit, Valid: true},
+				Offset:  sql.NullInt32{Int32: 0, Valid: true},
+				Offered: offered,
+				IDs:     NullStrings{Valid: true, Strings: []string{"invalid"}},
+			},
+			buildStub: func(uc *mocks.MockMenuUsecase) {
+				uc.EXPECT().Fetch(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
+				require.Equal(t, 400, recorder.Code)
+			},
+		},
+		{
+			name: "If IDs length is greater than limit then return error",
+			req: req{
+				Limit:   sql.NullInt32{Int32: 1, Valid: true},
+				Offset:  sql.NullInt32{Int32: 0, Valid: true},
+				Offered: offered,
+				IDs:     NullStrings{Valid: true, Strings: []string{util.NewUlid(), util.NewUlid()}},
+			},
+			buildStub: func(uc *mocks.MockMenuUsecase) {
+				uc.EXPECT().Fetch(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
+				require.Equal(t, 400, recorder.Code)
+			},
+		},
+		{
+			name: "If Limit is not specified, it will be set to domain.DEFAULT_LIMIT",
+			req: req{
+				Limit:   sql.NullInt32{Int32: 0, Valid: false},
+				Offset:  sql.NullInt32{Int32: 0, Valid: true},
+				Offered: offered,
+				IDs:     NullStrings{Valid: false},
+			},
+			buildStub: func(uc *mocks.MockMenuUsecase) {
+				parsedOffered, err := util.ParseDate(offered)
+
+				require.NoError(t, err)
+
+				uc.EXPECT().Fetch(gomock.Any(), gomock.Eq(domain.DEFAULT_LIMIT), gomock.Eq(int32(0)), gomock.Eq(parsedOffered), gomock.Eq([]string{})).Times(1).Return(menus, nil)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
+				require.Equal(t, 200, recorder.Code)
+				requireBodyMatchMenus(t, recorder.Body, menus)
+			},
+		},
+		{
+			name: "If Offset is not specified, it will be set to domain.DEFAULT_OFFSET",
+			req: req{
+				Limit:   sql.NullInt32{Int32: limit, Valid: true},
+				Offset:  sql.NullInt32{Int32: 0, Valid: false},
+				Offered: offered,
+				IDs:     NullStrings{Valid: false},
+			},
+			buildStub: func(uc *mocks.MockMenuUsecase) {
+				parsedOffered, err := util.ParseDate(offered)
+
+				require.NoError(t, err)
+
+				uc.EXPECT().Fetch(gomock.Any(), gomock.Eq(limit), gomock.Eq(domain.DEFAULT_OFFSET), gomock.Eq(parsedOffered), gomock.Eq([]string{})).Times(1).Return(menus, nil)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
+				require.Equal(t, 200, recorder.Code)
+				requireBodyMatchMenus(t, recorder.Body, menus)
+			},
+		},
+		{
+			name: "Internal Server Error",
+			req: req{
+				Limit:   sql.NullInt32{Int32: limit, Valid: true},
+				Offset:  sql.NullInt32{Int32: 0, Valid: true},
+				Offered: offered,
+				IDs:     NullStrings{Valid: false},
+			},
+			buildStub: func(uc *mocks.MockMenuUsecase) {
+				parsedOffered, err := util.ParseDate(offered)
+
+				require.NoError(t, err)
+
+				uc.EXPECT().Fetch(gomock.Any(), gomock.Eq(limit), gomock.Eq(int32(0)), gomock.Eq(parsedOffered), gomock.Eq([]string{})).Times(1).Return(nil, sql.ErrConnDone)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
+				require.Equal(t, 500, recorder.Code)
+			},
+		},
+		{
+			name: "Empty Result",
+			req: req{
+				Limit:   sql.NullInt32{Int32: limit, Valid: true},
+				Offset:  sql.NullInt32{Int32: 0, Valid: true},
+				Offered: offered,
+				IDs:     NullStrings{Valid: false},
+			},
+			buildStub: func(uc *mocks.MockMenuUsecase) {
+				parsedOffered, err := util.ParseDate(offered)
+
+				require.NoError(t, err)
+
+				uc.EXPECT().Fetch(gomock.Any(), gomock.Eq(limit), gomock.Eq(int32(0)), gomock.Eq(parsedOffered), gomock.Eq([]string{})).Times(1).Return([]*domain.Menu{}, nil)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
+				require.Equal(t, 200, recorder.Code)
+				data, err := io.ReadAll(recorder.Body)
+
+				require.NoError(t, err)
+
+				var res fetchMenuResponse
+				err = json.Unmarshal(data, &res)
+
+				require.NoError(t, err)
+
+				var menuData []*domain.Menu
+
+				menuData = append(menuData, res.Menus...)
+
+				require.Empty(t, menuData)
+				require.Equal(t, res.Next, "")
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		uc := mocks.NewMockMenuUsecase(ctrl)
+		tc.buildStub(uc)
+
+		q := make(url.Values)
+		if tc.req.Limit.Valid {
+			q.Set("limit", fmt.Sprintf("%d", tc.req.Limit.Int32))
+		}
+
+		if tc.req.Offset.Valid {
+			q.Set("offset", fmt.Sprintf("%d", tc.req.Offset.Int32))
+		}
+
+		q.Set("offered", tc.req.Offered)
+
+		if tc.req.IDs.Valid {
+			for _, id := range tc.req.IDs.Strings {
+				q.Add("id", id)
+			}
+		}
+
+		url := fmt.Sprintf("/menus?%s", q.Encode())
+		req, err := http.NewRequest(http.MethodGet, url, nil)
+
+		require.NoError(t, err)
+
+		recorder := httptest.NewRecorder()
+		e := newSetUpTestServer()
+		e.GET("/menus", NewMenuController(uc).Fetch)
+		e.ServeHTTP(recorder, req)
+
+		tc.check(t, recorder, menus)
+	}
+
+}
+
 func requireBodyMatchMenu(t *testing.T, body *bytes.Buffer, menu *domain.Menu) {
 	data, err := io.ReadAll(body)
 

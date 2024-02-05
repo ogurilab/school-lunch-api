@@ -2,6 +2,7 @@ package controller
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/labstack/echo/v4"
 	"github.com/ogurilab/school-lunch-api/domain"
@@ -97,7 +98,7 @@ func (mc *menuController) GetByID(c echo.Context) error {
 	return c.JSON(200, menu)
 }
 
-type fetchMenuRequest struct {
+type fetchMenuRequestByCity struct {
 	CityCode int32  `param:"code" validate:"required,gt=0"`
 	Limit    int32  `query:"limit" validate:"gt=0"`
 	Offset   int32  `query:"offset" validate:"gte=0"`
@@ -110,7 +111,7 @@ type fetchMenuResponse struct {
 }
 
 func (mc *menuController) FetchByCity(c echo.Context) error {
-	var req fetchMenuRequest
+	var req fetchMenuRequestByCity
 
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(errors.NewBadRequestError(err))
@@ -142,6 +143,72 @@ func (mc *menuController) FetchByCity(c echo.Context) error {
 		req.Offset,
 		parsedDate,
 		req.CityCode,
+	)
+
+	if err != nil {
+		return c.JSON(errors.NewInternalServerError(err))
+	}
+
+	if len(menus) == 0 {
+		return c.JSON(200, fetchMenuResponse{Menus: []*domain.Menu{}, Next: ""})
+	}
+
+	next := util.FormatDate(menus[len(menus)-1].OfferedAt)
+
+	res := fetchMenuResponse{
+		Menus: menus,
+		Next:  next,
+	}
+
+	return c.JSON(200, res)
+}
+
+type fetchMenuRequest struct {
+	Limit   int32    `query:"limit" validate:"gt=0"`
+	Offset  int32    `query:"offset" validate:"gte=0"`
+	Offered string   `query:"offered" validate:"YYYY-MM-DD"`
+	IDs     []string `query:"id" validate:"multipleULID"`
+}
+
+func (mc *menuController) Fetch(c echo.Context) error {
+	var req fetchMenuRequest
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(errors.NewBadRequestError(err))
+	}
+
+	if req.Limit == 0 {
+		req.Limit = domain.DEFAULT_LIMIT
+	}
+
+	if req.Offset == 0 {
+		req.Offset = domain.DEFAULT_OFFSET
+	}
+
+	if err := c.Validate(&req); err != nil {
+		return c.JSON(errors.NewBadRequestError(err))
+	}
+
+	parsedDate, err := util.ParseDate(req.Offered)
+
+	if err != nil {
+		return c.JSON(errors.NewBadRequestError(err))
+	}
+
+	if len(req.IDs) == 0 {
+		req.IDs = []string{}
+	}
+
+	fmt.Println(req.IDs)
+
+	ctx := c.Request().Context()
+
+	menus, err := mc.mu.Fetch(
+		ctx,
+		req.Limit,
+		req.Offset,
+		parsedDate,
+		req.IDs,
 	)
 
 	if err != nil {

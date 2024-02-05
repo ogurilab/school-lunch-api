@@ -16,6 +16,7 @@ func NewMenuRouter(group *echo.Group, timeout time.Duration, query db.Query) {
 
 	group.GET("/cities/:code/menus/:id/basic", mc.GetByID)
 	group.GET("/cities/:code/menus/basic", mc.FetchByCity)
+	group.GET("/menus/basic", mc.Fetch)
 
 	group.POST("/cities/:code/menus", mc.Create)
 
