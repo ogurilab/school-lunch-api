@@ -22,17 +22,62 @@ func (r *dishRepository) Create(ctx context.Context, dish *domain.Dish, menuID s
 	return r.query.CreateDishTx(ctx, dish, menuID)
 }
 
-func (r *dishRepository) GetByID(ctx context.Context, id string) (*domain.Dish, error) {
+func (r *dishRepository) GetByID(ctx context.Context, id string, limit int32, offset int32) (*domain.DishWithMenuIDs, error) {
 
-	result, err := r.query.GetDish(ctx, id)
+	arg := db.GetDishParams{
+		ID:     id,
+		Limit:  limit,
+		Offset: offset,
+	}
+
+	results, err := r.query.GetDish(ctx, arg)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return domain.ReNewDish(
-		result.ID,
-		result.Name,
+	menuIDs := make([]string, 0, len(results))
+
+	for _, result := range results {
+		menuIDs = append(menuIDs, result.MenuID)
+	}
+
+	firstResult := results[0]
+
+	return domain.ReNewDishWithMenuIDs(
+		firstResult.ID,
+		firstResult.Name,
+		menuIDs,
+	)
+}
+
+func (r *dishRepository) GetByIdInCity(ctx context.Context, id string, limit int32, offset int32, city int32) (*domain.DishWithMenuIDs, error) {
+
+	arg := db.GetDishInCityParams{
+		ID:       id,
+		Limit:    limit,
+		Offset:   offset,
+		CityCode: city,
+	}
+
+	results, err := r.query.GetDishInCity(ctx, arg)
+
+	if err != nil {
+		return nil, err
+	}
+
+	menuIDs := make([]string, 0, len(results))
+
+	for _, result := range results {
+		menuIDs = append(menuIDs, result.MenuID)
+	}
+
+	firstResult := results[0]
+
+	return domain.ReNewDishWithMenuIDs(
+		firstResult.ID,
+		firstResult.Name,
+		menuIDs,
 	)
 }
 
