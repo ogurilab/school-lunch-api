@@ -28,18 +28,22 @@ type MenuRepository interface {
 	Create(ctx context.Context, menu *Menu) error
 	GetByID(ctx context.Context, id string, city int32) (*Menu, error)
 	FetchByCity(ctx context.Context, limit int32, offset int32, offered time.Time, city int32) ([]*Menu, error)
+	Fetch(ctx context.Context, limit int32, offset int32, offered time.Time) ([]*Menu, error)
+	FetchByIDs(ctx context.Context, Limit int32, Offset int32, offered time.Time, ids []string) ([]*Menu, error)
 }
 
 type MenuUsecase interface {
 	Create(ctx context.Context, menu *Menu) error
 	GetByID(ctx context.Context, id string, city int32) (*Menu, error)
 	FetchByCity(ctx context.Context, limit int32, offset int32, offered time.Time, city int32) ([]*Menu, error)
+	Fetch(ctx context.Context, limit int32, offset int32, offered time.Time, ids []string) ([]*Menu, error)
 }
 
 type MenuController interface {
 	Create(c echo.Context) error
 	GetByID(c echo.Context) error
 	FetchByCity(c echo.Context) error
+	Fetch(c echo.Context) error
 }
 
 func (m *Menu) MarshalJSON() ([]byte, error) {

@@ -55,6 +55,21 @@ func (mr *MockMenuRepositoryMockRecorder) Create(ctx, menu any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockMenuRepository)(nil).Create), ctx, menu)
 }
 
+// Fetch mocks base method.
+func (m *MockMenuRepository) Fetch(ctx context.Context, limit, offset int32, offered time.Time) ([]*domain.Menu, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Fetch", ctx, limit, offset, offered)
+	ret0, _ := ret[0].([]*domain.Menu)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Fetch indicates an expected call of Fetch.
+func (mr *MockMenuRepositoryMockRecorder) Fetch(ctx, limit, offset, offered any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockMenuRepository)(nil).Fetch), ctx, limit, offset, offered)
+}
+
 // FetchByCity mocks base method.
 func (m *MockMenuRepository) FetchByCity(ctx context.Context, limit, offset int32, offered time.Time, city int32) ([]*domain.Menu, error) {
 	m.ctrl.T.Helper()
@@ -68,6 +83,21 @@ func (m *MockMenuRepository) FetchByCity(ctx context.Context, limit, offset int3
 func (mr *MockMenuRepositoryMockRecorder) FetchByCity(ctx, limit, offset, offered, city any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByCity", reflect.TypeOf((*MockMenuRepository)(nil).FetchByCity), ctx, limit, offset, offered, city)
+}
+
+// FetchByIDs mocks base method.
+func (m *MockMenuRepository) FetchByIDs(ctx context.Context, Limit, Offset int32, offered time.Time, ids []string) ([]*domain.Menu, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FetchByIDs", ctx, Limit, Offset, offered, ids)
+	ret0, _ := ret[0].([]*domain.Menu)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FetchByIDs indicates an expected call of FetchByIDs.
+func (mr *MockMenuRepositoryMockRecorder) FetchByIDs(ctx, Limit, Offset, offered, ids any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchByIDs", reflect.TypeOf((*MockMenuRepository)(nil).FetchByIDs), ctx, Limit, Offset, offered, ids)
 }
 
 // GetByID mocks base method.
@@ -120,6 +150,21 @@ func (m *MockMenuUsecase) Create(ctx context.Context, menu *domain.Menu) error {
 func (mr *MockMenuUsecaseMockRecorder) Create(ctx, menu any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockMenuUsecase)(nil).Create), ctx, menu)
+}
+
+// Fetch mocks base method.
+func (m *MockMenuUsecase) Fetch(ctx context.Context, limit, offset int32, offered time.Time, ids []string) ([]*domain.Menu, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Fetch", ctx, limit, offset, offered, ids)
+	ret0, _ := ret[0].([]*domain.Menu)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Fetch indicates an expected call of Fetch.
+func (mr *MockMenuUsecaseMockRecorder) Fetch(ctx, limit, offset, offered, ids any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockMenuUsecase)(nil).Fetch), ctx, limit, offset, offered, ids)
 }
 
 // FetchByCity mocks base method.
@@ -187,6 +232,20 @@ func (m *MockMenuController) Create(c echo.Context) error {
 func (mr *MockMenuControllerMockRecorder) Create(c any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockMenuController)(nil).Create), c)
+}
+
+// Fetch mocks base method.
+func (m *MockMenuController) Fetch(c echo.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Fetch", c)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Fetch indicates an expected call of Fetch.
+func (mr *MockMenuControllerMockRecorder) Fetch(c any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockMenuController)(nil).Fetch), c)
 }
 
 // FetchByCity mocks base method.
