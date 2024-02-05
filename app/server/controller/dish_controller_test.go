@@ -97,50 +97,155 @@ func TestFetchDishByMenuID(t *testing.T) {
 }
 
 func TestGetDishByID(t *testing.T) {
-	dish := randomDish(t)
+	dish := randomDishWithMenuIDs(t)
 
-	type req getDishRequest
+	type req struct {
+		id     string
+		limit  sql.NullInt32
+		offset sql.NullInt32
+	}
 
 	testCases := []struct {
 		name      string
 		req       req
 		buildStub func(du *mocks.MockDishUsecase)
-		check     func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.Dish)
+		check     func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs)
 	}{
 		{
 			name: "OK",
 			req: req{
-				ID: dish.ID,
+				id:     dish.ID,
+				limit:  sql.NullInt32{Int32: 10, Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
 			},
 			buildStub: func(du *mocks.MockDishUsecase) {
-				du.EXPECT().GetByID(gomock.Any(), dish.ID).Times(1).Return(dish, nil)
+				arg := req{
+					id:     dish.ID,
+					limit:  sql.NullInt32{Int32: 10, Valid: true},
+					offset: sql.NullInt32{Int32: 0, Valid: true},
+				}
+				du.EXPECT().GetByID(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32)).Times(1).Return(dish, nil)
 			},
-			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.Dish) {
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
 				require.Equal(t, http.StatusOK, recorder.Code)
-				requireBodyMatchDish(t, recorder.Body, dish)
+				requireBodyMatchDishWithMenuIDs(t, recorder.Body, dish)
 			},
 		},
 		{
 			name: "Bad Request",
 			req: req{
-				ID: "invalid",
+				id:     "invalid",
+				limit:  sql.NullInt32{Int32: 10, Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
 			},
 			buildStub: func(du *mocks.MockDishUsecase) {
-				du.EXPECT().GetByID(gomock.Any(), dish.ID).Times(0)
+				arg := req{
+					id:     "invalid",
+					limit:  sql.NullInt32{Int32: 10, Valid: true},
+					offset: sql.NullInt32{Int32: 0, Valid: true},
+				}
+				du.EXPECT().GetByID(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32)).Times(0)
 			},
-			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.Dish) {
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name: "Bad Request - Limit",
+			req: req{
+				id:     dish.ID,
+				limit:  sql.NullInt32{Int32: -1, Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
+			},
+			buildStub: func(du *mocks.MockDishUsecase) {
+				arg := req{
+					id:     dish.ID,
+					limit:  sql.NullInt32{Int32: -1, Valid: true},
+					offset: sql.NullInt32{Int32: 0, Valid: true},
+				}
+				du.EXPECT().GetByID(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32)).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name: "Bad Request - Offset",
+			req: req{
+				id:     dish.ID,
+				limit:  sql.NullInt32{Int32: 10, Valid: true},
+				offset: sql.NullInt32{Int32: -1, Valid: true},
+			},
+			buildStub: func(du *mocks.MockDishUsecase) {
+				arg := req{
+					id:     dish.ID,
+					limit:  sql.NullInt32{Int32: 10, Valid: true},
+					offset: sql.NullInt32{Int32: -1, Valid: true},
+				}
+				du.EXPECT().GetByID(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32)).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name: "If limit is not set, it will be set to domain.DEFAULT_LIMIT",
+			req: req{
+				id:     dish.ID,
+				limit:  sql.NullInt32{Int32: 0, Valid: false},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
+			},
+
+			buildStub: func(du *mocks.MockDishUsecase) {
+				arg := req{
+					id:     dish.ID,
+					limit:  sql.NullInt32{Int32: domain.DEFAULT_LIMIT, Valid: true},
+					offset: sql.NullInt32{Int32: 0, Valid: true},
+				}
+				du.EXPECT().GetByID(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32)).Times(1).Return(dish, nil)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchDishWithMenuIDs(t, recorder.Body, dish)
+			},
+		},
+		{
+			name: "If offset is not set, it will be set to domain.DEFAULT_OFFSET",
+			req: req{
+				id:     dish.ID,
+				limit:  sql.NullInt32{Int32: 10, Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: false},
+			},
+			buildStub: func(du *mocks.MockDishUsecase) {
+
+				arg := req{
+					id:     dish.ID,
+					limit:  sql.NullInt32{Int32: 10, Valid: true},
+					offset: sql.NullInt32{Int32: domain.DEFAULT_OFFSET, Valid: true},
+				}
+				du.EXPECT().GetByID(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32)).Times(1).Return(dish, nil)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchDishWithMenuIDs(t, recorder.Body, dish)
 			},
 		},
 		{
 			name: "Internal Server Error",
 			req: req{
-				ID: dish.ID,
+				id:     dish.ID,
+				limit:  sql.NullInt32{Int32: 10, Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
 			},
 			buildStub: func(du *mocks.MockDishUsecase) {
-				du.EXPECT().GetByID(gomock.Any(), dish.ID).Times(1).Return(nil, sql.ErrConnDone)
+				arg := req{
+					id:     dish.ID,
+					limit:  sql.NullInt32{Int32: 10, Valid: true},
+					offset: sql.NullInt32{Int32: 0, Valid: true},
+				}
+				du.EXPECT().GetByID(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32)).Times(1).Return(dish, sql.ErrConnDone)
 			},
-			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.Dish) {
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 			},
 		},
@@ -153,9 +258,19 @@ func TestGetDishByID(t *testing.T) {
 		du := mocks.NewMockDishUsecase(ctrl)
 		tc.buildStub(du)
 
+		q := make(url.Values)
+
+		if tc.req.limit.Valid {
+			q.Set("limit", fmt.Sprintf("%d", tc.req.limit.Int32))
+		}
+
+		if tc.req.offset.Valid {
+			q.Set("offset", fmt.Sprintf("%d", tc.req.offset.Int32))
+		}
+
 		recorder := httptest.NewRecorder()
 
-		url := fmt.Sprintf("/dishes/%s", tc.req.ID)
+		url := fmt.Sprintf("/dishes/%s?%s", tc.req.id, q.Encode())
 		req, err := http.NewRequest(http.MethodGet, url, nil)
 
 		require.NoError(t, err)
@@ -167,6 +282,211 @@ func TestGetDishByID(t *testing.T) {
 
 		tc.check(t, recorder, dish)
 	}
+}
+
+func TestGetDishByIDInCity(t *testing.T) {
+	dish := randomDishWithMenuIDs(t)
+	cityCode := util.RandomInt32()
+
+	type req struct {
+		id     string
+		limit  sql.NullInt32
+		offset sql.NullInt32
+		city   int32
+	}
+
+	testCases := []struct {
+		name      string
+		req       req
+		buildStub func(du *mocks.MockDishUsecase)
+		check     func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs)
+	}{
+		{
+			name: "OK",
+			req: req{
+				id:     dish.ID,
+				limit:  sql.NullInt32{Int32: 10, Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
+				city:   cityCode,
+			},
+			buildStub: func(du *mocks.MockDishUsecase) {
+				arg := req{
+					id:     dish.ID,
+					limit:  sql.NullInt32{Int32: 10, Valid: true},
+					offset: sql.NullInt32{Int32: 0, Valid: true},
+					city:   cityCode,
+				}
+				du.EXPECT().GetByIdInCity(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32), gomock.Eq(arg.city)).Times(1).Return(dish, nil)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchDishWithMenuIDs(t, recorder.Body, dish)
+			},
+		},
+		{
+			name: "Bad Request",
+			req: req{
+				id:     "invalid",
+				limit:  sql.NullInt32{Int32: 10, Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
+				city:   cityCode,
+			},
+			buildStub: func(du *mocks.MockDishUsecase) {
+				arg := req{
+					id:     "invalid",
+					limit:  sql.NullInt32{Int32: 10, Valid: true},
+					offset: sql.NullInt32{Int32: 0, Valid: true},
+					city:   cityCode,
+				}
+				du.EXPECT().GetByIdInCity(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32), gomock.Eq(arg.city)).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name: "Bad Request - Limit",
+			req: req{
+				id: dish.ID,
+
+				limit:  sql.NullInt32{Int32: -1, Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
+				city:   cityCode,
+			},
+			buildStub: func(du *mocks.MockDishUsecase) {
+				arg := req{
+					id:     dish.ID,
+					limit:  sql.NullInt32{Int32: -1, Valid: true},
+					offset: sql.NullInt32{Int32: 0, Valid: true},
+					city:   cityCode,
+				}
+				du.EXPECT().GetByIdInCity(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32), gomock.Eq(arg.city)).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name: "Bad Request - Offset",
+			req: req{
+				id:     dish.ID,
+				limit:  sql.NullInt32{Int32: 10, Valid: true},
+				offset: sql.NullInt32{Int32: -1, Valid: true},
+				city:   cityCode,
+			},
+			buildStub: func(du *mocks.MockDishUsecase) {
+				arg := req{
+					id:     dish.ID,
+					limit:  sql.NullInt32{Int32: 10, Valid: true},
+					offset: sql.NullInt32{Int32: -1, Valid: true},
+					city:   cityCode,
+				}
+				du.EXPECT().GetByIdInCity(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32), gomock.Eq(arg.city)).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+
+			},
+		},
+		{
+			name: "If limit is not set, it will be set to domain.DEFAULT_LIMIT",
+			req: req{
+				id:     dish.ID,
+				limit:  sql.NullInt32{Int32: 0, Valid: false},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
+				city:   cityCode,
+			},
+			buildStub: func(du *mocks.MockDishUsecase) {
+				arg := req{
+					id:     dish.ID,
+					limit:  sql.NullInt32{Int32: domain.DEFAULT_LIMIT, Valid: true},
+					offset: sql.NullInt32{Int32: 0, Valid: true},
+					city:   cityCode,
+				}
+				du.EXPECT().GetByIdInCity(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32), gomock.Eq(arg.city)).Times(1).Return(dish, nil)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchDishWithMenuIDs(t, recorder.Body, dish)
+			},
+		},
+		{
+			name: "If offset is not set, it will be set to domain.DEFAULT_OFFSET",
+			req: req{
+				id:     dish.ID,
+				limit:  sql.NullInt32{Int32: 10, Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: false},
+				city:   cityCode,
+			},
+			buildStub: func(du *mocks.MockDishUsecase) {
+				arg := req{
+					id:     dish.ID,
+					limit:  sql.NullInt32{Int32: 10, Valid: true},
+					offset: sql.NullInt32{Int32: domain.DEFAULT_OFFSET, Valid: true},
+					city:   cityCode,
+				}
+				du.EXPECT().GetByIdInCity(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32), gomock.Eq(arg.city)).Times(1).Return(dish, nil)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchDishWithMenuIDs(t, recorder.Body, dish)
+			},
+		},
+		{
+			name: "Internal Server Error",
+			req: req{
+				id:     dish.ID,
+				limit:  sql.NullInt32{Int32: 10, Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
+				city:   cityCode,
+			},
+			buildStub: func(du *mocks.MockDishUsecase) {
+				arg := req{
+					id:     dish.ID,
+					limit:  sql.NullInt32{Int32: 10, Valid: true},
+					offset: sql.NullInt32{Int32: 0, Valid: true},
+					city:   cityCode,
+				}
+				du.EXPECT().GetByIdInCity(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32), gomock.Eq(arg.city)).Times(1).Return(dish, sql.ErrConnDone)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		du := mocks.NewMockDishUsecase(ctrl)
+		tc.buildStub(du)
+
+		q := make(url.Values)
+
+		if tc.req.limit.Valid {
+			q.Set("limit", fmt.Sprintf("%d", tc.req.limit.Int32))
+		}
+
+		if tc.req.offset.Valid {
+			q.Set("offset", fmt.Sprintf("%d", tc.req.offset.Int32))
+		}
+
+		recorder := httptest.NewRecorder()
+
+		url := fmt.Sprintf("/cities/%d/dishes/%s?%s", tc.req.city, tc.req.id, q.Encode())
+		req, err := http.NewRequest(http.MethodGet, url, nil)
+
+		require.NoError(t, err)
+
+		e := newSetUpTestServer()
+		e.GET("/cities/:code/dishes/:id", NewDishController(du).GetByIdInCity)
+
+		e.ServeHTTP(recorder, req)
+
+		tc.check(t, recorder, dish)
+	}
+
 }
 
 func TestFetchDish(t *testing.T) {
@@ -329,12 +649,12 @@ func TestFetchDish(t *testing.T) {
 	}
 }
 
-func requireBodyMatchDish(t *testing.T, body *bytes.Buffer, dish *domain.Dish) {
+func requireBodyMatchDishWithMenuIDs(t *testing.T, body *bytes.Buffer, dish *domain.DishWithMenuIDs) {
 	data, err := io.ReadAll(body)
 
 	require.NoError(t, err)
 
-	var dishData domain.Dish
+	var dishData domain.DishWithMenuIDs
 
 	err = json.Unmarshal(data, &dishData)
 
@@ -342,6 +662,7 @@ func requireBodyMatchDish(t *testing.T, body *bytes.Buffer, dish *domain.Dish) {
 
 	require.Equal(t, dish.ID, dishData.ID)
 	require.Equal(t, dish.Name, dishData.Name)
+	require.ElementsMatch(t, dish.MenuIDs, dishData.MenuIDs)
 }
 
 func requireBodyMatchDishes(t *testing.T, body *bytes.Buffer, dishes []*domain.Dish) {
@@ -366,4 +687,26 @@ func randomDish(t *testing.T) *domain.Dish {
 	require.NoError(t, err)
 
 	return dish
+}
+
+func randomDishWithMenuIDs(t *testing.T) *domain.DishWithMenuIDs {
+	dish := randomDish(t)
+
+	n := 10
+
+	menuIDs := make([]string, 0, n)
+
+	for i := 0; i < n; i++ {
+		menuIDs = append(menuIDs, util.RandomUlid())
+	}
+
+	dishes, err := domain.ReNewDishWithMenuIDs(
+		dish.ID,
+		dish.Name,
+		menuIDs,
+	)
+
+	require.NoError(t, err)
+
+	return dishes
 }

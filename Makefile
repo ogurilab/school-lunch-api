@@ -84,6 +84,10 @@ build_swagger:
 	rm -rf ${APP_PATH}/doc/swagger/statik
 	cd ${APP_PATH} && statik -src=./doc/swagger -dest=./doc
 
+rebuild_prod:
+	$(DOCKER_COMPOSE) -f docker-compose.yaml down
+	$(DOCKER_COMPOSE) -f docker-compose.yaml up -d --build
+
 # 半田市のデータをデータベースに追加
 seed_handa:
 	docker compose cp ./ops/docker/entrypoint/data/ mysql:tmp/data/

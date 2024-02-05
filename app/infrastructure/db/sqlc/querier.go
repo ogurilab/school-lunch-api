@@ -14,7 +14,8 @@ type Querier interface {
 	CreateMenu(ctx context.Context, arg CreateMenuParams) error
 	CreateMenuDish(ctx context.Context, arg CreateMenuDishParams) error
 	GetCity(ctx context.Context, cityCode int32) (City, error)
-	GetDish(ctx context.Context, id string) (GetDishRow, error)
+	GetDish(ctx context.Context, arg GetDishParams) ([]GetDishRow, error)
+	GetDishInCity(ctx context.Context, arg GetDishInCityParams) ([]GetDishInCityRow, error)
 	GetMenu(ctx context.Context, arg GetMenuParams) (Menu, error)
 	GetMenuWithDishes(ctx context.Context, arg GetMenuWithDishesParams) ([]GetMenuWithDishesRow, error)
 	ListCities(ctx context.Context, arg ListCitiesParams) ([]City, error)
