@@ -2,7 +2,6 @@ package controller
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/labstack/echo/v4"
 	"github.com/ogurilab/school-lunch-api/domain"
@@ -198,8 +197,6 @@ func (mc *menuController) Fetch(c echo.Context) error {
 	if len(req.IDs) == 0 {
 		req.IDs = []string{}
 	}
-
-	fmt.Println(req.IDs)
 
 	ctx := c.Request().Context()
 
