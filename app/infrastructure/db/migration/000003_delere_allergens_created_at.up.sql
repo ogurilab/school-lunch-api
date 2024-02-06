@@ -1,0 +1,1 @@
+ALTER TABLE `allergens` DROP COLUMN `created_at`;
