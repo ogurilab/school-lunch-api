@@ -18,4 +18,5 @@ func InitRoutes(env bootstrap.Env, timeout time.Duration, e *echo.Echo, query db
 	NewMenuRouter(v1, timeout, query)
 	NewMenuWithDishesRouter(v1, timeout, query)
 	NewDishRouter(v1, timeout, query)
+	NewAllergenRouter(v1, timeout, query)
 }
