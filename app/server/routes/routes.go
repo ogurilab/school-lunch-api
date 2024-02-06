@@ -9,6 +9,8 @@ import (
 )
 
 func InitRoutes(env bootstrap.Env, timeout time.Duration, e *echo.Echo, query db.Query) {
+
+	NewDocumentRouter(e)
 	v1 := e.Group("/v1")
 
 	NewSwaggerRouter(v1)
