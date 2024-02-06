@@ -10,9 +10,8 @@ import (
 )
 
 type Allergen struct {
-	ID        int32     `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
+	ID   int32  `json:"id"`
+	Name string `json:"name"`
 }
 
 type City struct {

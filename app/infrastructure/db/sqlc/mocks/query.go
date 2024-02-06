@@ -40,6 +40,20 @@ func (m *MockQuery) EXPECT() *MockQueryMockRecorder {
 	return m.recorder
 }
 
+// CreateAllergen mocks base method.
+func (m *MockQuery) CreateAllergen(ctx context.Context, name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateAllergen", ctx, name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateAllergen indicates an expected call of CreateAllergen.
+func (mr *MockQueryMockRecorder) CreateAllergen(ctx, name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAllergen", reflect.TypeOf((*MockQuery)(nil).CreateAllergen), ctx, name)
+}
+
 // CreateCity mocks base method.
 func (m *MockQuery) CreateCity(ctx context.Context, arg db.CreateCityParams) error {
 	m.ctrl.T.Helper()
@@ -82,6 +96,20 @@ func (mr *MockQueryMockRecorder) CreateDishTx(ctx, dish, menuID any) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDishTx", reflect.TypeOf((*MockQuery)(nil).CreateDishTx), ctx, dish, menuID)
 }
 
+// CreateDishesAllergens mocks base method.
+func (m *MockQuery) CreateDishesAllergens(ctx context.Context, arg db.CreateDishesAllergensParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateDishesAllergens", ctx, arg)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateDishesAllergens indicates an expected call of CreateDishesAllergens.
+func (mr *MockQueryMockRecorder) CreateDishesAllergens(ctx, arg any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDishesAllergens", reflect.TypeOf((*MockQuery)(nil).CreateDishesAllergens), ctx, arg)
+}
+
 // CreateDishesTx mocks base method.
 func (m *MockQuery) CreateDishesTx(ctx context.Context, dishes []*domain.Dish, menuID string) error {
 	m.ctrl.T.Helper()
@@ -122,6 +150,21 @@ func (m *MockQuery) CreateMenuDish(ctx context.Context, arg db.CreateMenuDishPar
 func (mr *MockQueryMockRecorder) CreateMenuDish(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMenuDish", reflect.TypeOf((*MockQuery)(nil).CreateMenuDish), ctx, arg)
+}
+
+// GetAllergenByName mocks base method.
+func (m *MockQuery) GetAllergenByName(ctx context.Context, name string) (db.Allergen, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllergenByName", ctx, name)
+	ret0, _ := ret[0].(db.Allergen)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllergenByName indicates an expected call of GetAllergenByName.
+func (mr *MockQueryMockRecorder) GetAllergenByName(ctx, name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllergenByName", reflect.TypeOf((*MockQuery)(nil).GetAllergenByName), ctx, name)
 }
 
 // GetCity mocks base method.
@@ -197,6 +240,36 @@ func (m *MockQuery) GetMenuWithDishes(ctx context.Context, arg db.GetMenuWithDis
 func (mr *MockQueryMockRecorder) GetMenuWithDishes(ctx, arg any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMenuWithDishes", reflect.TypeOf((*MockQuery)(nil).GetMenuWithDishes), ctx, arg)
+}
+
+// ListAllergenByDishID mocks base method.
+func (m *MockQuery) ListAllergenByDishID(ctx context.Context, dishID string) ([]db.Allergen, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListAllergenByDishID", ctx, dishID)
+	ret0, _ := ret[0].([]db.Allergen)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListAllergenByDishID indicates an expected call of ListAllergenByDishID.
+func (mr *MockQueryMockRecorder) ListAllergenByDishID(ctx, dishID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAllergenByDishID", reflect.TypeOf((*MockQuery)(nil).ListAllergenByDishID), ctx, dishID)
+}
+
+// ListAllergenInDish mocks base method.
+func (m *MockQuery) ListAllergenInDish(ctx context.Context, dishIds []string) ([]db.Allergen, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListAllergenInDish", ctx, dishIds)
+	ret0, _ := ret[0].([]db.Allergen)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListAllergenInDish indicates an expected call of ListAllergenInDish.
+func (mr *MockQueryMockRecorder) ListAllergenInDish(ctx, dishIds any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAllergenInDish", reflect.TypeOf((*MockQuery)(nil).ListAllergenInDish), ctx, dishIds)
 }
 
 // ListCities mocks base method.

@@ -9,15 +9,20 @@ import (
 )
 
 type Querier interface {
+	CreateAllergen(ctx context.Context, name string) error
 	CreateCity(ctx context.Context, arg CreateCityParams) error
 	CreateDish(ctx context.Context, arg CreateDishParams) error
+	CreateDishesAllergens(ctx context.Context, arg CreateDishesAllergensParams) error
 	CreateMenu(ctx context.Context, arg CreateMenuParams) error
 	CreateMenuDish(ctx context.Context, arg CreateMenuDishParams) error
+	GetAllergenByName(ctx context.Context, name string) (Allergen, error)
 	GetCity(ctx context.Context, cityCode int32) (City, error)
 	GetDish(ctx context.Context, arg GetDishParams) ([]GetDishRow, error)
 	GetDishInCity(ctx context.Context, arg GetDishInCityParams) ([]GetDishInCityRow, error)
 	GetMenu(ctx context.Context, arg GetMenuParams) (Menu, error)
 	GetMenuWithDishes(ctx context.Context, arg GetMenuWithDishesParams) ([]GetMenuWithDishesRow, error)
+	ListAllergenByDishID(ctx context.Context, dishID string) ([]Allergen, error)
+	ListAllergenInDish(ctx context.Context, dishIds []string) ([]Allergen, error)
 	ListCities(ctx context.Context, arg ListCitiesParams) ([]City, error)
 	ListCitiesByName(ctx context.Context, arg ListCitiesByNameParams) ([]City, error)
 	ListCitiesByPrefecture(ctx context.Context, arg ListCitiesByPrefectureParams) ([]City, error)
