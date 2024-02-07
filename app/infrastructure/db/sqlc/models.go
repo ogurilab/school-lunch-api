@@ -32,6 +32,7 @@ type Dish struct {
 type DishesAllergen struct {
 	AllergenID int32  `json:"allergen_id"`
 	DishID     string `json:"dish_id"`
+	Category   int32  `json:"category"`
 }
 
 type ExternalDataSource struct {

@@ -7,8 +7,9 @@ import (
 )
 
 type Allergen struct {
-	ID   int32  `json:"id"`
-	Name string `json:"name"`
+	ID       int32  `json:"id"`
+	Name     string `json:"name"`
+	Category int32  `json:"category"`
 }
 
 type AllergenRepository interface {
@@ -26,13 +27,14 @@ type AllergenController interface {
 	FetchByMenuID(c echo.Context) error
 }
 
-func newAllergen(id int32, name string) *Allergen {
+func newAllergen(id int32, name string, category int32) *Allergen {
 	return &Allergen{
-		ID:   id,
-		Name: name,
+		ID:       id,
+		Name:     name,
+		Category: category,
 	}
 }
 
-func ReNewAllergen(id int32, name string) *Allergen {
-	return newAllergen(id, name)
+func ReNewAllergen(id int32, name string, category int32) *Allergen {
+	return newAllergen(id, name, category)
 }

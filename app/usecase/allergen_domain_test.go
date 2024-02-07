@@ -198,6 +198,7 @@ func randomAllergens(t *testing.T, length int) []*domain.Allergen {
 		allergen := domain.ReNewAllergen(
 			util.RandomInt32(),
 			util.RandomString(10),
+			util.RandomInt32(),
 		)
 
 		allergens = append(allergens, allergen)

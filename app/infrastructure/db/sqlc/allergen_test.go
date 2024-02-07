@@ -11,7 +11,8 @@ import (
 
 func TestCreateAllergen(t *testing.T) {
 	name := util.RandomString(50)
-	createRandomAllergen(t, name)
+	category := util.RandomInt32()
+	createRandomAllergen(t, name, category)
 }
 
 func TestListAllergenByDishID(t *testing.T) {
@@ -22,7 +23,8 @@ func TestListAllergenByDishID(t *testing.T) {
 	allergens := createRandomAllergens(t, 10)
 
 	for _, allergen := range allergens {
-		createRandomDishesAllergens(t, dish.ID, allergen.ID)
+		category := util.RandomInt32()
+		createRandomDishesAllergens(t, dish.ID, allergen.ID, category)
 	}
 
 	res, err := testQuery.ListAllergenByDishID(context.Background(), dish.ID)
@@ -73,7 +75,8 @@ func TestListAllergenInDish(t *testing.T) {
 		allAllergens = append(allAllergens, allergens...)
 
 		for _, allergen := range allergens {
-			createRandomDishesAllergens(t, dishID, allergen.ID)
+			category := util.RandomInt32()
+			createRandomDishesAllergens(t, dishID, allergen.ID, category)
 		}
 
 	}
@@ -99,7 +102,7 @@ func TestListAllergenInDish(t *testing.T) {
 	require.ElementsMatch(t, allergensNames, resNames)
 }
 
-func createRandomAllergen(t *testing.T, name string) *domain.Allergen {
+func createRandomAllergen(t *testing.T, name string, category int32) *domain.Allergen {
 
 	ctx := context.Background()
 
@@ -115,7 +118,7 @@ func createRandomAllergen(t *testing.T, name string) *domain.Allergen {
 
 	require.Equal(t, name, res.Name)
 
-	return domain.ReNewAllergen(res.ID, res.Name)
+	return domain.ReNewAllergen(res.ID, res.Name, category)
 }
 
 func createRandomAllergens(t *testing.T, length int) []*domain.Allergen {
@@ -123,7 +126,8 @@ func createRandomAllergens(t *testing.T, length int) []*domain.Allergen {
 
 	for i := 0; i < length; i++ {
 		name := util.RandomString(50)
-		allergen := createRandomAllergen(t, name)
+		category := util.RandomInt32()
+		allergen := createRandomAllergen(t, name, category)
 		allergens = append(allergens, allergen)
 	}
 

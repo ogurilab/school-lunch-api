@@ -13,24 +13,26 @@ func TestCreateDishesAllergens(t *testing.T) {
 	menu := createRandomMenu(t, city.CityCode)
 	dish := createRandomDish(t, menu.ID)
 	name := util.RandomString(50)
-	allergen := createRandomAllergen(t, name)
+	category := util.RandomInt32()
+	allergen := createRandomAllergen(t, name, category)
 
-	createRandomDishesAllergens(t, dish.ID, allergen.ID)
+	createRandomDishesAllergens(t, dish.ID, allergen.ID, category)
 }
 
-func createRandomDishesAllergens(t *testing.T, dishID string, AllergenID int32) error {
+func createRandomDishesAllergens(t *testing.T, dishID string, allergenID int32, category int32) error {
 	ctx := context.Background()
 
 	arg := CreateDishesAllergensParams{
 		DishID:     dishID,
-		AllergenID: AllergenID,
+		AllergenID: allergenID,
+		Category:   category,
 	}
 
 	err := testQuery.CreateDishesAllergens(ctx, arg)
 
 	require.NoError(t, err)
 
-	result, err := testQuery.getDishesAllergens(dishID, AllergenID)
+	result, err := testQuery.getDishesAllergens(dishID, allergenID, category)
 
 	require.NoError(t, err)
 

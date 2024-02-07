@@ -10,16 +10,21 @@ import (
 )
 
 const createDishesAllergens = `-- name: CreateDishesAllergens :exec
-INSERT INTO dishes_allergens (dish_id, allergen_id)
-VALUES (?, ?)
+INSERT INTO dishes_allergens (dish_id, allergen_id, category)
+VALUES (
+    ?,
+    ?,
+    ?
+  )
 `
 
 type CreateDishesAllergensParams struct {
 	DishID     string `json:"dish_id"`
 	AllergenID int32  `json:"allergen_id"`
+	Category   int32  `json:"category"`
 }
 
 func (q *Queries) CreateDishesAllergens(ctx context.Context, arg CreateDishesAllergensParams) error {
-	_, err := q.db.ExecContext(ctx, createDishesAllergens, arg.DishID, arg.AllergenID)
+	_, err := q.db.ExecContext(ctx, createDishesAllergens, arg.DishID, arg.AllergenID, arg.Category)
 	return err
 }
