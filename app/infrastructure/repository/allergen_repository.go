@@ -28,7 +28,7 @@ func (r *allergenRepository) FetchByDishID(ctx context.Context, dishID string) (
 	allergens := make([]*domain.Allergen, 0, len(results))
 
 	for _, result := range results {
-		allergen := domain.ReNewAllergen(result.ID, result.Name)
+		allergen := domain.ReNewAllergen(result.ID, result.Name, result.Category)
 
 		allergens = append(allergens, allergen)
 	}
@@ -47,7 +47,7 @@ func (r *allergenRepository) FetchInDish(ctx context.Context, dishIDs []string) 
 	allergens := make([]*domain.Allergen, 0, len(results))
 
 	for _, result := range results {
-		allergen := domain.ReNewAllergen(result.ID, result.Name)
+		allergen := domain.ReNewAllergen(result.ID, result.Name, result.Category)
 
 		allergens = append(allergens, allergen)
 	}

@@ -16,7 +16,7 @@ type TestQuery interface {
 	truncateMenuDishesTable() error
 	getMenuDishes(menuID string, dishID string) (MenuDish, error)
 	getMenuDishesAllCount(menuID string) (int, error)
-	getDishesAllergens(dishID string, allergenID int32) (DishesAllergen, error)
+	getDishesAllergens(dishID string, allergenID int32, category int32) (DishesAllergen, error)
 }
 
 type query struct {
@@ -83,14 +83,15 @@ func (q *query) getMenuDishesAllCount(menuID string) (int, error) {
 	return count, err
 }
 
-func (q *query) getDishesAllergens(dishID string, allergenID int32) (DishesAllergen, error) {
+func (q *query) getDishesAllergens(dishID string, allergenID int32, category int32) (DishesAllergen, error) {
 	var dishesAllergen DishesAllergen
 
-	row := q.db.QueryRow("SELECT * FROM dishes_allergens WHERE dish_id = ? AND allergen_id = ?", dishID, allergenID)
+	row := q.db.QueryRow("SELECT * FROM dishes_allergens WHERE dish_id = ? AND allergen_id = ? AND category = ?", dishID, allergenID, category)
 
 	err := row.Scan(
 		&dishesAllergen.AllergenID,
 		&dishesAllergen.DishID,
+		&dishesAllergen.Category,
 	)
 
 	return dishesAllergen, err

@@ -35,24 +35,31 @@ func (q *Queries) GetAllergenByName(ctx context.Context, name string) (Allergen,
 }
 
 const listAllergenByDishID = `-- name: ListAllergenByDishID :many
-SELECT allergens.id,
-  allergens.name
+SELECT DISTINCT allergens.id,
+  allergens.name,
+  dishes_allergens.category
 FROM allergens
   JOIN dishes_allergens ON allergens.id = dishes_allergens.allergen_id
 WHERE dishes_allergens.dish_id = ?
 ORDER BY allergens.name
 `
 
-func (q *Queries) ListAllergenByDishID(ctx context.Context, dishID string) ([]Allergen, error) {
+type ListAllergenByDishIDRow struct {
+	ID       int32  `json:"id"`
+	Name     string `json:"name"`
+	Category int32  `json:"category"`
+}
+
+func (q *Queries) ListAllergenByDishID(ctx context.Context, dishID string) ([]ListAllergenByDishIDRow, error) {
 	rows, err := q.db.QueryContext(ctx, listAllergenByDishID, dishID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Allergen{}
+	items := []ListAllergenByDishIDRow{}
 	for rows.Next() {
-		var i Allergen
-		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+		var i ListAllergenByDishIDRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.Category); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -67,15 +74,22 @@ func (q *Queries) ListAllergenByDishID(ctx context.Context, dishID string) ([]Al
 }
 
 const listAllergenInDish = `-- name: ListAllergenInDish :many
-SELECT allergens.id,
-  allergens.name
+SELECT DISTINCT allergens.id,
+  allergens.name,
+  dishes_allergens.category
 FROM allergens
   JOIN dishes_allergens ON allergens.id = dishes_allergens.allergen_id
 WHERE dishes_allergens.dish_id IN (/*SLICE:dish_ids*/?)
 ORDER BY allergens.name
 `
 
-func (q *Queries) ListAllergenInDish(ctx context.Context, dishIds []string) ([]Allergen, error) {
+type ListAllergenInDishRow struct {
+	ID       int32  `json:"id"`
+	Name     string `json:"name"`
+	Category int32  `json:"category"`
+}
+
+func (q *Queries) ListAllergenInDish(ctx context.Context, dishIds []string) ([]ListAllergenInDishRow, error) {
 	query := listAllergenInDish
 	var queryParams []interface{}
 	if len(dishIds) > 0 {
@@ -91,10 +105,10 @@ func (q *Queries) ListAllergenInDish(ctx context.Context, dishIds []string) ([]A
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Allergen{}
+	items := []ListAllergenInDishRow{}
 	for rows.Next() {
-		var i Allergen
-		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+		var i ListAllergenInDishRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.Category); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

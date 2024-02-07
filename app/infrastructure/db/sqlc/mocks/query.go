@@ -243,10 +243,10 @@ func (mr *MockQueryMockRecorder) GetMenuWithDishes(ctx, arg any) *gomock.Call {
 }
 
 // ListAllergenByDishID mocks base method.
-func (m *MockQuery) ListAllergenByDishID(ctx context.Context, dishID string) ([]db.Allergen, error) {
+func (m *MockQuery) ListAllergenByDishID(ctx context.Context, dishID string) ([]db.ListAllergenByDishIDRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListAllergenByDishID", ctx, dishID)
-	ret0, _ := ret[0].([]db.Allergen)
+	ret0, _ := ret[0].([]db.ListAllergenByDishIDRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -258,10 +258,10 @@ func (mr *MockQueryMockRecorder) ListAllergenByDishID(ctx, dishID any) *gomock.C
 }
 
 // ListAllergenInDish mocks base method.
-func (m *MockQuery) ListAllergenInDish(ctx context.Context, dishIds []string) ([]db.Allergen, error) {
+func (m *MockQuery) ListAllergenInDish(ctx context.Context, dishIds []string) ([]db.ListAllergenInDishRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListAllergenInDish", ctx, dishIds)
-	ret0, _ := ret[0].([]db.Allergen)
+	ret0, _ := ret[0].([]db.ListAllergenInDishRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

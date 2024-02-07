@@ -15,7 +15,7 @@ import (
 
 func TestFetchAllegerByDishID(t *testing.T) {
 	dish := randomDish(t)
-	results := randomDbAllergens(t, 10)
+	results := randomDbListAllergenByDishIDRow(t, 10)
 
 	testCases := []struct {
 		name       string
@@ -72,7 +72,7 @@ func TestFetchInDish(t *testing.T) {
 		dishIds = append(dishIds, dish.ID)
 	}
 
-	results := randomDbAllergens(t, 10)
+	results := randomDbListAllergenInDishRow(t, 10)
 
 	testCases := []struct {
 		name       string
@@ -121,14 +121,33 @@ func TestFetchInDish(t *testing.T) {
 	}
 }
 
-func randomDbAllergens(t *testing.T, length int) []db.Allergen {
+func randomDbListAllergenByDishIDRow(t *testing.T, length int) []db.ListAllergenByDishIDRow {
 
-	allergens := make([]db.Allergen, 0, length)
+	allergens := make([]db.ListAllergenByDishIDRow, 0, length)
 
 	for i := 0; i < length; i++ {
-		allergen := db.Allergen{
-			ID:   util.RandomInt32(),
-			Name: util.RandomString(50),
+		allergen := db.ListAllergenByDishIDRow{
+			ID:       util.RandomInt32(),
+			Name:     util.RandomString(50),
+			Category: util.RandomInt32(),
+		}
+
+		allergens = append(allergens, allergen)
+	}
+
+	return allergens
+
+}
+
+func randomDbListAllergenInDishRow(t *testing.T, length int) []db.ListAllergenInDishRow {
+
+	allergens := make([]db.ListAllergenInDishRow, 0, length)
+
+	for i := 0; i < length; i++ {
+		allergen := db.ListAllergenInDishRow{
+			ID:       util.RandomInt32(),
+			Name:     util.RandomString(50),
+			Category: util.RandomInt32(),
 		}
 
 		allergens = append(allergens, allergen)
