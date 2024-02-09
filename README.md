@@ -31,7 +31,7 @@ cp app/.env.example app/.env
 make prod
 ```
 
-5. localhost:8080 にアクセスすると Swagger UI が表示されます。
+5. localhost:8080 にアクセスすると ドキュメント が表示されます。
 
 [http://localhost:8080](http://localhost:8080)
 
@@ -91,7 +91,7 @@ make up
 make start
 ```
 
-7. localhost:8080 にアクセスすると Swagger UI が表示されます。
+7. localhost:8080 にアクセスすると ドキュメント が表示されます。
 
 [http://localhost:8080](http://localhost:8080)
 
