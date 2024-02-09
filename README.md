@@ -31,9 +31,9 @@ cp app/.env.example app/.env
 make prod
 ```
 
-5. localhost:8080/v1/swagger/ にアクセスすると Swagger UI が表示されます。
+5. localhost:8080 にアクセスすると Swagger UI が表示されます。
 
-[http://localhost:8080/v1/swagger/](http://localhost:8080/v1/swagger/)
+[http://localhost:8080](http://localhost:8080)
 
 6. 半田市の学校給食のデータを追加する。
 
@@ -91,9 +91,9 @@ make up
 make start
 ```
 
-7. localhost:8080/v1/swagger/ にアクセスすると Swagger UI が表示されます。
+7. localhost:8080 にアクセスすると Swagger UI が表示されます。
 
-[http://localhost:8080/v1/swagger/](http://localhost:8080/v1/swagger/)
+[http://localhost:8080](http://localhost:8080)
 
 8. データベースの停止
 
