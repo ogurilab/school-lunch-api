@@ -10,11 +10,15 @@ import (
 	"github.com/ogurilab/school-lunch-api/usecase"
 )
 
-func NewMenuRouter(group *echo.Group, timeout time.Duration, query db.Query) {
+func NewAdminRouter(group *echo.Group, timeout time.Duration, query db.Query) {
 	mr := repository.NewMenuRepository(query)
-	mc := controller.NewMenuController(usecase.NewMenuUsecase(mr, timeout))
+	mu := usecase.NewMenuUsecase(mr, timeout)
 
-	group.GET("/cities/:code/menus/:id/basic", mc.GetByID)
-	group.GET("/cities/:code/menus/basic", mc.FetchByCity)
-	group.GET("/menus/basic", mc.Fetch)
+	dr := repository.NewDishRepository(query)
+	du := usecase.NewDishUsecase(dr, timeout)
+
+	ac := controller.NewAdminController(mu, du)
+
+	group.POST("/menus", ac.CreateMenu)
+
 }
