@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/labstack/echo/v4"
 	"github.com/ogurilab/school-lunch-api/bootstrap"
-	"github.com/ogurilab/school-lunch-api/domain"
 	"github.com/ogurilab/school-lunch-api/domain/mocks"
+	"github.com/ogurilab/school-lunch-api/server/validator"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
@@ -30,7 +31,7 @@ func TestCreateMenu(t *testing.T) {
 		body      body
 		setUpKey  func(t *testing.T, env bootstrap.Env, req *http.Request)
 		buildStub func(uc *mocks.MockMenuUsecase)
-		check     func(t *testing.T, recorder *httptest.ResponseRecorder, menu *domain.Menu)
+		check     func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
 			name: "OK",
@@ -45,9 +46,8 @@ func TestCreateMenu(t *testing.T) {
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				uc.EXPECT().Create(gomock.Any(), gomock.Any()).Times(1).Return(nil)
 			},
-			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menu *domain.Menu) {
-				require.Equal(t, 200, recorder.Code)
-				requireBodyMatchMenu(t, recorder.Body, menu)
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusCreated, recorder.Code)
 			},
 		},
 		{
@@ -64,8 +64,8 @@ func TestCreateMenu(t *testing.T) {
 				uc.EXPECT().Create(gomock.Any(), gomock.Any()).Times(0)
 
 			},
-			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menu *domain.Menu) {
-				require.Equal(t, 400, recorder.Code)
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
 		},
 		{
@@ -81,8 +81,8 @@ func TestCreateMenu(t *testing.T) {
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				uc.EXPECT().Create(gomock.Any(), gomock.Any()).Times(0)
 			},
-			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menu *domain.Menu) {
-				require.Equal(t, 400, recorder.Code)
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
 		},
 		{
@@ -98,8 +98,8 @@ func TestCreateMenu(t *testing.T) {
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				uc.EXPECT().Create(gomock.Any(), gomock.Any()).Times(0)
 			},
-			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menu *domain.Menu) {
-				require.Equal(t, 400, recorder.Code)
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
 		},
 		{
@@ -115,8 +115,8 @@ func TestCreateMenu(t *testing.T) {
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				uc.EXPECT().Create(gomock.Any(), gomock.Any()).Times(0)
 			},
-			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menu *domain.Menu) {
-				require.Equal(t, 400, recorder.Code)
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
 		},
 		{
@@ -132,8 +132,8 @@ func TestCreateMenu(t *testing.T) {
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				uc.EXPECT().Create(gomock.Any(), gomock.Any()).Times(0)
 			},
-			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menu *domain.Menu) {
-				require.Equal(t, 400, recorder.Code)
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
 		},
 		{
@@ -149,7 +149,7 @@ func TestCreateMenu(t *testing.T) {
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				uc.EXPECT().Create(gomock.Any(), gomock.Any()).Times(1).Return(sql.ErrConnDone)
 			},
-			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menu *domain.Menu) {
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, 500, recorder.Code)
 			},
 		},
@@ -168,7 +168,7 @@ func TestCreateMenu(t *testing.T) {
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				uc.EXPECT().Create(gomock.Any(), gomock.Any()).Times(0)
 			},
-			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menu *domain.Menu) {
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusUnauthorized, recorder.Code)
 			},
 		},
@@ -187,7 +187,7 @@ func TestCreateMenu(t *testing.T) {
 			buildStub: func(uc *mocks.MockMenuUsecase) {
 				uc.EXPECT().Create(gomock.Any(), gomock.Any()).Times(0)
 			},
-			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menu *domain.Menu) {
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
 		},
@@ -221,6 +221,302 @@ func TestCreateMenu(t *testing.T) {
 		e.POST(url, NewAdminController(uc, nil).CreateMenu)
 		e.ServeHTTP(recorder, req)
 
-		tc.check(t, recorder, menu)
+		tc.check(t, recorder)
+	}
+}
+
+func TestCreateDish(t *testing.T) {
+	menu := randomMenu(t)
+	dish := randomDish(t)
+
+	type body struct {
+		Name string `json:"name" validate:"required"`
+	}
+
+	testCases := []struct {
+		name      string
+		menuID    string
+		body      body
+		setUpKey  func(t *testing.T, env bootstrap.Env, req *http.Request)
+		buildStub func(uc *mocks.MockDishUsecase)
+		check     func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name:   "OK",
+			menuID: menu.ID,
+			body: body{
+				Name: dish.Name,
+			},
+			setUpKey: createValidAdminKey,
+			buildStub: func(uc *mocks.MockDishUsecase) {
+				uc.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any()).Times(1).Return(nil)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusCreated, recorder.Code)
+			},
+		},
+		{
+			name:   "Bad Request - Invalid MenuID",
+			menuID: "invalid",
+			body: body{
+				Name: dish.Name,
+			},
+			setUpKey: createValidAdminKey,
+			buildStub: func(uc *mocks.MockDishUsecase) {
+				uc.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:   "Bad Request - Invalid Name",
+			menuID: menu.ID,
+			body: body{
+				Name: "",
+			},
+			setUpKey: createValidAdminKey,
+			buildStub: func(uc *mocks.MockDishUsecase) {
+				uc.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:   "Internal Server Error",
+			menuID: menu.ID,
+			body: body{
+				Name: dish.Name,
+			},
+			setUpKey: createValidAdminKey,
+			buildStub: func(uc *mocks.MockDishUsecase) {
+				uc.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any()).Times(1).Return(sql.ErrConnDone)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name:   "Bad Admin Key",
+			menuID: menu.ID,
+			body: body{
+				Name: dish.Name,
+			},
+			setUpKey: func(t *testing.T, env bootstrap.Env, req *http.Request) {
+				req.Header.Set("X-Admin-Key", "invalid")
+			},
+			buildStub: func(uc *mocks.MockDishUsecase) {
+				uc.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+			},
+		},
+		{
+			name:   "No Admin Key",
+			menuID: menu.ID,
+			body: body{
+				Name: dish.Name,
+			},
+			setUpKey: func(t *testing.T, env bootstrap.Env, req *http.Request) {
+				// do nothing
+			},
+			buildStub: func(uc *mocks.MockDishUsecase) {
+				uc.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		uc := mocks.NewMockDishUsecase(ctrl)
+		tc.buildStub(uc)
+
+		recorder := httptest.NewRecorder()
+
+		jsonData, err := json.Marshal(tc.body)
+		reqBody := bytes.NewBuffer(jsonData)
+
+		require.NotNil(t, reqBody)
+		require.NoError(t, err)
+
+		url := fmt.Sprintf("/admin/menus/%s/dishes", tc.menuID)
+		req, err := http.NewRequest(http.MethodPost, url, reqBody)
+
+		require.NoError(t, err)
+
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		e, env := newSetupAdminTestServer(t)
+		tc.setUpKey(t, env, req)
+
+		e.POST("/admin/menus/:id/dishes", NewAdminController(nil, uc).CreateDish)
+		e.ServeHTTP(recorder, req)
+
+		tc.check(t, recorder)
+	}
+}
+
+func TestCreateDishes(t *testing.T) {
+	menu := randomMenu(t)
+
+	dishes := make([]validator.Dish, 0, 3)
+	badDishes := make([]validator.Dish, 0, 3)
+
+	for i := 0; i < 3; i++ {
+		d := randomDish(t)
+		dishes = append(dishes, validator.Dish{
+			Name: d.Name,
+		})
+
+		if i == 0 {
+			d.Name = ""
+		}
+
+		badDishes = append(badDishes, validator.Dish{
+			Name: d.Name,
+		})
+	}
+
+	type body struct {
+		Dishes []validator.Dish `json:"dishes" validate:"required,dishes"`
+	}
+
+	testCases := []struct {
+		name      string
+		menuID    string
+		body      body
+		setUpKey  func(t *testing.T, env bootstrap.Env, req *http.Request)
+		buildStub func(uc *mocks.MockDishUsecase)
+		check     func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name:   "OK",
+			menuID: menu.ID,
+			body: body{
+				Dishes: dishes,
+			},
+			setUpKey: createValidAdminKey,
+			buildStub: func(uc *mocks.MockDishUsecase) {
+
+				uc.EXPECT().CreateMany(gomock.Any(), gomock.Any(), gomock.Eq(menu.ID)).Times(1).Return(nil)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusCreated, recorder.Code)
+			},
+		},
+		{
+			name:   "Bad Request - Invalid MenuID",
+			menuID: "invalid",
+			body: body{
+				Dishes: dishes,
+			},
+			setUpKey: createValidAdminKey,
+			buildStub: func(uc *mocks.MockDishUsecase) {
+				uc.EXPECT().CreateMany(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:   "Bad Request - Invalid Dishes",
+			menuID: menu.ID,
+			body: body{
+				Dishes: badDishes,
+			},
+			setUpKey: createValidAdminKey,
+			buildStub: func(uc *mocks.MockDishUsecase) {
+				uc.EXPECT().CreateMany(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:   "Internal Server Error",
+			menuID: menu.ID,
+			body: body{
+				Dishes: dishes,
+			},
+			setUpKey: createValidAdminKey,
+			buildStub: func(uc *mocks.MockDishUsecase) {
+				uc.EXPECT().CreateMany(gomock.Any(), gomock.Any(), gomock.Any()).Times(1).Return(sql.ErrConnDone)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name:   "Bad Admin Key",
+			menuID: menu.ID,
+			body: body{
+				Dishes: dishes,
+			},
+			setUpKey: func(t *testing.T, env bootstrap.Env, req *http.Request) {
+				req.Header.Set("X-Admin-Key", "invalid")
+			},
+			buildStub: func(uc *mocks.MockDishUsecase) {
+				uc.EXPECT().CreateMany(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+			},
+		},
+		{
+			name:   "No Admin Key",
+			menuID: menu.ID,
+			body: body{
+				Dishes: dishes,
+			},
+			setUpKey: func(t *testing.T, env bootstrap.Env, req *http.Request) {
+				// do nothing
+			},
+			buildStub: func(uc *mocks.MockDishUsecase) {
+				uc.EXPECT().CreateMany(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			uc := mocks.NewMockDishUsecase(ctrl)
+			tc.buildStub(uc)
+
+			recorder := httptest.NewRecorder()
+
+			jsonData, err := json.Marshal(tc.body)
+			reqBody := bytes.NewBuffer(jsonData)
+
+			require.NotNil(t, reqBody)
+			require.NoError(t, err)
+
+			url := fmt.Sprintf("/admin/menus/%s/dishes/bulk", tc.menuID)
+			req, err := http.NewRequest(http.MethodPost, url, reqBody)
+
+			require.NoError(t, err)
+
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+			e, env := newSetupAdminTestServer(t)
+			tc.setUpKey(t, env, req)
+
+			e.POST("/admin/menus/:id/dishes/bulk", NewAdminController(nil, uc).CreateDishes)
+			e.ServeHTTP(recorder, req)
+
+			tc.check(t, recorder)
+		})
 	}
 }

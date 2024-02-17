@@ -19,6 +19,7 @@ func NewCustomValidator() *CustomValidator {
 
 	validator.RegisterValidation("YYYY-MM-DD", ValidDateFormat)
 	validator.RegisterValidation("multipleULID", ValidMultipleULID)
+	validator.RegisterValidation("dishes", ValidDishes)
 
 	return &CustomValidator{validator: validator}
 }
@@ -67,5 +68,29 @@ func ValidMultipleULID(fl validator.FieldLevel) bool {
 		}
 	}
 
+	return true
+}
+
+type Dish struct {
+	Name string `json:"name" validate:"required"`
+}
+
+func ValidDishes(fl validator.FieldLevel) bool {
+
+	dishes, ok := fl.Field().Interface().([]Dish)
+
+	if !ok {
+		return false
+	}
+
+	if len(dishes) == 0 {
+		return false
+	}
+
+	for _, dish := range dishes {
+		if name := dish.Name; len(name) < 1 || len(name) > 255 {
+			return false
+		}
+	}
 	return true
 }

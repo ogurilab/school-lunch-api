@@ -283,3 +283,135 @@ func TestMultipleULID(t *testing.T) {
 		})
 	}
 }
+
+func TestDishesWithEcho(t *testing.T) {
+	e := echo.New()
+	e.Validator = NewCustomValidator()
+	ctx := e.NewContext(nil, nil)
+
+	type input struct {
+		Dishes []Dish `validate:"dishes"`
+	}
+
+	testCases := []struct {
+		name  string
+		input input
+		check func(output *input, err error)
+	}{
+		{
+			name: "valid dishes",
+			input: input{
+				Dishes: []Dish{
+					{
+						Name: "valid",
+					},
+					{
+						Name: "valid",
+					},
+				},
+			},
+			check: func(output *input, err error) {
+				require.NoError(t, err)
+				require.Len(t, output.Dishes, 2)
+			},
+		},
+		{
+			name: "empty dishes",
+			input: input{
+				Dishes: []Dish{},
+			},
+			check: func(output *input, err error) {
+				require.Error(t, err)
+				require.Len(t, output.Dishes, 0)
+			},
+		},
+		{
+			name: "invalid value dishes",
+			input: input{
+				Dishes: []Dish{{Name: "valid"}, {Name: ""}},
+			},
+			check: func(output *input, err error) {
+				require.Error(t, err)
+				require.Len(t, output.Dishes, 2)
+			},
+		},
+		{
+			name: "max value dishes",
+			input: input{
+				Dishes: []Dish{{Name: "valid"}, {Name: util.RandomString(256)}},
+			},
+			check: func(output *input, err error) {
+				require.Error(t, err)
+				require.Len(t, output.Dishes, 2)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			err := ctx.Validate(&tc.input)
+			tc.check(&tc.input, err)
+		})
+	}
+}
+
+func TestDishes(t *testing.T) {
+	validator := NewCustomValidator()
+
+	type input struct {
+		Dishes []Dish `validate:"dishes"`
+	}
+
+	testCases := []struct {
+		name  string
+		input input
+		check func(err error)
+	}{
+		{
+			name: "valid dishes",
+			input: input{
+				Dishes: []Dish{{Name: "test"}},
+			},
+			check: func(err error) {
+				require.NoError(t, err)
+			},
+		},
+		{
+			name: "empty dishes",
+			input: input{
+				Dishes: []Dish{},
+			},
+			check: func(err error) {
+				require.Error(t, err)
+			},
+		},
+		{
+			name: "invalid value dishes",
+			input: input{
+				Dishes: []Dish{{Name: "valid"}, {Name: ""}},
+			},
+			check: func(err error) {
+				require.Error(t, err)
+			},
+		},
+		{
+			name: "max value dishes",
+			input: input{
+				Dishes: []Dish{{Name: "valid"}, {Name: util.RandomString(256)}},
+			},
+			check: func(err error) {
+				require.Error(t, err)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			err := validator.Validate(tc.input)
+
+			tc.check(err)
+		})
+	}
+}

@@ -20,5 +20,6 @@ func NewAdminRouter(group *echo.Group, timeout time.Duration, query db.Query) {
 	ac := controller.NewAdminController(mu, du)
 
 	group.POST("/menus", ac.CreateMenu)
-
+	group.POST("/menus/:id/dishes", ac.CreateDish)
+	group.POST("/menus/:id/dishes/bulk", ac.CreateDishes)
 }
