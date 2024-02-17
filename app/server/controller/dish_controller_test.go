@@ -231,6 +231,25 @@ func TestGetDishByID(t *testing.T) {
 			},
 		},
 		{
+			name: "Max Limit Error",
+			req: req{
+				id:     dish.ID,
+				limit:  sql.NullInt32{Int32: domain.MAX_LIMIT + 1, Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
+			},
+			buildStub: func(du *mocks.MockDishUsecase) {
+				arg := req{
+					id:     dish.ID,
+					limit:  sql.NullInt32{Int32: domain.MAX_LIMIT + 1, Valid: true},
+					offset: sql.NullInt32{Int32: 0, Valid: true},
+				}
+				du.EXPECT().GetByID(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32)).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
 			name: "Internal Server Error",
 			req: req{
 				id:     dish.ID,
@@ -433,6 +452,27 @@ func TestGetDishByIDInCity(t *testing.T) {
 			},
 		},
 		{
+			name: "Max Limit Error",
+			req: req{
+				id:     dish.ID,
+				limit:  sql.NullInt32{Int32: domain.MAX_LIMIT + 1, Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
+				city:   cityCode,
+			},
+			buildStub: func(du *mocks.MockDishUsecase) {
+				arg := req{
+					id:     dish.ID,
+					limit:  sql.NullInt32{Int32: domain.MAX_LIMIT + 1, Valid: true},
+					offset: sql.NullInt32{Int32: 0, Valid: true},
+					city:   cityCode,
+				}
+				du.EXPECT().GetByIdInCity(gomock.Any(), gomock.Eq(arg.id), gomock.Eq(arg.limit.Int32), gomock.Eq(arg.offset.Int32), gomock.Eq(arg.city)).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dish *domain.DishWithMenuIDs) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
 			name: "Internal Server Error",
 			req: req{
 				id:     dish.ID,
@@ -486,7 +526,6 @@ func TestGetDishByIDInCity(t *testing.T) {
 
 		tc.check(t, recorder, dish)
 	}
-
 }
 
 func TestFetchDish(t *testing.T) {
@@ -591,6 +630,20 @@ func TestFetchDish(t *testing.T) {
 			},
 			buildStub: func(du *mocks.MockDishUsecase) {
 				du.EXPECT().Fetch(gomock.Any(), gomock.Eq("dish"), gomock.Eq(int32(-1)), gomock.Eq(int32(0))).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dishes []*domain.Dish) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name: "Max Limit Error",
+			req: req{
+				limit:  sql.NullInt32{Int32: domain.MAX_LIMIT + 1, Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
+				search: sql.NullString{String: "dish", Valid: true},
+			},
+			buildStub: func(du *mocks.MockDishUsecase) {
+				du.EXPECT().Fetch(gomock.Any(), gomock.Eq("dish"), gomock.Eq(int32(domain.MAX_LIMIT+1)), gomock.Eq(int32(0))).Times(0)
 			},
 			check: func(t *testing.T, recorder *httptest.ResponseRecorder, dishes []*domain.Dish) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)

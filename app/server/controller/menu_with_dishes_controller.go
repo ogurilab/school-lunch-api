@@ -73,6 +73,10 @@ func (mc *menuWithDishesController) FetchByCity(c echo.Context) error {
 		return c.JSON(errors.NewBadRequestError(err))
 	}
 
+	if req.Limit > domain.MAX_LIMIT {
+		return c.JSON(errors.NewMaxLimitError())
+	}
+
 	if req.Limit == 0 {
 		req.Limit = domain.DEFAULT_LIMIT
 	}
@@ -130,6 +134,10 @@ func (mc *menuWithDishesController) Fetch(c echo.Context) error {
 
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(errors.NewBadRequestError(err))
+	}
+
+	if req.Limit > domain.MAX_LIMIT {
+		return c.JSON(errors.NewMaxLimitError())
 	}
 
 	if req.Limit == 0 {

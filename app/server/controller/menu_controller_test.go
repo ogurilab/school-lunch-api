@@ -278,6 +278,21 @@ func TestFetchMenuByCity(t *testing.T) {
 			},
 		},
 		{
+			name: "Max Limit Error",
+			req: req{
+				CityCode: cityCode,
+				Limit:    sql.NullInt32{Int32: domain.MAX_LIMIT + 1, Valid: true},
+				Offset:   sql.NullInt32{Int32: offset, Valid: true},
+				Offered:  offered,
+			},
+			buildStub: func(uc *mocks.MockMenuUsecase) {
+				uc.EXPECT().FetchByCity(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
+				require.Equal(t, 400, recorder.Code)
+			},
+		},
+		{
 			name: "Internal Server Error",
 			req: req{
 				CityCode: cityCode,
@@ -548,6 +563,21 @@ func TestFetchMenu(t *testing.T) {
 			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
 				require.Equal(t, 200, recorder.Code)
 				requireBodyMatchMenus(t, recorder.Body, menus)
+			},
+		},
+		{
+			name: "Max Limit Error",
+			req: req{
+				Limit:   sql.NullInt32{Int32: domain.MAX_LIMIT + 1, Valid: true},
+				Offset:  sql.NullInt32{Int32: 0, Valid: true},
+				Offered: offered,
+				IDs:     NullStrings{Valid: false},
+			},
+			buildStub: func(uc *mocks.MockMenuUsecase) {
+				uc.EXPECT().Fetch(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder, menus []*domain.Menu) {
+				require.Equal(t, 400, recorder.Code)
 			},
 		},
 		{

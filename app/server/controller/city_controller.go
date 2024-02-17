@@ -72,6 +72,10 @@ func (cc *cityController) Fetch(c echo.Context) error {
 		req.Offset = domain.DEFAULT_OFFSET
 	}
 
+	if req.Limit > domain.MAX_LIMIT {
+		return c.JSON(errors.NewMaxLimitError())
+	}
+
 	if err := c.Validate(&req); err != nil {
 		return c.JSON(errors.NewBadRequestError(err))
 	}
@@ -99,6 +103,10 @@ func (cc *cityController) FetchByPrefectureCode(c echo.Context) error {
 
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(errors.NewBadRequestError(err))
+	}
+
+	if req.Limit > domain.MAX_LIMIT {
+		return c.JSON(errors.NewMaxLimitError())
 	}
 
 	if req.Limit == 0 {
