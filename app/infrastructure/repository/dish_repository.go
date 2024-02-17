@@ -22,6 +22,10 @@ func (r *dishRepository) Create(ctx context.Context, dish *domain.Dish, menuID s
 	return r.query.CreateDishTx(ctx, dish, menuID)
 }
 
+func (r *dishRepository) CreateMany(ctx context.Context, dishes []*domain.Dish, menuID string) error {
+	return r.query.CreateDishesTx(ctx, dishes, menuID)
+}
+
 func (r *dishRepository) GetByID(ctx context.Context, id string, limit int32, offset int32) (*domain.DishWithMenuIDs, error) {
 
 	arg := db.GetDishParams{

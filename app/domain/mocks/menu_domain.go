@@ -220,20 +220,6 @@ func (m *MockMenuController) EXPECT() *MockMenuControllerMockRecorder {
 	return m.recorder
 }
 
-// Create mocks base method.
-func (m *MockMenuController) Create(c echo.Context) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", c)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Create indicates an expected call of Create.
-func (mr *MockMenuControllerMockRecorder) Create(c any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockMenuController)(nil).Create), c)
-}
-
 // Fetch mocks base method.
 func (m *MockMenuController) Fetch(c echo.Context) error {
 	m.ctrl.T.Helper()

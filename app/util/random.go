@@ -21,7 +21,7 @@ func RandomUlid() string {
 func RandomDate() time.Time {
 	// YYYY-MM-DD
 
-	year := RandomInt(0, 9999)
+	year := RandomInt(1, 9999)
 	month := RandomInt(1, 12)
 	day := RandomInt(1, 31)
 

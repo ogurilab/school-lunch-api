@@ -26,6 +26,13 @@ func (du *dishUsecase) Create(ctx context.Context, dish *domain.Dish, menuID str
 	return du.dishRepo.Create(ctx, dish, menuID)
 }
 
+func (du *dishUsecase) CreateMany(ctx context.Context, dishes []*domain.Dish, menuID string) error {
+	ctx, cancel := context.WithTimeout(ctx, du.contextTimeout)
+	defer cancel()
+
+	return du.dishRepo.CreateMany(ctx, dishes, menuID)
+}
+
 func (du *dishUsecase) GetByID(ctx context.Context, id string, limit int32, offset int32) (*domain.DishWithMenuIDs, error) {
 	ctx, cancel := context.WithTimeout(ctx, du.contextTimeout)
 	defer cancel()

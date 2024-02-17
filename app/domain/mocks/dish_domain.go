@@ -54,6 +54,20 @@ func (mr *MockDishRepositoryMockRecorder) Create(ctx, dish, menuID any) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockDishRepository)(nil).Create), ctx, dish, menuID)
 }
 
+// CreateMany mocks base method.
+func (m *MockDishRepository) CreateMany(ctx context.Context, dishes []*domain.Dish, menuID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateMany", ctx, dishes, menuID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateMany indicates an expected call of CreateMany.
+func (mr *MockDishRepositoryMockRecorder) CreateMany(ctx, dishes, menuID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMany", reflect.TypeOf((*MockDishRepository)(nil).CreateMany), ctx, dishes, menuID)
+}
+
 // Fetch mocks base method.
 func (m *MockDishRepository) Fetch(ctx context.Context, limit, offset int32) ([]*domain.Dish, error) {
 	m.ctrl.T.Helper()
@@ -164,6 +178,20 @@ func (m *MockDishUsecase) Create(ctx context.Context, dish *domain.Dish, menuID 
 func (mr *MockDishUsecaseMockRecorder) Create(ctx, dish, menuID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockDishUsecase)(nil).Create), ctx, dish, menuID)
+}
+
+// CreateMany mocks base method.
+func (m *MockDishUsecase) CreateMany(ctx context.Context, dishes []*domain.Dish, menuID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateMany", ctx, dishes, menuID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateMany indicates an expected call of CreateMany.
+func (mr *MockDishUsecaseMockRecorder) CreateMany(ctx, dishes, menuID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMany", reflect.TypeOf((*MockDishUsecase)(nil).CreateMany), ctx, dishes, menuID)
 }
 
 // Fetch mocks base method.

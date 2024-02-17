@@ -65,6 +65,63 @@ func TestCreateDish(t *testing.T) {
 	}
 }
 
+func TestCreateManyDish(t *testing.T) {
+	var dishes []*domain.Dish
+	menu := randomMenu(t)
+
+	for i := 0; i < 10; i++ {
+		dishes = append(dishes, randomDish(t))
+	}
+
+	timeout := time.Second * 10
+	ctx := context.Background()
+
+	testCases := []struct {
+		name       string
+		dishes     []*domain.Dish
+		buildStubs func(r *mocks.MockDishRepository)
+		check      func(err error)
+	}{
+		{
+			name:   "OK",
+			dishes: dishes,
+			buildStubs: func(r *mocks.MockDishRepository) {
+				r.EXPECT().CreateMany(gomock.Any(), gomock.Eq(dishes), gomock.Eq(menu.ID)).Times(1).Return(nil)
+			},
+			check: func(err error) {
+				require.NoError(t, err)
+			},
+		},
+		{
+			name:   "NG",
+			dishes: dishes,
+			buildStubs: func(r *mocks.MockDishRepository) {
+				r.EXPECT().CreateMany(gomock.Any(), gomock.Eq(dishes), gomock.Eq(menu.ID)).Times(1).Return(sql.ErrNoRows)
+			},
+			check: func(err error) {
+				require.Error(t, err)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			repo := mocks.NewMockDishRepository(ctrl)
+			tc.buildStubs(repo)
+
+			du := NewDishUsecase(repo, timeout)
+
+			err := du.CreateMany(ctx, tc.dishes, menu.ID)
+
+			tc.check(err)
+		})
+	}
+}
+
 func TestGetDishByID(t *testing.T) {
 	dish := randomDishWithMenuIDs(t)
 	timeout := time.Second * 10

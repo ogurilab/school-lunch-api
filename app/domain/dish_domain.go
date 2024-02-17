@@ -19,6 +19,7 @@ type DishWithMenuIDs struct {
 
 type DishRepository interface {
 	Create(ctx context.Context, dish *Dish, menuID string) error
+	CreateMany(ctx context.Context, dishes []*Dish, menuID string) error
 	GetByID(ctx context.Context, id string, limit int32, offset int32) (*DishWithMenuIDs, error)
 	GetByIdInCity(ctx context.Context, id string, limit int32, offset int32, city int32) (*DishWithMenuIDs, error)
 	FetchByMenuID(ctx context.Context, menuID string) ([]*Dish, error)
@@ -28,6 +29,7 @@ type DishRepository interface {
 
 type DishUsecase interface {
 	Create(ctx context.Context, dish *Dish, menuID string) error
+	CreateMany(ctx context.Context, dishes []*Dish, menuID string) error
 	GetByID(ctx context.Context, id string, limit int32, offset int32) (*DishWithMenuIDs, error)
 	GetByIdInCity(ctx context.Context, id string, limit int32, offset int32, city int32) (*DishWithMenuIDs, error)
 	FetchByMenuID(ctx context.Context, menuID string) ([]*Dish, error)

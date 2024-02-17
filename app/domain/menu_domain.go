@@ -40,7 +40,6 @@ type MenuUsecase interface {
 }
 
 type MenuController interface {
-	Create(c echo.Context) error
 	GetByID(c echo.Context) error
 	FetchByCity(c echo.Context) error
 	Fetch(c echo.Context) error

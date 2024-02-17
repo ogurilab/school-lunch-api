@@ -10,6 +10,7 @@ type Env struct {
 	MigrationURL      string `mapstructure:"MIGRATION_URL"`
 	ServerAddress     string `mapstructure:"SERVER_ADDRESS"`
 	ContextTimeout    int    `mapstructure:"CONTEXT_TIMEOUT"`
+	ADMIN_KEY         string `mapstructure:"ADMIN_KEY"`
 	WikimediaUserName string `mapstructure:"WIKIMEDIA_USERNAME"`
 	WikimediaPassword string `mapstructure:"WIKIMEDIA_PASSWORD"`
 }
