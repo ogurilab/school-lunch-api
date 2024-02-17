@@ -67,6 +67,67 @@ func TestCreateDish(t *testing.T) {
 	}
 }
 
+func TestCreateManyDish(t *testing.T) {
+	dishes := []*domain.Dish{
+		randomDish(t),
+		randomDish(t),
+		randomDish(t),
+	}
+	ctx := context.Background()
+	menuID := util.RandomString(10)
+
+	testCases := []struct {
+		name       string
+		input      []*domain.Dish
+		buildStubs func(query *mocks.MockQuery)
+		check      func(err error)
+	}{
+		{
+			name:  "OK",
+			input: dishes,
+			buildStubs: func(query *mocks.MockQuery) {
+				arg := make([]*domain.Dish, 0, len(dishes))
+				for _, dish := range dishes {
+					d, err := domain.ReNewDish(dish.ID, dish.Name)
+					require.NoError(t, err)
+					arg = append(arg, d)
+				}
+				query.EXPECT().CreateDishesTx(gomock.Any(), gomock.Eq(arg), gomock.Eq(menuID)).Times(1).Return(nil)
+			},
+			check: func(err error) {
+				require.NoError(t, err)
+			},
+		},
+		{
+			name:  "NG",
+			input: []*domain.Dish{},
+			buildStubs: func(query *mocks.MockQuery) {
+				query.EXPECT().CreateDishesTx(gomock.Any(), gomock.Any(), gomock.Eq(menuID)).Times(1).Return(sql.ErrConnDone)
+			},
+			check: func(err error) {
+				require.Error(t, err)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			query := mocks.NewMockQuery(ctrl)
+
+			tc.buildStubs(query)
+
+			repo := NewDishRepository(query)
+
+			err := repo.CreateMany(ctx, tc.input, menuID)
+
+			tc.check(err)
+		})
+	}
+}
+
 func TestGetDishByID(t *testing.T) {
 	results := randomGetDishRowResults(t, 10)
 	ctx := context.Background()
