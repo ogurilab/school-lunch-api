@@ -249,6 +249,21 @@ func TestFetch(t *testing.T) {
 			},
 		},
 		{
+			name: "Max Limit Error",
+			ctx:  ctx,
+			query: query{
+				limit:  sql.NullInt32{Int32: int32(domain.MAX_LIMIT + 1), Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
+				search: sql.NullString{String: "", Valid: false},
+			},
+			buildStub: func(uc *mocks.MockCityUsecase) {
+				uc.EXPECT().Fetch(context.Background(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
 			name: "Internal Server Error",
 			ctx:  ctx,
 			buildStub: func(uc *mocks.MockCityUsecase) {
@@ -396,6 +411,21 @@ func TestFetchByPrefectureCode(t *testing.T) {
 			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
 				requireBodyMatchCities(t, recorder.Body, []*domain.City{})
+			},
+		},
+		{
+			name: "Max Limit Error",
+			ctx:  ctx,
+			code: cities[0].PrefectureCode,
+			query: query{
+				limit:  sql.NullInt32{Int32: int32(domain.MAX_LIMIT + 1), Valid: true},
+				offset: sql.NullInt32{Int32: 0, Valid: true},
+			},
+			buildStub: func(uc *mocks.MockCityUsecase) {
+				uc.EXPECT().FetchByPrefectureCode(context.Background(), gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			check: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
 		},
 		{

@@ -12,6 +12,7 @@ const (
 	ErrNotFound            ErrorType = "Your requested Item is not found"
 	ErrConflict            ErrorType = "Your Item already exist"
 	ErrBadRequest          ErrorType = "Bad Request"
+	ErrorMaxLimit          ErrorType = "Max limit reached"
 )
 
 type ErrorResponse struct {
@@ -38,4 +39,9 @@ func NewConflictError(err error) (int, *ErrorResponse) {
 
 func NewBadRequestError(err error) (int, *ErrorResponse) {
 	return http.StatusBadRequest, NewErrorResponse(ErrBadRequest, err)
+}
+
+func NewMaxLimitError() (int, *ErrorResponse) {
+	err := fmt.Errorf("max limit reached")
+	return http.StatusBadRequest, NewErrorResponse(ErrorMaxLimit, err)
 }
